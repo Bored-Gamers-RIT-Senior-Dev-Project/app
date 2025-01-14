@@ -9,6 +9,7 @@ const NavDrawer = ({ open, onClose }) => {
       open={open}
       onClose={onClose}
       variant={desktop ? "permanent" : "temporary"}
+      color="secondary"
     >
       <Toolbar />
       <Box>Drawer!!</Box>

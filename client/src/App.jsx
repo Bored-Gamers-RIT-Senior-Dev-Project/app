@@ -1,5 +1,12 @@
 import { AccountCircle, Menu } from "@mui/icons-material";
-import { AppBar, Box, IconButton, Toolbar, Typography } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  CssBaseline,
+  IconButton,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import { Outlet } from "react-router";
 import "./App.css";
@@ -9,14 +16,19 @@ function App() {
   const [mobileDrawer, setMobileDrawer] = useState(false);
   return (
     <>
-      {/* <CssBaseline /> */}
+      <CssBaseline />
       <Box>
         <AppBar
           position="fixed"
           color="primary"
           sx={{ zIndex: (theme) => theme.zIndex.drawer + 10 }}
         >
-          <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Toolbar
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
             <IconButton
               edge="start"
               color="inherit"
