@@ -1,4 +1,4 @@
-import { createTheme } from "@mui/material";
+import { createTheme, responsiveFontSizes } from "@mui/material";
 
 //Colors taken from Sponsor Document
 const Colors = {
@@ -14,23 +14,24 @@ const Colors = {
     tan: "#edca82",
     purple: "#8A307F",
   },
-  background: {
-    white: "#FFFFFF",
-    black: "#000000",
-  },
 };
 
 const palette = {
   primary: {
-    main: Colors.aardvark.main,
-    // contrastText: Colors.white,
+    main: Colors.game.blue,
   },
   secondary: {
-    main: Colors.game.blue,
+    main: Colors.game.purple,
+  },
+  success: {
+    main: Colors.game.darkGreen,
+  },
+  error: {
+    main: Colors.game.salmon,
   },
 };
 
-const theme = createTheme({ palette });
+const theme = responsiveFontSizes(createTheme({ palette }));
 
 export { theme };
 

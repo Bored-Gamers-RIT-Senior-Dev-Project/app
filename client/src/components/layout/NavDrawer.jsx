@@ -1,19 +1,90 @@
-import { Box, Drawer, Toolbar, Typography, useMediaQuery } from "@mui/material";
+import {
+  Box,
+  Divider,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Toolbar,
+  useMediaQuery,
+} from "@mui/material";
 import PropTypes from "prop-types";
+import { useNavigate } from "react-router";
+
+const nav_links = [
+  { key: "homepage", text: "Home", path: "/" },
+  { key: "schedule", text: "Schedule", path: "/schedule" },
+  { key: "search", text: "Search Teams & Schools", path: "/search" },
+  { key: "about", text: 'About "A New World"', path: "/about" },
+  { key: "rules", text: "Rules", path: "/rules" },
+  { key: "faq", text: "FAQ", path: "/faq" },
+];
+
+const admin_links = [
+  { key: "adminDash", text: "Dashboard", path: "/admin" },
+  { key: "adminReports", text: "Reports View", path: "/admin/reports" },
+  { key: "adminUserManager", text: "User Manager", path: "/admin/users" },
+];
+
+const participant_links = [
+  { key: "myTeam", text: "My Team", path: "/teams/1" },
+  { key: "teamSchedule", text: "Team Schedule", path: "/schedule?team=1" },
+];
+
+const university_links = [
+  { key: "repDashboard", text: "Dashboard", path: "/representative" },
+  { key: "uniPage", text: "University Page", path: "/university/1" },
+];
 
 const NavDrawer = ({ open, onClose }) => {
-  const desktop = useMediaQuery((theme) => theme.breakpoints.up("lg"));
-  //   const desktop = true;
+  const desktop = useMediaQuery((theme) => theme.breakpoints.up("lg")); //Transition from desktop (permanent drawer) to mobile (temporary drawer) when screen width is less than the large breakpoint.
+  const navigate = useNavigate();
   return (
     <Drawer
       open={open}
       onClose={onClose}
       variant={desktop ? "permanent" : "temporary"}
-      color="secondary"
+      elevation={8}
     >
+      {/* Placeholder Toolbar prevents NavDrawer content form being covered by the actual navbar */}
       <Toolbar />
-      <Box>Drawer!!</Box>
-      {desktop && <Typography variant="p">Desktop</Typography>}
+      <Box height={"100%"} px={2}>
+        {/* TODO: We will need a way to dynamically generate the links in the drawer based on user permissions. */}
+        <List>
+          {nav_links.map(({ key, text, path }) => (
+            <ListItem key={key} onClick={() => navigate(path)}>
+              <ListItemButton>
+                <ListItemText primary={text} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+          <Divider>Admin</Divider>
+          {admin_links.map(({ key, text, path }) => (
+            <ListItem key={key} onClick={() => navigate(path)}>
+              <ListItemButton>
+                <ListItemText primary={text} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+        <Divider>TEAM NAME</Divider>
+        {participant_links.map(({ key, text, path }) => (
+          <ListItem key={key} onClick={() => navigate(path)}>
+            <ListItemButton>
+              <ListItemText primary={text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+        <Divider>University Representative</Divider>
+        {university_links.map(({ key, text, path }) => (
+          <ListItem key={key} onClick={() => navigate(path)}>
+            <ListItemButton>
+              <ListItemText primary={text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </Box>
     </Drawer>
   );
 };
@@ -24,4 +95,3 @@ NavDrawer.propTypes = {
 };
 
 export { NavDrawer };
-

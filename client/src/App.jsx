@@ -21,6 +21,7 @@ function App() {
         <AppBar
           position="fixed"
           color="primary"
+          elevation={10}
           sx={{ zIndex: (theme) => theme.zIndex.drawer + 10 }}
         >
           <Toolbar
