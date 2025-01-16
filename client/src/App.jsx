@@ -1,15 +1,10 @@
-import { AccountCircle, Menu } from "@mui/icons-material";
-import {
-  AppBar,
-  Box,
-  CssBaseline,
-  IconButton,
-  Toolbar,
-  Typography,
-} from "@mui/material";
+import { Menu } from "@mui/icons-material";
+import { AppBar, Box, CssBaseline, IconButton, Toolbar } from "@mui/material";
 import { useState } from "react";
 import { Outlet } from "react-router";
 import "./App.css";
+import title from "./assets/title.png";
+import { AccountIcon } from "./components/layout/AccountIcon";
 import { NavDrawer } from "./components/layout/NavDrawer";
 function App() {
   //UseState tracks whether or not the drawer is open (used on mobile devices)
@@ -38,10 +33,11 @@ function App() {
             >
               <Menu />
             </IconButton>
-            <Typography variant="h6">Tournament App</Typography>
-            <IconButton edge="end" color="inherit">
-              <AccountCircle />
-            </IconButton>
+            <Box sx={{ maxWidth: "50%", maxHeight: "90%" }}>
+              <img src={title} alt="A New World" height="100%" width="100%" />
+            </Box>
+            {/* <Typography variant="h6">Tournament App</Typography> */}
+            <AccountIcon />
           </Toolbar>
         </AppBar>
         <NavDrawer open={mobileDrawer} onClose={() => setMobileDrawer(false)} />
