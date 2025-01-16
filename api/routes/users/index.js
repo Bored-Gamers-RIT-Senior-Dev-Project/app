@@ -3,7 +3,6 @@ const router = express.Router();
 const mysql = require("mysql2");
 const fs = require("node:fs");
 const { exit } = require("node:process");
-console.log("loaded index")
 const password = (() => {
     let password = "";
     try {
