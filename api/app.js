@@ -1,3 +1,5 @@
+// Adding for now to ban dumb things durning development, but we can remove
+// this later:
 "use strict";
 const createError = require('http-errors');
 const express = require('express');
