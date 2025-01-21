@@ -65,21 +65,21 @@ const NavDrawer = ({ open, onClose }) => {
       <Box height={"100%"} px={2}>
         {/* TODO: We will need a way to dynamically generate the links in the drawer based on user permissions. */}
         <List>
-          {nav_links.map((link) => (
-            <NavDrawerItem {...link} />
+          {nav_links.map(({ key, ...link }) => (
+            <NavDrawerItem key={key} {...link} />
           ))}
           <Divider>Admin</Divider>
-          {admin_links.map((link) => (
-            <NavDrawerItem {...link} />
+          {admin_links.map(({ key, ...link }) => (
+            <NavDrawerItem key={key} {...link} />
           ))}
         </List>
         <Divider>TEAM NAME</Divider>
-        {participant_links.map((link) => (
-          <NavDrawerItem {...link} />
+        {participant_links.map(({ key, ...link }) => (
+          <NavDrawerItem key={key} {...link} />
         ))}
         <Divider>University Representative</Divider>
-        {university_links.map((link) => (
-          <NavDrawerItem {...link} />
+        {university_links.map(({ key, ...link }) => (
+          <NavDrawerItem key={key} {...link} />
         ))}
       </Box>
     </Drawer>
