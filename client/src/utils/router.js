@@ -1,15 +1,17 @@
 import { createBrowserRouter } from "react-router";
 import App from "../App";
+import { Home } from "../pages";
 
 const routes = [
   {
     path: "/",
-    Component: () => "Home Page",
+    Component: Home,
   },
   {
     path: "/about",
     Component: () => "About Page",
   },
+
   { path: "*", Component: () => "404 Page" },
 ];
 
