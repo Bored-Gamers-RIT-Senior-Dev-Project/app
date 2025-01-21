@@ -15,10 +15,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// Serve the react app (https://stackoverflow.com/a/59490594)
-app.use(express.static(path.join(__dirname, '../client/dist/')));
-
-
 // catch 404 and forward to error handler
 app.use(function(_, _, next) {
   next(createError(404));
