@@ -39,7 +39,7 @@ const university_links = [
 ];
 
 const NavDrawer = ({ open, onClose }) => {
-  const desktop = useMediaQuery((theme) => theme.breakpoints.up("lg")); //Transition from desktop (permanent drawer) to mobile (temporary drawer) when screen width is less than the large breakpoint.
+  const desktop = useMediaQuery((theme) => theme.breakpoints.up("lg")); // Transition from desktop (permanent drawer) to mobile (temporary drawer) when screen width is less than the large breakpoint.
   const navigate = useNavigate();
 
   const NavDrawerItem = useCallback(
@@ -60,10 +60,9 @@ const NavDrawer = ({ open, onClose }) => {
       variant={desktop ? "permanent" : "temporary"}
       elevation={8}
     >
-      {/* Placeholder Toolbar prevents NavDrawer content form being covered by the actual navbar */}
+      {/* Placeholder Toolbar prevents NavDrawer content from being covered by the actual navbar */}
       <Toolbar />
       <Box height={"100%"} px={2}>
-        {/* TODO: We will need a way to dynamically generate the links in the drawer based on user permissions. */}
         <List>
           {nav_links.map(({ key, ...link }) => (
             <NavDrawerItem key={key} {...link} />
