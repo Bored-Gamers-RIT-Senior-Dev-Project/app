@@ -10,6 +10,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import PropTypes from "prop-types";
+import { useCallback } from "react";
 import { useNavigate } from "react-router";
 
 const nav_links = [
@@ -40,6 +41,18 @@ const university_links = [
 const NavDrawer = ({ open, onClose }) => {
   const desktop = useMediaQuery((theme) => theme.breakpoints.up("lg")); //Transition from desktop (permanent drawer) to mobile (temporary drawer) when screen width is less than the large breakpoint.
   const navigate = useNavigate();
+
+  const NavDrawerItem = useCallback(
+    ({ key, text, path }) => (
+      <ListItem key={key} onClick={() => navigate(path)}>
+        <ListItemButton>
+          <ListItemText primary={text} />
+        </ListItemButton>
+      </ListItem>
+    ),
+    [navigate]
+  );
+
   return (
     <Drawer
       open={open}
@@ -52,37 +65,21 @@ const NavDrawer = ({ open, onClose }) => {
       <Box height={"100%"} px={2}>
         {/* TODO: We will need a way to dynamically generate the links in the drawer based on user permissions. */}
         <List>
-          {nav_links.map(({ key, text, path }) => (
-            <ListItem key={key} onClick={() => navigate(path)}>
-              <ListItemButton>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
+          {nav_links.map((link) => (
+            <NavDrawerItem {...link} />
           ))}
           <Divider>Admin</Divider>
-          {admin_links.map(({ key, text, path }) => (
-            <ListItem key={key} onClick={() => navigate(path)}>
-              <ListItemButton>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
+          {admin_links.map((link) => (
+            <NavDrawerItem {...link} />
           ))}
         </List>
         <Divider>TEAM NAME</Divider>
-        {participant_links.map(({ key, text, path }) => (
-          <ListItem key={key} onClick={() => navigate(path)}>
-            <ListItemButton>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
+        {participant_links.map((link) => (
+          <NavDrawerItem {...link} />
         ))}
         <Divider>University Representative</Divider>
-        {university_links.map(({ key, text, path }) => (
-          <ListItem key={key} onClick={() => navigate(path)}>
-            <ListItemButton>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
+        {university_links.map((link) => (
+          <NavDrawerItem {...link} />
         ))}
       </Box>
     </Drawer>
