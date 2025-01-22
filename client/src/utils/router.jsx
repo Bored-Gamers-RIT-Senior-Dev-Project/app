@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
-import UserSignUp from "../components/Auth/UserSignUp";
-import UserSignIn from "../components/Auth/UserSignIn"; // Ensure you import the sign-in component if needed
+import UserSignIn from "../pages/UserSignIn";
+import UserSignUp from "../pages/UserSignUp";
 
 const router = createBrowserRouter([
   {
@@ -13,11 +13,11 @@ const router = createBrowserRouter([
         element: <div>Home Page</div>,
       },
       {
-        path: "/signin", // Adding the sign-in route explicitly
+        path: "/signin",
         element: <UserSignIn />,
       },
       {
-        path: "/signup", // Ensure this points to UserSignUp
+        path: "/signup",
         element: <UserSignUp />,
       },
       {
