@@ -1,4 +1,4 @@
-import { AccountCircle } from "@mui/icons-material";
+import { AccountCircle, Menu } from "@mui/icons-material";
 import {
   AppBar,
   Box,
@@ -8,9 +8,8 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import { useNavigate } from "react-router";
 import { useState } from "react";
-import { Outlet } from "react-router";
+import { Outlet, useNavigate } from "react-router";
 import "./App.css";
 import { NavDrawer } from "./components/layout/NavDrawer";
 
@@ -41,7 +40,7 @@ function App() {
               onClick={() => setMobileDrawer(!mobileDrawer)}
               sx={{ display: { lg: "none" } }}
             >
-              <Typography variant="h6">Menu</Typography>
+              <Menu />
             </IconButton>
             <Typography variant="h6">Tournament App</Typography>
             <Box>
@@ -60,14 +59,20 @@ function App() {
               >
                 Sign Up
               </Button>
-              <IconButton edge="end" color="inherit" sx={{ marginLeft: "10px" }}>
+              <IconButton
+                edge="end"
+                color="inherit"
+                sx={{ marginLeft: "10px" }}
+              >
                 <AccountCircle />
               </IconButton>
             </Box>
           </Toolbar>
         </AppBar>
         <NavDrawer open={mobileDrawer} onClose={() => setMobileDrawer(false)} />
-        <Box sx={{ marginTop: "64px" }}> {/* Ensures content is not hidden by the AppBar */}
+        <Box sx={{ marginTop: "64px" }}>
+          {" "}
+          {/* Ensures content is not hidden by the AppBar */}
           <Outlet />
         </Box>
       </Box>
