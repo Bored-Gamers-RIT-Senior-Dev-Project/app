@@ -1,12 +1,5 @@
 import { Menu } from "@mui/icons-material";
-import {
-  AppBar,
-  Box,
-  Button,
-  CssBaseline,
-  IconButton,
-  Toolbar,
-} from "@mui/material";
+import { AppBar, Box, CssBaseline, IconButton, Toolbar } from "@mui/material";
 import { useState } from "react";
 import { Outlet, useNavigate } from "react-router";
 import "./App.css";
@@ -47,17 +40,7 @@ function App() {
               <img src={title} alt="A New World" height="100%" width="100%" />
             </Box>
             {/* <Typography variant="h6">Tournament App</Typography> */}
-            <Box>
-              <Button
-                variant="outlined"
-                color="inherit"
-                sx={{ marginRight: "10px" }}
-                onClick={() => navigate("/signin")}
-              >
-                Sign In
-              </Button>
-              <AccountIcon />
-            </Box>
+            <AccountIcon />
           </Toolbar>
         </AppBar>
         <NavDrawer open={mobileDrawer} onClose={() => setMobileDrawer(false)} />
