@@ -1,17 +1,17 @@
-import React, { useState } from "react";
 import {
+  Autocomplete,
   Box,
-  TextField,
   Button,
-  Typography,
-  RadioGroup,
+  CircularProgress,
+  Divider,
   FormControlLabel,
   Radio,
-  Divider,
-  Autocomplete,
-  CircularProgress,
+  RadioGroup,
+  TextField,
+  Typography,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router";
 
 const UserSignUp = () => {
   const [signUpData, setSignUpData] = useState({
@@ -247,4 +247,4 @@ const UserSignUp = () => {
   );
 };
 
-export default UserSignUp;
+export { UserSignUp };
