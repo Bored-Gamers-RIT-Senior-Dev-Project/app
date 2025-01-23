@@ -1,31 +1,31 @@
 import { createBrowserRouter } from "react-router";
 import App from "../App";
-import { UserSignIn, UserSignUp } from "../pages";
+import { Home, UserSignIn, UserSignUp } from "../pages";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    Component: App,
     children: [
       {
         path: "/",
-        element: <div>Home Page</div>,
+        element: Home,
       },
       {
         path: "/signin",
-        element: <UserSignIn />,
+        Component: UserSignIn,
       },
       {
         path: "/signup",
-        element: <UserSignUp />,
+        Component: UserSignUp,
       },
       {
         path: "/about",
-        element: <div>About Page</div>,
+        element: "TODO: About Page",
       },
       {
         path: "*",
-        element: <div>404 Page Not Found</div>,
+        element: "TODO: 404 Page",
       },
     ],
   },
