@@ -1,5 +1,5 @@
-import { UserSignIn } from "../components/UserSignIn";
-import { UserSignup } from "../components/UserSignup";
 import { Search } from "./Search";
+import { UserSignIn } from "./UserSignIn";
+import { UserSignup } from "./UserSignup";
 
 export { Search, UserSignIn, UserSignup };
