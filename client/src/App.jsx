@@ -1,6 +1,7 @@
+import { Menu } from "@mui/icons-material";
 import { AppBar, Box, CssBaseline, IconButton, Toolbar } from "@mui/material";
 import { useState } from "react";
-import { Outlet } from "react-router";
+import { Outlet, useNavigate } from "react-router";
 import "./App.css";
 import title from "./assets/title.png";
 import { AccountIcon } from "./components/layout/AccountIcon";
@@ -33,7 +34,7 @@ function App() {
               onClick={() => setMobileDrawer(!mobileDrawer)}
               sx={{ display: { lg: "none" } }}
             >
-              <Typography variant="h6">Menu</Typography>
+              <Menu />
             </IconButton>
             <Box sx={{ maxWidth: "50%", maxHeight: "90%" }}>
               <img src={title} alt="A New World" height="100%" width="100%" />
@@ -44,7 +45,6 @@ function App() {
         </AppBar>
         <NavDrawer open={mobileDrawer} onClose={() => setMobileDrawer(false)} />
         <Box sx={{ marginTop: "64px" }}>
-          {" "}
           {/* Ensures content is not hidden by the AppBar */}
           <Outlet />
         </Box>
