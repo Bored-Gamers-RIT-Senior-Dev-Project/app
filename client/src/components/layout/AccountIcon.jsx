@@ -1,5 +1,5 @@
 import { AccountCircle } from "@mui/icons-material";
-import { IconButton, Menu, MenuItem } from "@mui/material";
+import { Box, Button, IconButton, Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 const AccountIcon = () => {
@@ -19,7 +19,15 @@ const AccountIcon = () => {
   };
 
   return (
-    <>
+    <Box>
+      <Button
+        variant="contained"
+        size="small"
+        color="secondary"
+        onClick={() => navigate("/signin")}
+      >
+        Sign In
+      </Button>
       <Menu
         id="account-menu"
         anchorEl={anchor}
@@ -31,10 +39,10 @@ const AccountIcon = () => {
           Register
         </MenuItem>
       </Menu>
-      <IconButton edge="end" color="inherit" onClick={handleClick}>
+      <IconButton color="inherit" onClick={handleClick}>
         <AccountCircle />
       </IconButton>
-    </>
+    </Box>
   );
 };
 
