@@ -1,14 +1,23 @@
 import { Menu } from "@mui/icons-material";
-import { AppBar, Box, CssBaseline, IconButton, Toolbar } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  Button,
+  CssBaseline,
+  IconButton,
+  Toolbar,
+} from "@mui/material";
 import { useState } from "react";
-import { Outlet } from "react-router";
+import { Outlet, useNavigate } from "react-router";
 import "./App.css";
 import title from "./assets/title.png";
 import { AccountIcon } from "./components/layout/AccountIcon";
 import { NavDrawer } from "./components/layout/NavDrawer";
+
 function App() {
-  //UseState tracks whether or not the drawer is open (used on mobile devices)
   const [mobileDrawer, setMobileDrawer] = useState(false);
+  const navigate = useNavigate(); // For navigation
+
   return (
     <>
       <CssBaseline />
@@ -23,6 +32,7 @@ function App() {
             sx={{
               display: "flex",
               justifyContent: "space-between",
+              alignItems: "center",
             }}
           >
             <IconButton
@@ -37,11 +47,25 @@ function App() {
               <img src={title} alt="A New World" height="100%" width="100%" />
             </Box>
             {/* <Typography variant="h6">Tournament App</Typography> */}
-            <AccountIcon />
+            <Box>
+              <Button
+                variant="outlined"
+                color="inherit"
+                sx={{ marginRight: "10px" }}
+                onClick={() => navigate("/signin")}
+              >
+                Sign In
+              </Button>
+              <AccountIcon />
+            </Box>
           </Toolbar>
         </AppBar>
         <NavDrawer open={mobileDrawer} onClose={() => setMobileDrawer(false)} />
-        <Outlet />
+        <Box sx={{ marginTop: "64px" }}>
+          {" "}
+          {/* Ensures content is not hidden by the AppBar */}
+          <Outlet />
+        </Box>
       </Box>
     </>
   );
