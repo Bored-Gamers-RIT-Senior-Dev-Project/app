@@ -5,7 +5,7 @@ import { Home, UserSignIn, UserSignUp } from "../pages";
 const router = createBrowserRouter([
   {
     path: "/",
-    Component: App,
+    element: <App />,
     children: [
       {
         path: "/",
@@ -13,11 +13,11 @@ const router = createBrowserRouter([
       },
       {
         path: "/signin",
-        Component: UserSignIn,
+        element: <UserSignIn />,
       },
       {
         path: "/signup",
-        Component: UserSignUp,
+        element: <UserSignUp />,
       },
       {
         path: "/about",
