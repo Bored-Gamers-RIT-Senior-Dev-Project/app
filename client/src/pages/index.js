@@ -1,4 +1,4 @@
-import { UserSignIn } from "../components/UserSignIn";
-import { UserSignup } from "../components/UserSignup";
+import { UserSignIn } from "./UserSignIn";
+import { UserSignUp } from "./UserSignUp";
 
-export { UserSignIn, UserSignup };
+export { UserSignIn, UserSignUp };
