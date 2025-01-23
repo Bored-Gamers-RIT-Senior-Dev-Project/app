@@ -6,16 +6,20 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const users = require("./routes/users");
+const test = require("./routes/test");
+const bodyParser = require("body-parser");
+
 const app = express();
 
-const users = require("./routes/users");
 
 app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(bodyParser.json())
 
 app.use("/api", users);
+app.use("/api", test);
+
 
 // catch 404 and forward to error handler
 app.use(function(_req, _res, next) {
