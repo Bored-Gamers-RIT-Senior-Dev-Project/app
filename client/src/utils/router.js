@@ -1,24 +1,34 @@
 import { createBrowserRouter } from "react-router";
 import App from "../App";
+import { UserSignIn, UserSignUp } from "../pages";
 
-const routes = [
-  {
-    path: "/",
-    Component: () => "Home Page",
-  },
-  {
-    path: "/about",
-    Component: () => "About Page",
-  },
-  { path: "*", Component: () => "404 Page" },
-];
-
-//Create a router instance with our defined routes
 const router = createBrowserRouter([
   {
     path: "/",
     Component: App,
-    children: routes,
+    children: [
+      {
+        path: "/",
+        Component: () => "Home Page",
+      },
+      {
+        path: "/signin",
+        Component: UserSignIn,
+      },
+      {
+        path: "/signup",
+        Component: UserSignUp,
+      },
+      {
+        path: "/about",
+        Component: () => "About Page",
+      },
+      {
+        path: "*",
+        Component: () => "404 Page Not Found",
+      },
+    ],
   },
 ]);
+
 export { router };

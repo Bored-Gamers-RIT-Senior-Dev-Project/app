@@ -2,18 +2,21 @@ import { AccountCircle, Menu } from "@mui/icons-material";
 import {
   AppBar,
   Box,
+  Button,
   CssBaseline,
   IconButton,
   Toolbar,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { Outlet } from "react-router";
+import { Outlet, useNavigate } from "react-router";
 import "./App.css";
 import { NavDrawer } from "./components/layout/NavDrawer";
+
 function App() {
-  //UseState tracks whether or not the drawer is open (used on mobile devices)
   const [mobileDrawer, setMobileDrawer] = useState(false);
+  const navigate = useNavigate(); // For navigation
+
   return (
     <>
       <CssBaseline />
@@ -28,6 +31,7 @@ function App() {
             sx={{
               display: "flex",
               justifyContent: "space-between",
+              alignItems: "center",
             }}
           >
             <IconButton
@@ -39,13 +43,38 @@ function App() {
               <Menu />
             </IconButton>
             <Typography variant="h6">Tournament App</Typography>
-            <IconButton edge="end" color="inherit">
-              <AccountCircle />
-            </IconButton>
+            <Box>
+              <Button
+                variant="outlined"
+                color="inherit"
+                sx={{ marginRight: "10px" }}
+                onClick={() => navigate("/signin")}
+              >
+                Sign In
+              </Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => navigate("/signup")}
+              >
+                Sign Up
+              </Button>
+              <IconButton
+                edge="end"
+                color="inherit"
+                sx={{ marginLeft: "10px" }}
+              >
+                <AccountCircle />
+              </IconButton>
+            </Box>
           </Toolbar>
         </AppBar>
         <NavDrawer open={mobileDrawer} onClose={() => setMobileDrawer(false)} />
-        <Outlet />
+        <Box sx={{ marginTop: "64px" }}>
+          {" "}
+          {/* Ensures content is not hidden by the AppBar */}
+          <Outlet />
+        </Box>
       </Box>
     </>
   );
