@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router";
 import App from "../App";
 import { Search } from "../pages";
-import { sendTest } from "./api";
+import { getTest, sendTest } from "./api";
 
 //Make an action out of an api call
 const makeAction = (action) => async (params) => {
@@ -22,6 +22,7 @@ const routes = [
     path: "/search",
     Component: Search,
     action: makeAction(sendTest),
+    loader: getTest,
   },
   { path: "*", Component: () => "404 Page" },
 ];
