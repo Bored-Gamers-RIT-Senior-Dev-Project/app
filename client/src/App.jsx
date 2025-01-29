@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { Outlet } from "react-router";
+import bg from "./assets/art/photo_mountains_from_air.jpg";
 import title from "./assets/game/title_blue.png";
 import { AccountIcon } from "./components/layout/AccountIcon";
 import { NavDrawer } from "./components/layout/NavDrawer";
@@ -27,7 +28,10 @@ function App() {
           display: "flex",
           width: "100%",
           height: "100%",
-          overflow: "none",
+          justifyContent: "center",
+          backgroundImage: `url(${bg})`,
+          backgroundSize: "cover",
+          backgroundAttachment: "scroll",
         }}
       >
         <AppBar
@@ -62,10 +66,17 @@ function App() {
           onClose={() => setMobileDrawer(false)}
           desktop={desktop}
         />
-        <Box width="100%" p="2em">
+        <Box>
           {/* Empty Toolbar ensures content is not hidden by the AppBar */}
           <Toolbar />
-          <Outlet />
+          <Box
+            padding="1em"
+            height="100%"
+            sx={{ backgroundColor: "white", borderRadius: "10px" }}
+            component="content"
+          >
+            <Outlet />
+          </Box>
         </Box>
       </Box>
     </>
