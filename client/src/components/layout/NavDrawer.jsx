@@ -69,7 +69,7 @@ const NavDrawer = ({ open, onClose, desktop }) => {
     >
       {/* Placeholder Toolbar prevents NavDrawer content from being covered by the actual navbar */}
       <Toolbar />
-      <Box height={"100%"} px={2}>
+      <Box px={2}>
         <List>
           {nav_links.map(({ key, ...link }) => (
             <NavDrawerItem key={key} {...link} />

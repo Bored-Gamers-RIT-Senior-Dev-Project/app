@@ -71,9 +71,8 @@ function App() {
           <Toolbar />
           <Box
             padding="1em"
-            height="100%"
             sx={{ backgroundColor: "white", borderRadius: "10px" }}
-            component="content"
+            component="main"
           >
             <Outlet />
           </Box>
