@@ -6,7 +6,6 @@ const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
-
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
@@ -23,6 +22,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cors()); // Enable CORS
 app.use(bodyParser.json());
+
+// Load environment variables
+require("dotenv").config();
 
 app.use("/api", users);
 app.use("/api", test);
@@ -46,9 +48,6 @@ app.use((err, req, res, _) => {
     error: err,
   }); // FIXME: This is temporary, send to user friendly error page instead
 });
-
-// Load environment variables
-require("dotenv").config();
 
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {
