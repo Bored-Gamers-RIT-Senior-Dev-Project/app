@@ -14,12 +14,11 @@ function App() {
     <>
       <CssBaseline />
       <Box
+        id="app"
         sx={{
           display: "flex",
-          width: "100vw",
-          height: "100vh",
-          padding: "5%",
-          justifyContent: "center",
+          width: "100%",
+          minHeight: "100vh",
         }}
       >
         <AppBar
@@ -51,8 +50,16 @@ function App() {
           </Toolbar>
         </AppBar>
         <NavDrawer open={mobileDrawer} onClose={() => setMobileDrawer(false)} />
-        <Box className="TEST" sx={{ marginTop: "64px" }}>
-          {/* Ensures content is not hidden by the AppBar */}
+        <Box
+          id="content"
+          sx={{
+            width: "100%",
+            margin: "1em",
+            marginLeft: { lg: "21em" },
+          }}
+        >
+          {/* Empty Toolbar ensures content is not hidden by the AppBar */}
+          <Toolbar />
           <Outlet />
         </Box>
       </Box>

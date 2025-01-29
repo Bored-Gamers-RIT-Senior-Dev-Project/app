@@ -42,15 +42,23 @@ const NavDrawer = ({ open, onClose }) => {
   const desktop = useMediaQuery((theme) => theme.breakpoints.up("lg")); // Transition from desktop (permanent drawer) to mobile (temporary drawer) when screen width is less than the large breakpoint.
   const navigate = useNavigate();
 
+  const handleNavigate = useCallback(
+    (location) => {
+      onClose();
+      navigate(location);
+    },
+    [navigate, onClose]
+  );
+
   const NavDrawerItem = useCallback(
     ({ key, text, path }) => (
-      <ListItem key={key} onClick={() => navigate(path)}>
+      <ListItem key={key} onClick={() => handleNavigate(path)}>
         <ListItemButton>
           <ListItemText primary={text} />
         </ListItemButton>
       </ListItem>
     ),
-    [navigate]
+    [handleNavigate]
   );
 
   return (
@@ -59,6 +67,9 @@ const NavDrawer = ({ open, onClose }) => {
       onClose={onClose}
       variant={desktop ? "permanent" : "temporary"}
       elevation={8}
+      sx={{
+        "& .MuiDrawer-paper": { width: { lg: "20em" } },
+      }}
     >
       {/* Placeholder Toolbar prevents NavDrawer content from being covered by the actual navbar */}
       <Toolbar />
