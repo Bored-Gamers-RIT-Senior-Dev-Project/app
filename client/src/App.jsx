@@ -2,8 +2,7 @@ import { Menu } from "@mui/icons-material";
 import { AppBar, Box, CssBaseline, IconButton, Toolbar } from "@mui/material";
 import { useState } from "react";
 import { Outlet } from "react-router";
-import "./App.css";
-import title from "./assets/title.png";
+import title from "./assets/game/title_blue.png";
 import { AccountIcon } from "./components/layout/AccountIcon";
 import { NavDrawer } from "./components/layout/NavDrawer";
 
@@ -14,7 +13,15 @@ function App() {
   return (
     <>
       <CssBaseline />
-      <Box>
+      <Box
+        sx={{
+          display: "flex",
+          width: "100vw",
+          height: "100vh",
+          padding: "5%",
+          justifyContent: "center",
+        }}
+      >
         <AppBar
           position="fixed"
           color="primary"
@@ -44,7 +51,7 @@ function App() {
           </Toolbar>
         </AppBar>
         <NavDrawer open={mobileDrawer} onClose={() => setMobileDrawer(false)} />
-        <Box sx={{ marginTop: "64px" }}>
+        <Box className="TEST" sx={{ marginTop: "64px" }}>
           {/* Ensures content is not hidden by the AppBar */}
           <Outlet />
         </Box>
