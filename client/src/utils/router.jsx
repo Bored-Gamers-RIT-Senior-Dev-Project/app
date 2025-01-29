@@ -1,6 +1,13 @@
 import { createBrowserRouter } from "react-router";
 import App from "../App";
-import { Home, UserSignIn, UserSignUp } from "../pages";
+import { Home, Search, UserSignIn, UserSignUp } from "../pages";
+import { getTest, sendTest } from "./api";
+
+//Make an action out of an api call
+const makeAction = (action) => async (params) => {
+  const data = await params.request.json();
+  return action(data);
+};
 
 const router = createBrowserRouter([
   {
@@ -18,6 +25,12 @@ const router = createBrowserRouter([
       {
         path: "/signup",
         element: <UserSignUp />,
+      },
+      {
+        path: "/search",
+        element: <Search />,
+        action: makeAction(sendTest),
+        loader: getTest,
       },
       {
         path: "/about",
