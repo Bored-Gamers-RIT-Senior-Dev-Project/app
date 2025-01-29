@@ -7,7 +7,6 @@ import {
   ListItemButton,
   ListItemText,
   Toolbar,
-  useMediaQuery,
 } from "@mui/material";
 import PropTypes from "prop-types";
 import { useCallback } from "react";
@@ -38,8 +37,7 @@ const university_links = [
   { key: "uniPage", text: "University Page", path: "/university/1" },
 ];
 
-const NavDrawer = ({ open, onClose }) => {
-  const desktop = useMediaQuery((theme) => theme.breakpoints.up("lg")); // Transition from desktop (permanent drawer) to mobile (temporary drawer) when screen width is less than the large breakpoint.
+const NavDrawer = ({ open, onClose, desktop }) => {
   const navigate = useNavigate();
 
   const handleNavigate = useCallback(
@@ -65,11 +63,9 @@ const NavDrawer = ({ open, onClose }) => {
     <Drawer
       open={open}
       onClose={onClose}
-      variant={desktop ? "permanent" : "temporary"}
       elevation={8}
-      sx={{
-        "& .MuiDrawer-paper": { width: { lg: "20em" } },
-      }}
+      // hideBackdrop={desktop}
+      variant={desktop ? "persistent" : "temporary"}
     >
       {/* Placeholder Toolbar prevents NavDrawer content from being covered by the actual navbar */}
       <Toolbar />
@@ -97,8 +93,9 @@ const NavDrawer = ({ open, onClose }) => {
 };
 
 NavDrawer.propTypes = {
-  open: PropTypes.bool.isRequired,
+  desktop: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
+  open: PropTypes.bool.isRequired,
 };
 
 export { NavDrawer };

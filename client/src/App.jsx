@@ -1,5 +1,12 @@
 import { Menu } from "@mui/icons-material";
-import { AppBar, Box, CssBaseline, IconButton, Toolbar } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  CssBaseline,
+  IconButton,
+  Toolbar,
+  useMediaQuery,
+} from "@mui/material";
 import { useState } from "react";
 import { Outlet } from "react-router";
 import title from "./assets/game/title_blue.png";
@@ -7,8 +14,9 @@ import { AccountIcon } from "./components/layout/AccountIcon";
 import { NavDrawer } from "./components/layout/NavDrawer";
 
 function App() {
-  //MobileDrawer state handles if the drawer is open/closed in mobile view
-  const [mobileDrawer, setMobileDrawer] = useState(false);
+  const desktop = useMediaQuery((theme) => theme.breakpoints.up("lg"));
+  //MobileDrawer state handles if the drawer is open/closed.  Default to open when on desktop.
+  const [mobileDrawer, setMobileDrawer] = useState(desktop);
 
   return (
     <>
@@ -18,7 +26,8 @@ function App() {
         sx={{
           display: "flex",
           width: "100%",
-          minHeight: "100vh",
+          height: "100%",
+          overflow: "none",
         }}
       >
         <AppBar
@@ -38,7 +47,6 @@ function App() {
               edge="start"
               color="inherit"
               onClick={() => setMobileDrawer(!mobileDrawer)}
-              sx={{ display: { lg: "none" } }}
             >
               <Menu />
             </IconButton>
@@ -49,15 +57,12 @@ function App() {
             <AccountIcon />
           </Toolbar>
         </AppBar>
-        <NavDrawer open={mobileDrawer} onClose={() => setMobileDrawer(false)} />
-        <Box
-          id="content"
-          sx={{
-            width: "100%",
-            margin: "1em",
-            marginLeft: { lg: "21em" },
-          }}
-        >
+        <NavDrawer
+          open={mobileDrawer}
+          onClose={() => setMobileDrawer(false)}
+          desktop={desktop}
+        />
+        <Box width="100%" p="2em">
           {/* Empty Toolbar ensures content is not hidden by the AppBar */}
           <Toolbar />
           <Outlet />
