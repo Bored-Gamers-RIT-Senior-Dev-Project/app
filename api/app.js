@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // Adding for now to ban dumb things durning development, but we can remove
 // this later:
 "use strict";
@@ -12,34 +11,33 @@ const test = require("./routes/test");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
-=======
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
+
 
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
 const authRoutes = require("./routes/auth.routes");
->>>>>>> db30d8e (Signup page frontend and backend there are some problems with backend)
 const app = express();
 app.use(cors());
 
-<<<<<<< HEAD
 app.use(logger("dev"));
 app.use(cookieParser());
 app.use(bodyParser.json());
 
 app.use("/api", users);
 app.use("/api", test);
+app.use("/api/auth", authRoutes);
 
 // catch 404 and forward to error handler
-app.use(function (_req, _res, next) {
+app.use((_req, _res, next) => {
   next(createError(404));
 });
 
 // error handler
-app.use(function (err, req, res, _) {
+app.use((err, req, res, _) => {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
@@ -50,7 +48,8 @@ app.use(function (err, req, res, _) {
     message: err.message, // https://stackoverflow.com/a/32836884
     error: err,
   }); // FIXME: This is temporary, send to user friendly error page instead
-=======
+});
+
 // Load environment variables
 require('dotenv').config();
 
@@ -82,7 +81,7 @@ app.use((err, req, res, next) => {
     message: err.message,
     error: req.app.get('env') === 'development' ? err : {}, // Hide stack trace in production
   });
->>>>>>> db30d8e (Signup page frontend and backend there are some problems with backend)
 });
 
 module.exports = app;
+
