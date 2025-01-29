@@ -1,15 +1,15 @@
 import { Menu } from "@mui/icons-material";
 import { AppBar, Box, CssBaseline, IconButton, Toolbar } from "@mui/material";
 import { useState } from "react";
-import { Outlet, useNavigate } from "react-router";
+import { Outlet } from "react-router";
 import "./App.css";
 import title from "./assets/title.png";
 import { AccountIcon } from "./components/layout/AccountIcon";
 import { NavDrawer } from "./components/layout/NavDrawer";
 
 function App() {
+  //MobileDrawer state handles if the drawer is open/closed in mobile view
   const [mobileDrawer, setMobileDrawer] = useState(false);
-  const navigate = useNavigate(); // For navigation
 
   return (
     <>
