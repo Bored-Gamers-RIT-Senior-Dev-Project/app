@@ -20,7 +20,7 @@ COPY . .
 RUN npm run build
 
 # Expose a port for the app to run on
-EXPOSE 3000
+EXPOSE 5173
 
 # Run the app on the port listed above
 CMD [ "npx", "serve", "dist" ]
