@@ -8,7 +8,7 @@ exports.authenticateToken = (req, res, next) => {
     return res.status(401).json({ message: "Access Denied: No Token Provided" });
   }
 
-  jwt.verify(token, "your_secret_key", (err, user) => {
+  jwt.verify(token, "your_secret_key", (err, user) => { // FIXME  "your_secret_key" should probably be something else...
     if (err) {
       return res.status(403).json({ message: "Invalid Token" });
     }
