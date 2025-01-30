@@ -18,7 +18,6 @@ router.post("/signin", async (req, res) => {
         }
 
         console.log("User fetched from DB:", user);
-        console.log("Password from request:", password);
         console.log("Password from DB:", user.Password);
 
         const isMatch = await bcrypt.compare(password, user.Password);
