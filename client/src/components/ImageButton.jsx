@@ -1,10 +1,17 @@
+/**
+ * ImageButton Component contains an image overlaid with text on a translucent black background.
+ * Credit for help: https://chatgpt.com/share/679bfed8-d4ac-8001-a85a-aa73eeebb376
+ */
+
 import { Box, ButtonBase, Typography } from "@mui/material";
 import PropTypes from "prop-types";
+import { ImageHolder } from "./ImageHolder";
 
 const ImageButton = ({ src, text, onClick, borderRadius = "4px" }) => {
   return (
     <ButtonBase
       onClick={onClick}
+      aria-label={text}
       focusRipple
       sx={{
         width: "100%",
@@ -22,7 +29,7 @@ const ImageButton = ({ src, text, onClick, borderRadius = "4px" }) => {
       }}
     >
       {/* Background Image */}
-      <Box
+      <ImageHolder
         component="img"
         src={src}
         alt={text}
@@ -61,7 +68,7 @@ ImageButton.propTypes = {
   src: PropTypes.string.isRequired,
   text: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
-  borderRadius: PropTypes.string,
+  borderRadius: PropTypes.string || PropTypes.number,
 };
 
 export { ImageButton };
