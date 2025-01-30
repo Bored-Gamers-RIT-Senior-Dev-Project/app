@@ -5,7 +5,6 @@ const db = require("../config/db"); // Adjust based on your database configurati
 const router = express.Router();
 
 // Sign In Route
-// Sign In Route
 router.post("/signin", async (req, res) => {
     const { email, password } = req.body;
 
