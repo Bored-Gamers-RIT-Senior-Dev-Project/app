@@ -55,8 +55,7 @@ function App() {
           >
             <Menu />
           </IconButton>
-          <ImageHolder src={title} alt="" sx={{ maxWidth: "45%" }} />
-          <h1 style={{ display: "none" }}>A New World</h1>
+          <ImageHolder src={title} alt="A New World" sx={{ maxWidth: "45%" }} />
           <AccountIcon desktop={desktop} />
         </Toolbar>
       </AppBar>
