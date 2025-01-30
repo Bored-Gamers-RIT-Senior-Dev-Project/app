@@ -9,8 +9,8 @@ import {
   Toolbar,
 } from "@mui/material";
 import PropTypes from "prop-types";
-import { useCallback } from "react";
-import { useNavigate } from "react-router";
+import { useCallback, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router";
 
 const nav_links = [
   { key: "homepage", text: "Home", path: "/" },
@@ -39,24 +39,22 @@ const university_links = [
 
 const NavDrawer = ({ open, onClose, desktop }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleNavigate = useCallback(
-    (location) => {
-      onClose();
-      navigate(location);
-    },
-    [navigate, onClose]
-  );
+  //When the location changes, close the drawer on mobile.
+  useEffect(() => {
+    if (!desktop) onClose();
+  }, [location]);
 
   const NavDrawerItem = useCallback(
     ({ key, text, path }) => (
-      <ListItem key={key} onClick={() => handleNavigate(path)}>
+      <ListItem key={key} onClick={() => navigate(path)}>
         <ListItemButton>
           <ListItemText primary={text} />
         </ListItemButton>
       </ListItem>
     ),
-    [handleNavigate]
+    [navigate]
   );
 
   return (

@@ -10,7 +10,8 @@ import {
 import { useState } from "react";
 import { Outlet } from "react-router";
 import bg from "./assets/art/photo_mountains_from_air.jpg";
-import title from "./assets/game/title_blue.png";
+import title from "./assets/game/title_white.png";
+import { ImageHolder } from "./components/ImageHolder";
 import { AccountIcon } from "./components/layout/AccountIcon";
 import { NavDrawer } from "./components/layout/NavDrawer";
 
@@ -20,65 +21,56 @@ function App() {
   const [mobileDrawer, setMobileDrawer] = useState(desktop);
 
   return (
-    <>
+    <Box
+      id="app"
+      sx={{
+        display: "flex",
+        width: "100%",
+        minHeight: "100vh",
+        justifyContent: "center",
+        backgroundImage: `url(${bg})`,
+        backgroundSize: "cover",
+        backgroundAttachment: "fixed",
+      }}
+    >
       <CssBaseline />
-      <Box
-        id="app"
-        sx={{
-          display: "flex",
-          width: "100%",
-          height: "100%",
-          justifyContent: "center",
-          backgroundImage: `url(${bg})`,
-          backgroundSize: "cover",
-          backgroundAttachment: "scroll",
-        }}
+      <AppBar
+        position="fixed"
+        color="primary"
+        elevation={10}
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 10 }}
       >
-        <AppBar
-          position="fixed"
-          color="primary"
-          elevation={10}
-          sx={{ zIndex: (theme) => theme.zIndex.drawer + 10 }}
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+          }}
         >
-          <Toolbar
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
+          <IconButton
+            color="inherit"
+            onClick={() => setMobileDrawer(!mobileDrawer)}
+            size="large"
+            edge="start"
+            sx={{ position: "absolute", left: { lg: 25, xs: 15 } }}
           >
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={() => setMobileDrawer(!mobileDrawer)}
-            >
-              <Menu />
-            </IconButton>
-            <Box sx={{ maxWidth: "50%", maxHeight: "90%" }}>
-              <img src={title} alt="A New World" height="100%" width="100%" />
-            </Box>
-            {/* <Typography variant="h6">Tournament App</Typography> */}
-            <AccountIcon />
-          </Toolbar>
-        </AppBar>
-        <NavDrawer
-          open={mobileDrawer}
-          onClose={() => setMobileDrawer(false)}
-          desktop={desktop}
-        />
-        <Box>
-          {/* Empty Toolbar ensures content is not hidden by the AppBar */}
-          <Toolbar />
-          <Box
-            padding="1em"
-            sx={{ backgroundColor: "white", borderRadius: "10px" }}
-            component="main"
-          >
-            <Outlet />
-          </Box>
-        </Box>
+            <Menu />
+          </IconButton>
+          <ImageHolder src={title} alt="" sx={{ maxWidth: "45%" }} />
+          <h1 style={{ display: "none" }}>A New World</h1>
+          <AccountIcon desktop={desktop} />
+        </Toolbar>
+      </AppBar>
+      <NavDrawer
+        open={mobileDrawer}
+        onClose={() => setMobileDrawer(false)}
+        desktop={desktop}
+      />
+      <Box component="main" sx={{ padding: 2 }}>
+        {/* Empty Toolbar ensures content is not hidden by the AppBar */}
+        <Toolbar />
+        <Outlet />
       </Box>
-    </>
+    </Box>
   );
 }
 
