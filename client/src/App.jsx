@@ -1,53 +1,75 @@
-import { AccountCircle, Menu } from "@mui/icons-material";
+import { Menu } from "@mui/icons-material";
 import {
   AppBar,
   Box,
   CssBaseline,
   IconButton,
   Toolbar,
-  Typography,
+  useMediaQuery,
 } from "@mui/material";
 import { useState } from "react";
 import { Outlet } from "react-router";
-import "./App.css";
+import bg from "./assets/art/photo_mountains_from_air.jpg";
+import title from "./assets/game/title_white.png";
+import { ImageHolder } from "./components/ImageHolder";
+import { AccountIcon } from "./components/layout/AccountIcon";
 import { NavDrawer } from "./components/layout/NavDrawer";
+
 function App() {
-  //UseState tracks whether or not the drawer is open (used on mobile devices)
-  const [mobileDrawer, setMobileDrawer] = useState(false);
+  const desktop = useMediaQuery((theme) => theme.breakpoints.up("lg"));
+  //MobileDrawer state handles if the drawer is open/closed.  Default to open when on desktop.
+  const [mobileDrawer, setMobileDrawer] = useState(desktop);
+
   return (
-    <>
+    <Box
+      id="app"
+      sx={{
+        display: "flex",
+        width: "100%",
+        minHeight: "100vh",
+        justifyContent: "center",
+        backgroundImage: `url(${bg})`,
+        backgroundSize: "cover",
+        backgroundAttachment: "fixed",
+      }}
+    >
       <CssBaseline />
-      <Box>
-        <AppBar
-          position="fixed"
-          color="primary"
-          elevation={10}
-          sx={{ zIndex: (theme) => theme.zIndex.drawer + 10 }}
+      <AppBar
+        position="fixed"
+        color="primary"
+        elevation={10}
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 10 }}
+      >
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+          }}
         >
-          <Toolbar
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-            }}
+          <IconButton
+            color="inherit"
+            onClick={() => setMobileDrawer(!mobileDrawer)}
+            size="large"
+            edge="start"
+            sx={{ position: "absolute", left: { lg: 25, xs: 15 } }}
           >
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={() => setMobileDrawer(!mobileDrawer)}
-              sx={{ display: { lg: "none" } }}
-            >
-              <Menu />
-            </IconButton>
-            <Typography variant="h6">Tournament App</Typography>
-            <IconButton edge="end" color="inherit">
-              <AccountCircle />
-            </IconButton>
-          </Toolbar>
-        </AppBar>
-        <NavDrawer open={mobileDrawer} onClose={() => setMobileDrawer(false)} />
+            <Menu />
+          </IconButton>
+          <ImageHolder src={title} alt="A New World" sx={{ maxWidth: "45%" }} />
+          <AccountIcon desktop={desktop} />
+        </Toolbar>
+      </AppBar>
+      <NavDrawer
+        open={mobileDrawer}
+        onClose={() => setMobileDrawer(false)}
+        desktop={desktop}
+      />
+      <Box component="main" sx={{ padding: 2 }}>
+        {/* Empty Toolbar ensures content is not hidden by the AppBar */}
+        <Toolbar />
         <Outlet />
       </Box>
-    </>
+    </Box>
   );
 }
 

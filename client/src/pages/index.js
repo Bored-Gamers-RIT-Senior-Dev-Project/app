@@ -1,3 +1,6 @@
+import { Home } from "./Home";
 import { Search } from "./Search";
+import { UserSignIn } from "./UserSignIn";
+import { UserSignUp } from "./UserSignUp";
 
-export { Search };
+export { Home, Search, UserSignIn, UserSignUp };
