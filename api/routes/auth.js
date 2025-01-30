@@ -1,7 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const db = require("../config/db"); // Adjust based on your database configuration
+const db = require("../config/db");
 const router = express.Router();
 
 // Sign In Route
