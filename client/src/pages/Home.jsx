@@ -64,7 +64,11 @@ const Home = () => {
           />
         </Grid>
         <Grid size={6}>
-          <ImageHolder src="https://placehold.co/600x400" />
+          <ImageButton
+            src={"https://placehold.co/600x400"}
+            text="Find a Team"
+            onClick={() => navigate("/search")}
+          />
         </Grid>
       </Grid>
     </Paper>
