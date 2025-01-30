@@ -64,7 +64,7 @@ const UserSignIn = () => {
       console.log("Google ID Token:", idToken);
   
       // Send token to the backend
-      const response = await fetch("http://localhost:3000/api/auth/signin", {
+      const response = await fetch("http://localhost:3000/api/routes/signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken }),
