@@ -8,7 +8,7 @@ exports.signup = async (req, res) => {
 
   try {
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10); // FIXME: Salt, or do something else!
 
     // Insert user into the database
     const [result] = await db.execute(
