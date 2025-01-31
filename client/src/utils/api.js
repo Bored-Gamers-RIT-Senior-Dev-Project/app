@@ -6,7 +6,6 @@ const url = (path) => `${API_URL}/${path}`;
 
 const sendTest = async (params) => {
   let { data } = await axios.post(url("test"), params);
-  console.log("Axios: ", data);
   events.publish("message", { message: "Axios: " + JSON.stringify(data) });
   return data;
 };
