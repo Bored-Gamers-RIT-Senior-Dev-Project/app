@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router";
 import App from "../App";
-import { Home, Search, UserSignIn, UserSignUp } from "../pages";
+import { Home, NotFound, Search, UserSignIn, UserSignUp } from "../pages";
 import { getTest, sendTest } from "./api";
 import { events } from "./events";
 
@@ -44,7 +44,7 @@ const router = createBrowserRouter([
       },
       {
         path: "*",
-        element: "TODO: 404 Page",
+        element: <NotFound />,
       },
     ],
   },
