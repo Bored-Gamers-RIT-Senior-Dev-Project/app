@@ -2,12 +2,18 @@ import { createBrowserRouter } from "react-router";
 import App from "../App";
 import { Home, Search, UserSignIn, UserSignUp } from "../pages";
 import { getTest, sendTest } from "./api";
+import { events } from "./events";
 
 //Make an action out of an api call
-const makeAction = (action) => async (params) => {
-  const data = await params.request.json();
-  return action(data);
-};
+const makeAction =
+  (action, spinner = true) =>
+  async (params) => {
+    if (spinner) events.publish("spinner.open");
+    const data = await params.request.json();
+    const response = await action(data);
+    if (spinner) events.publish("spinner.close");
+    return response;
+  };
 
 const router = createBrowserRouter([
   {
