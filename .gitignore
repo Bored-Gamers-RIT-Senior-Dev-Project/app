@@ -141,3 +141,5 @@ database_password.txt
 
 node_modules/
 .env
+
+.firebase/
