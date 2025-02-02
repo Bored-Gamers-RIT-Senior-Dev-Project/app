@@ -1,12 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const { verifyFirebaseToken } = require("../services/firebase");
+const admin = require("firebase-admin"); 
+
+// Sign-In Route
 router.post("/signin", async (req, res) => {
   const { idToken } = req.body;
-
   try {
     const decodedToken = await verifyFirebaseToken(idToken);
-    console.log("Decoded Token:", decodedToken);
 
     res.status(200).json({
       message: "Sign-in successful!",
@@ -21,15 +22,7 @@ router.post("/signin", async (req, res) => {
   }
 });
 
-module.exports = router;
-
-
-
 // Sign-Up Route
-
-const admin = require("firebase-admin"); // Firebase Admin SDK
-
-
 router.post("/signup", async (req, res) => {
   const { email, password, username, role, schoolName, teamOption, teamName } = req.body;
 
@@ -44,8 +37,6 @@ router.post("/signup", async (req, res) => {
       password,
       displayName: username,
     });
-
-    console.log("User created:", userRecord);
 
     res.status(201).json({
       message: "Sign-up successful!",
@@ -64,9 +55,4 @@ router.post("/signup", async (req, res) => {
     res.status(400).json({ message: "Sign-up failed", error: error.message });
   }
 });
-
-
 module.exports = router;
-
-
-
