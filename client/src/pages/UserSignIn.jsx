@@ -29,7 +29,7 @@ const UserSignIn = () => {
         signInData.password
       );
       const idToken = await userCredential.user.getIdToken();
-      console.log("ID Token:", idToken);
+      
 
       // Send ID Token to backend
       const response = await fetch("http://localhost:3000/api/users/signin", {
@@ -45,7 +45,6 @@ const UserSignIn = () => {
 
       const data = await response.json();
       setMessage("Sign in successful!");
-      console.log("Backend response:", data);
       window.location.href = "/dashboard"; // Redirect to dashboard
     } catch (error) {
       console.error("Sign-in error:", error);
@@ -61,7 +60,7 @@ const UserSignIn = () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const idToken = await result.user.getIdToken(); 
-      console.log("Google ID Token:", idToken);
+      
   
       // Send token to the backend
       const response = await fetch("http://localhost:3000/api/users/signin", {

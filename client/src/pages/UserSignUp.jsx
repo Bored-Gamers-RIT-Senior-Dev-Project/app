@@ -100,7 +100,7 @@ const UserSignUp = () => {
       }
 
       const data = await response.json();
-      console.log("Sign-up successful:", data);
+      
       setMessage("Sign-up successful!");
       window.location.href = "/signin"; // Redirect to login page
     } catch (error) {
