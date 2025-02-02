@@ -32,7 +32,7 @@ const UserSignIn = () => {
       console.log("ID Token:", idToken);
 
       // Send ID Token to backend
-      const response = await fetch("http://localhost:3000/api/routes/signin", {
+      const response = await fetch("http://localhost:3000/api/users/signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken }),
@@ -60,11 +60,11 @@ const UserSignIn = () => {
   
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      const idToken = await result.user.getIdToken(); // ✅ Ensure this retrieves a valid token
+      const idToken = await result.user.getIdToken(); 
       console.log("Google ID Token:", idToken);
   
       // Send token to the backend
-      const response = await fetch("http://localhost:3000/api/routes/signin", {
+      const response = await fetch("http://localhost:3000/api/users/signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken }),
