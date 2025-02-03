@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const admin = require("firebase-admin");
 const { verifyFirebaseToken } = require("../../services/firebase");
+
 router.post("/signin", async (req, res) => {
   const { idToken } = req.body;
   try {
@@ -20,9 +22,7 @@ router.post("/signin", async (req, res) => {
   }
 });
 
-module.exports = router;
-// Sign-Up Route
-const admin = require("firebase-admin"); // Firebase Admin SDK
+
 router.post("/signup", async (req, res) => {
   const { email, password, username, role, schoolName, teamOption, teamName } = req.body;
 
