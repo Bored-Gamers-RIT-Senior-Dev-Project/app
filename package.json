@@ -2,7 +2,7 @@
     "scripts": {
         "install": "cd client && npm install && cd ../api && npm install",
         "audit": "cd client && npm audit && cd ../api && npm audit",
-        "start": "concurrently \"npm run dev --prefix client\" \"npm run start --prefix api\""
+        "start": "concurrently \"npm run dev --prefix client\" \"npm run dev --prefix api\""
     },
     "dependencies": {
         "concurrently": "^9.1.2"
