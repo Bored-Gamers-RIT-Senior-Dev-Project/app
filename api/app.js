@@ -25,10 +25,9 @@ app.use(bodyParser.json());
 
 // Load environment variables
 require("dotenv").config();
-
-app.use("/api", users);
+app.use("/api/users", users);
 app.use("/api", test);
-app.use("/api", auth);
+app.use("/api/auth", auth);
 
 // catch 404 and forward to error handler
 app.use((_req, _res, next) => {
@@ -46,7 +45,7 @@ app.use((err, req, res, _) => {
   res.json({
     message: err.message, // https://stackoverflow.com/a/32836884
     error: err,
-  }); // FIXME: This is temporary, send to user friendly error page instead
+  }); // FIXME: This is temporary, send to user friendly error page instead (Respond with an error response, React Router the frontend has the tools to do this.  -Nate)
 });
 
 // Catch 404 and forward to error handler
