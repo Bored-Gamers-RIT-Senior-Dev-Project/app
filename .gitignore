@@ -138,6 +138,13 @@ dist
 # Text file to store the database password
 database_password.txt
 
+
+node_modules/
+.env
+
+.firebase/
+
+.env
 # macOS Finder files
 .DS_Store
 .AppleDouble

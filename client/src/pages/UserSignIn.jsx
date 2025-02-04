@@ -1,3 +1,5 @@
+
+// Chatgpt helped me write funtion in this file and its the async funtion 
 import {
   Box,
   Button,
@@ -6,13 +8,13 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "../firebase/config";
 
 const UserSignIn = () => {
   const [signInData, setSignInData] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleSignInChange = (e) => {
     setSignInData({ ...signInData, [e.target.name]: e.target.value });
@@ -23,28 +25,67 @@ const UserSignIn = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3000/api/auth/signin", {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        signInData.email,
+        signInData.password
+      );
+      const idToken = await userCredential.user.getIdToken();
+      
+
+      // Send ID Token to backend
+      const response = await fetch("http://localhost:3000/api/users/signin", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(signInData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setMessage("Sign in successful!");
-        navigate("/dashboard"); // Redirect after successful sign-in
-      } else {
-        const errorText = await response.text();
-        setMessage(`Sign in failed: ${errorText}`);
+      if (!response.ok) {
+        const errorText = await response.text(); // Read response as text
+        throw new Error(`Server error: ${errorText}`);
       }
+
+      const data = await response.json();
+      setMessage("Sign in successful!");
+      window.location.href = "/dashboard"; // Redirect to dashboard
     } catch (error) {
-      setMessage("An error occurred during sign in.");
+      console.error("Sign-in error:", error);
+      setMessage(`Sign-in failed: ${error.message}`);
     } finally {
       setLoading(false);
     }
   };
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+  
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const idToken = await result.user.getIdToken(); 
+      
+  
+      // Send token to the backend
+      const response = await fetch("http://localhost:3000/api/users/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server error: ${errorText}`);
+      }
+  
+      const data = await response.json();
+      setMessage("Google Sign-in successful!");
+      window.location.href = "/dashboard";
+    } catch (error) {
+      setMessage(`Google Sign-In failed: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
 
   return (
     <Box
@@ -94,9 +135,18 @@ const UserSignIn = () => {
           {loading ? <CircularProgress size={24} /> : "Sign In"}
         </Button>
       </form>
+      <Button
+        variant="contained"
+        color="secondary"
+        fullWidth
+        onClick={handleGoogleSignIn}
+        disabled={loading}
+      >
+        {loading ? <CircularProgress size={24} /> : "Sign in with Google"}
+      </Button>
       <Typography
         sx={{ mt: 2, textAlign: "center", cursor: "pointer" }}
-        onClick={() => navigate("/signup")}
+        onClick={() => (window.location.href = "/signup")}
       >
         No account? Sign Up
       </Typography>
