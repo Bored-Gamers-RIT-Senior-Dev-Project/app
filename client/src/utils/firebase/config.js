@@ -1,7 +1,7 @@
 // Import Firebase SDKs
+import { getAnalytics } from "firebase/analytics";
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getAnalytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -25,4 +25,4 @@ const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
 // Export Firebase services for use in other files
-export { app, analytics, auth, googleProvider };
+export { analytics, app, auth, googleProvider };

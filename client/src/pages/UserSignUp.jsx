@@ -16,9 +16,9 @@ import {
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useActionData, useNavigate } from "react-router";
-import { auth } from "../firebase/config";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
+import { auth } from "../utils/firebase/config";
 
 const UserSignUp = () => {
   const [signUpData, setSignUpData] = useState({

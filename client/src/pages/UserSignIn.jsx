@@ -4,9 +4,9 @@ import { Box, Button, TextField, Typography } from "@mui/material";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useActionData, useNavigate } from "react-router";
-import { auth, googleProvider } from "../firebase/config";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
+import { auth, googleProvider } from "../utils/firebase/config";
 
 const UserSignIn = () => {
   const [signInData, setSignInData] = useState({ email: "", password: "" });
