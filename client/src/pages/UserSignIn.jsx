@@ -1,20 +1,19 @@
-
-// Chatgpt helped me write funtion in this file and its the async funtion 
-import {
-  Box,
-  Button,
-  CircularProgress,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { useState } from "react";
+// Chatgpt helped me write funtion in this file and its the async funtion
+import { Google } from "@mui/icons-material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { useEffect, useState } from "react";
+import { useActionData, useNavigate } from "react-router";
 import { auth, googleProvider } from "../firebase/config";
+import { usePostSubmit } from "../hooks/usePostSubmit";
+import { events } from "../utils/events";
 
 const UserSignIn = () => {
   const [signInData, setSignInData] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+  const actionData = useActionData();
+  const submit = usePostSubmit();
+  const navigate = useNavigate();
 
   const handleSignInChange = (e) => {
     setSignInData({ ...signInData, [e.target.name]: e.target.value });
@@ -22,8 +21,8 @@ const UserSignIn = () => {
 
   const handleSignInSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
+    // setLoading(true);
+    events.publish("spinner.open");
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
@@ -31,62 +30,43 @@ const UserSignIn = () => {
         signInData.password
       );
       const idToken = await userCredential.user.getIdToken();
-      
-
-      // Send ID Token to backend
-      const response = await fetch("http://localhost:3000/api/users/signin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text(); // Read response as text
-        throw new Error(`Server error: ${errorText}`);
-      }
-
-      const data = await response.json();
-      setMessage("Sign in successful!");
-      window.location.href = "/dashboard"; // Redirect to dashboard
+      submit({ idToken });
     } catch (error) {
       console.error("Sign-in error:", error);
       setMessage(`Sign-in failed: ${error.message}`);
-    } finally {
-      setLoading(false);
+      events.publish("spinner.close");
     }
+    // events.publish("spinner.close");
+    // setLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
-    setLoading(true);
-  
+    events.publish("spinner.open");
+    // setLoading(true);
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      const idToken = await result.user.getIdToken(); 
-      
-  
-      // Send token to the backend
-      const response = await fetch("http://localhost:3000/api/users/signin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken }),
-      });
-  
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Server error: ${errorText}`);
-      }
-  
-      const data = await response.json();
-      setMessage("Google Sign-in successful!");
-      window.location.href = "/dashboard";
+      const idToken = await result.user.getIdToken();
+      //TODO: We need to handle the case where the google user has is new (Redirect to the signup form with certain information filled in automatically?)
+      submit({ idToken });
     } catch (error) {
+      //TODO: If the user is new and an error took place in the API, we need to handle that case and erase the user from Firebase.
       setMessage(`Google Sign-In failed: ${error.message}`);
-    } finally {
-      setLoading(false);
+      events.publish("spinner.close");
     }
+    // setLoading(false);
   };
-  
 
+  //ActionData is the response from the usePostSubmit action, defined in router.jsx
+  //Will be undefined until the action is complete.  Then, we can use it to handle the result.
+  useEffect(() => {
+    if (actionData) {
+      events.publish("spinner.close");
+      events.publish("message", { message: actionData.message });
+      if (actionData.message === "Signin successful") {
+        navigate("/"); // Redirect to home on successful sign-in
+      }
+    }
+  }, [actionData]);
   return (
     <Box
       sx={{
@@ -125,14 +105,8 @@ const UserSignIn = () => {
           onChange={handleSignInChange}
           required
         />
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          fullWidth
-          disabled={loading}
-        >
-          {loading ? <CircularProgress size={24} /> : "Sign In"}
+        <Button type="submit" variant="contained" color="primary" fullWidth>
+          Sign In
         </Button>
       </form>
       <Button
@@ -140,13 +114,15 @@ const UserSignIn = () => {
         color="secondary"
         fullWidth
         onClick={handleGoogleSignIn}
-        disabled={loading}
+        startIcon={<Google />}
       >
-        {loading ? <CircularProgress size={24} /> : "Sign in with Google"}
+        Sign in with Google
       </Button>
+      {/*TODO: "Forgot Password/Forgot Username" link*/}
+      {/* TODO: Sign up link should look more like a link rather than plaintext  */}
       <Typography
         sx={{ mt: 2, textAlign: "center", cursor: "pointer" }}
-        onClick={() => (window.location.href = "/signup")}
+        onClick={() => navigate("/signup")}
       >
         No account? Sign Up
       </Typography>

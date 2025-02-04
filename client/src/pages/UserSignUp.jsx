@@ -1,8 +1,7 @@
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import {
   Autocomplete,
-  Box,
   Button,
-  CircularProgress,
   Divider,
   FormControlLabel,
   Grid,
@@ -14,10 +13,12 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { auth } from "../firebase/config";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { usePostSubmit } from "../hooks/usePostSubmit";
+import { events } from "../utils/events";
 
 const UserSignUp = () => {
   const [signUpData, setSignUpData] = useState({
@@ -33,7 +34,9 @@ const UserSignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [universityOptions, setUniversityOptions] = useState([]);
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+  const submit = usePostSubmit();
+  const actionData = useActionData();
+  const navigate = useNavigate();
 
   // Mock function to simulate fetching universities
   const mockFetchUniversities = (query) => {
@@ -70,47 +73,54 @@ const UserSignUp = () => {
 
   const handleSignUpSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    // setLoading(true);
+    events.publish("spinner.open");
 
     if (signUpData.password !== signUpData.repeatPassword) {
       setMessage("Passwords do not match");
-      setLoading(false); // Ensure loading stops here
+      // setLoading(false); // Ensure loading stops here
+      events.publish("spinner.close");
       return;
     }
-
+    let idToken = null;
     try {
-      const response = await fetch("http://localhost:3000/api/users/signup", {    
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: signUpData.email,
-          password: signUpData.password,
-          username: signUpData.username,
-          role: signUpData.role,
-          schoolName: signUpData.schoolName,
-          teamOption: signUpData.teamOption,
-          teamName: signUpData.teamName,
-        }),
+      const { user } = await createUserWithEmailAndPassword(
+        auth,
+        signUpData.email,
+        signUpData.password
+      );
+      idToken = await user.getIdToken();
+      submit({
+        idToken,
+        ...signUpData,
+        email: signUpData.email,
+        // password: signUpData.password,  //We probably don't need to send the password to our API if we're handling logins through Firebase's Auth system.  May be more secure, idk.
+        username: signUpData.username,
+        role: signUpData.role,
+        schoolName: signUpData.schoolName,
+        teamOption: signUpData.teamOption,
+        teamName: signUpData.teamName,
       });
-      
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Server error: ${errorText}`);
-      }
-
-      const data = await response.json();
-      
-      setMessage("Sign-up successful!");
-      window.location.href = "/signin"; // Redirect to login page
     } catch (error) {
       console.error("Sign-up error:", error);
       setMessage(`Sign-up failed: ${error.message}`);
     } finally {
-      setLoading(false);
+      // setLoading(false);
+      events.publish("spinner.close");
     }
   };
 
+  useEffect(() => {
+    if (actionData) {
+      events.publish("spinner.close");
+      events.publish("message", { message: actionData.message });
+      if (actionData.message === "Welcome!") {
+        navigate("/"); // Redirect to home on successful sign-up
+      }
+    }
+  }, [actionData, navigate]);
+
+  //TODO: Fix improper (and deprecated) use of Grid.  Do we even need Grid vs a Box in Display:flex here?
   return (
     <Grid container justifyContent="center" sx={{ mt: 5 }}>
       <Paper elevation={6} sx={{ p: 4, maxWidth: 600 }}>
@@ -172,15 +182,33 @@ const UserSignUp = () => {
             value={signUpData.role}
             onChange={handleSignUpChange}
           >
-            <FormControlLabel value="Follow the Tournament" control={<Radio />} label="Follow the Tournament" />
-            <FormControlLabel value="Participate" control={<Radio />} label="Participate" />
-            <FormControlLabel value="Represent a University" control={<Radio />} label="Represent a University" />
+            <FormControlLabel
+              value="Follow the Tournament"
+              control={<Radio />}
+              label="Follow the Tournament"
+            />
+            <FormControlLabel
+              value="Participate"
+              control={<Radio />}
+              label="Participate"
+            />
+            <FormControlLabel
+              value="Represent a University"
+              control={<Radio />}
+              label="Represent a University"
+            />
           </RadioGroup>
           <Autocomplete
             options={universityOptions}
             getOptionLabel={(option) => option}
             renderInput={(params) => (
-              <TextField {...params} label="School Name" onChange={handleSchoolNameInput} fullWidth disabled={signUpData.role !== "Represent a University"} />
+              <TextField
+                {...params}
+                label="School Name"
+                onChange={handleSchoolNameInput}
+                fullWidth
+                disabled={signUpData.role !== "Represent a University"}
+              />
             )}
             value={signUpData.schoolName}
             onChange={handleSchoolNameChange}
@@ -188,10 +216,26 @@ const UserSignUp = () => {
           />
           <Divider sx={{ my: 2 }} />
           <Typography variant="h6">Team</Typography>
-          <RadioGroup name="teamOption" value={signUpData.teamOption} onChange={handleSignUpChange}>
-            <FormControlLabel value="Start a new Team" control={<Radio />} label="Start a new Team" />
-            <FormControlLabel value="Join an Existing Team" control={<Radio />} label="Join an Existing Team" />
-            <FormControlLabel value="I'll do this later" control={<Radio />} label="I'll do this later" />
+          <RadioGroup
+            name="teamOption"
+            value={signUpData.teamOption}
+            onChange={handleSignUpChange}
+          >
+            <FormControlLabel
+              value="Start a new Team"
+              control={<Radio />}
+              label="Start a new Team"
+            />
+            <FormControlLabel
+              value="Join an Existing Team"
+              control={<Radio />}
+              label="Join an Existing Team"
+            />
+            <FormControlLabel
+              value="I'll do this later"
+              control={<Radio />}
+              label="I'll do this later"
+            />
           </RadioGroup>
           <TextField
             label="Team Name"
@@ -201,14 +245,26 @@ const UserSignUp = () => {
             fullWidth
             disabled={signUpData.teamOption !== "Join an Existing Team"}
           />
-          <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading} sx={{ mt: 2 }}>
-            {loading ? <CircularProgress size={24} /> : "Sign Up"}
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ mt: 2 }}
+          >
+            Sign Up
           </Button>
         </form>
         {message && (
-          <Typography sx={{ mt: 2, textAlign: "center", color: "red" }}>{message}</Typography>
+          <Typography sx={{ mt: 2, textAlign: "center", color: "red" }}>
+            {message}
+          </Typography>
         )}
-        <Typography sx={{ mt: 2, textAlign: "center", cursor: "pointer" }} onClick={() => (window.location.href = "/signin")}>
+        {/* TODO: Sign in link should look more like a link rather than plaintext  */}
+        <Typography
+          sx={{ mt: 2, textAlign: "center", cursor: "pointer" }}
+          onClick={() => navigate("/signin")}
+        >
           Already have an account? Sign In
         </Typography>
       </Paper>

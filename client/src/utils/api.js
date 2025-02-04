@@ -10,4 +10,19 @@ const sendTest = async (params) => {
   return data;
 };
 const getTest = async () => axios.get(url("users"));
-export { getTest, sendTest };
+
+/******************
+ * AUTHENTICATION *
+ ******************/
+const handleSignIn = async (params) => {
+  console.log(params);
+  let { data } = await axios.post(url("users/signin"), params);
+  return data;
+};
+
+const handleSignUp = async (params) => {
+  let { data } = await axios.post(url("users/signup"), params);
+  return data;
+};
+
+export { getTest, handleSignIn, handleSignUp, sendTest };
