@@ -1,42 +1,58 @@
-const express = require("express")
+const express = require("express");
 const router = express.Router();
-const mysql = require("mysql2");
-const fs = require("node:fs");
-const { exit } = require("node:process");
-const password = (() => {
-    let password = "";
-    try {
-        password = fs.readFileSync("./database_password.txt", "utf8");
-        // Probably don't intend to have whitespace at the beginning or end of
-        // a password:
-        password = password.trim();
-    } catch (error) {
-        console.error(error);
-        console.error(
-            "Create a file called database_password.txt in the api directory,\n" +
-            "and paste your database password there"
-        )
-        exit(1);
-    }
-    return password;
-})();
+const admin = require("firebase-admin");
+const { verifyFirebaseToken } = require("../../services/firebase");
 
-const pool = mysql.createPool({
-    host: 'localhost', 
-    user: 'root',      
-    password: password, 
-    database: 'BoardGame', 
-    connectionLimit: 10   
-});
+router.post("/signin", async (req, res) => {
+  const { idToken } = req.body;
+  try {
+    const decodedToken = await verifyFirebaseToken(idToken);
+    
 
-router.get("/users", (req, res) => {
-    pool.query('SELECT * FROM Users', (err, results) => {
-        if (err) {
-            console.error('Error fetching users:', err);
-            return res.status(500).send('Error fetching users');
-        }
-        res.json(results);
+    res.status(200).json({
+      message: "Sign-in successful!",
+      user: {
+        uid: decodedToken.uid,
+        email: decodedToken.email,
+      },
     });
+  } catch (error) {
+    console.error("Error during sign-in:", error.message);
+    res.status(401).json({ message: "Invalid ID token", error: error.message });
+  }
 });
 
+
+router.post("/signup", async (req, res) => {
+  const { email, password, username, role, schoolName, teamOption, teamName } = req.body;
+
+  try {
+    if (!email || !password || !username) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // Create a new user in Firebase Authentication
+    const userRecord = await admin.auth().createUser({
+      email,
+      password,
+      displayName: username,
+    });
+
+    res.status(201).json({
+      message: "Sign-up successful!",
+      user: {
+        uid: userRecord.uid,
+        email: userRecord.email,
+        username: userRecord.displayName,
+        role,
+        schoolName,
+        teamOption,
+        teamName,
+      },
+    });
+  } catch (error) {
+    console.error("Error during sign-up:", error.message);
+    res.status(400).json({ message: "Sign-up failed", error: error.message });
+  }
+});
 module.exports = router;
