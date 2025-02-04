@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router";
 import App from "../App";
 import { Home, NotFound, Search, UserSignIn, UserSignUp } from "../pages";
-import { getTest, sendTest } from "./api";
+import { handleSignIn, handleSignUp, sendTest } from "./api";
 import { events } from "./events";
 
 //Make an action out of an api call
@@ -27,16 +27,17 @@ const router = createBrowserRouter([
       {
         path: "/signin",
         element: <UserSignIn />,
+        action: makeAction(handleSignIn),
       },
       {
         path: "/signup",
         element: <UserSignUp />,
+        action: makeAction(handleSignUp),
       },
       {
         path: "/search",
         element: <Search />,
         action: makeAction(sendTest),
-        loader: getTest,
       },
       {
         path: "/about",

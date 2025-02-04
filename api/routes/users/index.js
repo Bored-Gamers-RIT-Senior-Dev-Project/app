@@ -7,7 +7,6 @@ router.post("/signin", async (req, res) => {
   const { idToken } = req.body;
   try {
     const decodedToken = await verifyFirebaseToken(idToken);
-    
 
     res.status(200).json({
       message: "Sign-in successful!",
@@ -22,24 +21,34 @@ router.post("/signin", async (req, res) => {
   }
 });
 
-
 router.post("/signup", async (req, res) => {
-  const { email, password, username, role, schoolName, teamOption, teamName } = req.body;
+  const {
+    idToken,
+    email,
+    //password,
+    username,
+    role,
+    schoolName,
+    teamOption,
+    teamName,
+  } = req.body;
 
   try {
-    if (!email || !password || !username) {
+    if (!email || !username || !idToken) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
+    const userRecord = await verifyFirebaseToken(idToken);
+
     // Create a new user in Firebase Authentication
-    const userRecord = await admin.auth().createUser({
-      email,
-      password,
-      displayName: username,
-    });
+    // const userRecord = await admin.auth().createUser({
+    //   email,
+    //   password,
+    //   displayName: username,
+    // });
 
     res.status(201).json({
-      message: "Sign-up successful!",
+      message: "Welcome!",
       user: {
         uid: userRecord.uid,
         email: userRecord.email,
