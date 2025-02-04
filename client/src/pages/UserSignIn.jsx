@@ -1,12 +1,11 @@
 // Chatgpt helped me write funtion in this file and its the async funtion
 import { Google } from "@mui/icons-material";
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useActionData, useNavigate } from "react-router";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
-import { auth, googleProvider } from "../utils/firebase/config";
+import { signInWithEmail, signInWithGoogle } from "../utils/firebase/auth";
 
 const UserSignIn = () => {
   const [signInData, setSignInData] = useState({ email: "", password: "" });
@@ -24,12 +23,8 @@ const UserSignIn = () => {
     // setLoading(true);
     events.publish("spinner.open");
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        signInData.email,
-        signInData.password
-      );
-      const idToken = await userCredential.user.getIdToken();
+      const user = await signInWithEmail(signInData.email, signInData.password);
+      const idToken = await user.getIdToken();
       submit({ idToken });
     } catch (error) {
       console.error("Sign-in error:", error);
@@ -44,10 +39,10 @@ const UserSignIn = () => {
     events.publish("spinner.open");
     // setLoading(true);
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const idToken = await result.user.getIdToken();
+      const user = await signInWithGoogle();
+      const idToken = await user.getIdToken();
       //TODO: We need to handle the case where the google user has is new (Redirect to the signup form with certain information filled in automatically?)
-      submit({ idToken });
+      submit({ idToken, ...user });
     } catch (error) {
       //TODO: If the user is new and an error took place in the API, we need to handle that case and erase the user from Firebase.
       setMessage(`Google Sign-In failed: ${error.message}`);

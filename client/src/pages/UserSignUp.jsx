@@ -13,12 +13,11 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useActionData, useNavigate } from "react-router";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
-import { auth } from "../utils/firebase/config";
+import { signUpWithEmail } from "../utils/firebase/auth";
 
 const UserSignUp = () => {
   const [signUpData, setSignUpData] = useState({
@@ -84,11 +83,7 @@ const UserSignUp = () => {
     }
     let idToken = null;
     try {
-      const { user } = await createUserWithEmailAndPassword(
-        auth,
-        signUpData.email,
-        signUpData.password
-      );
+      const user = await signUpWithEmail(signUpData.email, signUpData.password);
       idToken = await user.getIdToken();
       submit({
         idToken,
