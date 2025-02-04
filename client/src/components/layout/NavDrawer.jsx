@@ -7,10 +7,10 @@ import {
   ListItemButton,
   ListItemText,
   Toolbar,
-  useMediaQuery,
 } from "@mui/material";
 import PropTypes from "prop-types";
-import { useNavigate } from "react-router";
+import { useCallback, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router";
 
 const nav_links = [
   { key: "homepage", text: "Home", path: "/" },
@@ -37,52 +37,53 @@ const university_links = [
   { key: "uniPage", text: "University Page", path: "/university/1" },
 ];
 
-const NavDrawer = ({ open, onClose }) => {
-  const desktop = useMediaQuery((theme) => theme.breakpoints.up("lg")); //Transition from desktop (permanent drawer) to mobile (temporary drawer) when screen width is less than the large breakpoint.
+const NavDrawer = ({ open, onClose, desktop }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  //When the location changes, close the drawer on mobile.
+  useEffect(() => {
+    if (!desktop) onClose();
+  }, [location]);
+
+  const NavDrawerItem = useCallback(
+    ({ key, text, path }) => (
+      <ListItem key={key} onClick={() => navigate(path)}>
+        <ListItemButton>
+          <ListItemText primary={text} />
+        </ListItemButton>
+      </ListItem>
+    ),
+    [navigate]
+  );
+
   return (
     <Drawer
       open={open}
       onClose={onClose}
-      variant={desktop ? "permanent" : "temporary"}
       elevation={8}
+      // hideBackdrop={desktop}
+      variant={desktop ? "persistent" : "temporary"}
     >
-      {/* Placeholder Toolbar prevents NavDrawer content form being covered by the actual navbar */}
+      {/* Placeholder Toolbar prevents NavDrawer content from being covered by the actual navbar */}
       <Toolbar />
-      <Box height={"100%"} px={2}>
-        {/* TODO: We will need a way to dynamically generate the links in the drawer based on user permissions. */}
+      <Box px={2}>
         <List>
-          {nav_links.map(({ key, text, path }) => (
-            <ListItem key={key} onClick={() => navigate(path)}>
-              <ListItemButton>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
+          {nav_links.map(({ key, ...link }) => (
+            <NavDrawerItem key={key} {...link} />
           ))}
           <Divider>Admin</Divider>
-          {admin_links.map(({ key, text, path }) => (
-            <ListItem key={key} onClick={() => navigate(path)}>
-              <ListItemButton>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
+          {admin_links.map(({ key, ...link }) => (
+            <NavDrawerItem key={key} {...link} />
           ))}
         </List>
         <Divider>TEAM NAME</Divider>
-        {participant_links.map(({ key, text, path }) => (
-          <ListItem key={key} onClick={() => navigate(path)}>
-            <ListItemButton>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
+        {participant_links.map(({ key, ...link }) => (
+          <NavDrawerItem key={key} {...link} />
         ))}
         <Divider>University Representative</Divider>
-        {university_links.map(({ key, text, path }) => (
-          <ListItem key={key} onClick={() => navigate(path)}>
-            <ListItemButton>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
+        {university_links.map(({ key, ...link }) => (
+          <NavDrawerItem key={key} {...link} />
         ))}
       </Box>
     </Drawer>
@@ -90,8 +91,9 @@ const NavDrawer = ({ open, onClose }) => {
 };
 
 NavDrawer.propTypes = {
-  open: PropTypes.bool.isRequired,
+  desktop: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
+  open: PropTypes.bool.isRequired,
 };
 
 export { NavDrawer };
