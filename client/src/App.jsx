@@ -15,6 +15,8 @@ import title from "./assets/game/title_white.png";
 import { ImageHolder } from "./components/ImageHolder";
 import { AccountIcon } from "./components/layout/AccountIcon";
 import { NavDrawer } from "./components/layout/NavDrawer";
+import { Message } from "./components/Message";
+import { Spinner } from "./components/Spinner";
 
 function App() {
   const desktop = useMediaQuery((theme) => theme.breakpoints.up("lg"));
@@ -35,6 +37,8 @@ function App() {
       }}
     >
       <CssBaseline />
+      <Spinner />
+      <Message />
       <AppBar
         position="fixed"
         color="primary"
