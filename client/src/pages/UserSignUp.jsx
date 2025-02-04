@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useActionData, useNavigate } from "react-router";
 import { auth } from "../firebase/config";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
@@ -121,6 +121,7 @@ const UserSignUp = () => {
   }, [actionData, navigate]);
 
   //TODO: Fix improper (and deprecated) use of Grid.  Do we even need Grid vs a Box in Display:flex here?
+  //TOOD: Make the form more responsive based on selected role, add functionality where necessary to make it fully functional.
   return (
     <Grid container justifyContent="center" sx={{ mt: 5 }}>
       <Paper elevation={6} sx={{ p: 4, maxWidth: 600 }}>
