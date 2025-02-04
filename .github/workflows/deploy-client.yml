@@ -1,0 +1,94 @@
+name: Build and Deploy (React App) Frontend to Staging Host
+
+on:
+  # Trigger on push to the main branch
+  push:
+    branches:
+      - main
+
+  # Allows manual execution from any branch
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to deploy"  # User chooses the branch to deploy
+        required: false
+        default: "main"  # Default branch if no input is provided
+
+jobs:
+  build-and-test:
+    runs-on: self-hosted
+
+    steps:
+      # Checkout the selected branch
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref_name }}  # Uses input branch or current branch
+
+      # Build the Docker image for the React application
+      - name: Build Docker Image
+        run: |
+          docker build -t bg_frontend ./client  # Use ./client as the build context
+
+### For running test.js later ###
+#      # Run tests inside the container
+#      - name: Run Tests
+#        run: |
+#          docker run --rm bg_frontend npm test
+
+      # Save the Docker image as a .tar archive
+      - name: Save Docker Image as Tar Archive
+        run: |
+          docker save bg_frontend -o bg_frontend.tar
+
+      # Upload the image as an artifact for later deployment
+      - name: Upload Image Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: bg_frontend.tar
+
+  deploy:
+    runs-on: self-hosted
+    needs: build-and-test  # Deployment only runs if build and test succeed
+
+    steps:
+      # Download the Docker image artifact
+      - name: Download Docker Image Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      # Securely copy the Docker image to the remote server
+      - name: Copy Docker Image to Server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_STAGING_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "bg_frontend.tar"
+          target: "/tmp/bg_frontend.tar"
+
+      # Deploy the application on the app server
+      - name: Deploy Application via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_STAGING_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            CONTAINER_NAME=bg_frontend_container
+            IMAGE_TAR=/tmp/bg_frontend.tar
+
+            # Load the Docker image
+            docker load -i $IMAGE_TAR
+
+            # Stop and remove old container if it exists
+            docker stop $CONTAINER_NAME || true
+            docker rm $CONTAINER_NAME || true
+
+            # Run the new container on port 5173
+            docker run -d --name $CONTAINER_NAME -p 5173:5173 bg_frontend
+
+            # Clean up image tar file
+            rm -f $IMAGE_TAR
