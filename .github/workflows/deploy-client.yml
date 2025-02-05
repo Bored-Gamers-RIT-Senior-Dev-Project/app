@@ -68,7 +68,7 @@ jobs:
       # Deploy the application on the app server using SSH
       - name: Deploy Application via SSH
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_STAGING_HOST }} << EOF
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_STAGING_HOST }} << 'EOF'
             CONTAINER_NAME=bg_frontend_app
             IMAGE_TAR=/tmp/bg_frontend.tar
             echo "Container Name: $CONTAINER_NAME"
