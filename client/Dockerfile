@@ -23,4 +23,4 @@ RUN npm run build
 EXPOSE 5173
 
 # Run the app on the port listed above
-CMD [ "npx", "serve", "dist" ]
+CMD [ "npx", "serve", "-l", "5173", "dist" ]
