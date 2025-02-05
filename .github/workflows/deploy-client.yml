@@ -69,19 +69,26 @@ jobs:
       - name: Deploy Application via SSH
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_STAGING_HOST }} << EOF
-            CONTAINER_NAME=bg_frontend_container
+            CONTAINER_NAME=bg_frontend_app
             IMAGE_TAR=/tmp/bg_frontend.tar
+            echo "Container Name: $CONTAINER_NAME"
+            echo "Image .tar Name: $IMAGE_TAR"
 
             # Load the Docker image
-            docker load -i $IMAGE_TAR
+            echo "Loading $IMAGE_TAR"
+            docker load -i "$IMAGE_TAR"
 
             # Stop and remove old container if it exists
-            docker stop $CONTAINER_NAME || true
-            docker rm $CONTAINER_NAME || true
+            echo "Stopping running containers..."
+            docker stop "$CONTAINER_NAME" || true
+            echo "Removing previous containers..."
+            docker rm "$CONTAINER_NAME" || true
 
             # Run the new container on port 5173
-            docker run -d --name $CONTAINER_NAME -p 5173:5173 bg_frontend
+            echo "Running container: $CONTAINER_NAME"
+            docker run -d --name "$CONTAINER_NAME" -p 5173:5173 bg_frontend
 
             # Clean up image tar file
-            rm -f $IMAGE_TAR
+            echo "Cleaning up image file..."
+            rm -f "$IMAGE_TAR"
           EOF
