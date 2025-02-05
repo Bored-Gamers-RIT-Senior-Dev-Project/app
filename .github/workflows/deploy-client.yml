@@ -59,24 +59,16 @@ jobs:
         with:
           name: docker-image
 
-      # Securely copy the Docker image to the remote server
+      # Securely copy the Docker image to the remote server using SCP
       - name: Copy Docker Image to Server
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.SSH_STAGING_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "bg_frontend.tar"
-          target: "/tmp/bg_frontend.tar"
+        run: |
+          ssh-keyscan -t ed25519 ${{ secrets.SSH_STAGING_HOST }} >> ~/.ssh/known_hosts
+          scp bg_frontend.tar ${{ secrets.SSH_USER }}@${{ secrets.SSH_STAGING_HOST }}:/tmp/bg_frontend.tar
 
-      # Deploy the application on the app server
+      # Deploy the application on the app server using SSH
       - name: Deploy Application via SSH
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_STAGING_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_STAGING_HOST }} << EOF
             CONTAINER_NAME=bg_frontend_container
             IMAGE_TAR=/tmp/bg_frontend.tar
 
@@ -92,3 +84,4 @@ jobs:
 
             # Clean up image tar file
             rm -f $IMAGE_TAR
+          EOF
