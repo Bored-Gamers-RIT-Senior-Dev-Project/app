@@ -30,34 +30,30 @@ const UserSignIn = () => {
 
   const handleSignInSubmit = async (e) => {
     e.preventDefault();
-    // setLoading(true);
     events.publish("spinner.open");
     try {
       const user = await signInWithEmail(signInData.email, signInData.password);
       const idToken = await user.getIdToken();
-      submit({ idToken });
+      submit({ idToken, method: "email" });
     } catch (error) {
       handleErrors(error);
       events.publish("spinner.close");
     }
     // events.publish("spinner.close");
-    // setLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
     events.publish("spinner.open");
-    // setLoading(true);
     try {
       const user = await signInWithGoogle();
       const idToken = await user.getIdToken();
-      //TODO: We need to handle the case where the google user has is new (Redirect to the signup form with certain information filled in automatically?)
-      submit({ idToken, ...user, method: "google" });
+      const { displayName, photoUrl, email } = user;
+      submit({ idToken, displayName, photoUrl, email, method: "google" });
     } catch (error) {
       //TODO: If the user is new and an error took place in the API, we need to handle that case and erase the user from Firebase.
       handleErrors(error);
       events.publish("spinner.close");
     }
-    // setLoading(false);
   };
 
   //ActionData is the response from the usePostSubmit action, defined in router.jsx
