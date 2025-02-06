@@ -7,9 +7,19 @@ import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
 import { signInWithEmail, signInWithGoogle } from "../utils/firebase/auth";
 
+const handleErrors = (error) => {
+  switch (error.message) {
+    default:
+      console.error("Sign-in error:", error);
+      events.publish("message", {
+        message: "An unexpected error occurred",
+        severity: "error",
+      });
+  }
+};
+
 const UserSignIn = () => {
   const [signInData, setSignInData] = useState({ email: "", password: "" });
-  const [message, setMessage] = useState("");
   const actionData = useActionData();
   const submit = usePostSubmit();
   const navigate = useNavigate();
@@ -27,8 +37,7 @@ const UserSignIn = () => {
       const idToken = await user.getIdToken();
       submit({ idToken });
     } catch (error) {
-      console.error("Sign-in error:", error);
-      setMessage(`Sign-in failed: ${error.message}`);
+      handleErrors(error);
       events.publish("spinner.close");
     }
     // events.publish("spinner.close");
@@ -42,10 +51,10 @@ const UserSignIn = () => {
       const user = await signInWithGoogle();
       const idToken = await user.getIdToken();
       //TODO: We need to handle the case where the google user has is new (Redirect to the signup form with certain information filled in automatically?)
-      submit({ idToken, ...user });
+      submit({ idToken, ...user, method: "google" });
     } catch (error) {
       //TODO: If the user is new and an error took place in the API, we need to handle that case and erase the user from Firebase.
-      setMessage(`Google Sign-In failed: ${error.message}`);
+      handleErrors(error);
       events.publish("spinner.close");
     }
     // setLoading(false);
@@ -121,11 +130,6 @@ const UserSignIn = () => {
       >
         No account? Sign Up
       </Typography>
-      {message && (
-        <Typography sx={{ mt: 2, textAlign: "center", color: "red" }}>
-          {message}
-        </Typography>
-      )}
     </Box>
   );
 };
