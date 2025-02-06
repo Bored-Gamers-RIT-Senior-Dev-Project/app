@@ -50,7 +50,6 @@ const UserSignIn = () => {
         try {
             const user = await signInWithGoogle();
             const idToken = await user.getIdToken();
-            console.log(user);
             const { displayName, photoURL, email } = user;
             submit({ idToken, displayName, photoURL, email, method: "google" });
         } catch (error) {
