@@ -31,10 +31,6 @@ const UserSignUp = () => {
     username: "",
     password: "",
     repeatPassword: "",
-    role: "Follow the Tournament",
-    schoolName: "",
-    teamOption: "Join an Existing Team",
-    teamName: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const submit = usePostSubmit();
