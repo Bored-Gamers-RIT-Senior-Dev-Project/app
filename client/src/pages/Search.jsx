@@ -32,6 +32,7 @@ const Search = () => {
       <Button
         onClick={() =>
           events.publish("message", {
+            title: "Success!",
             message: "Message sent!",
             severity: "success",
           })
