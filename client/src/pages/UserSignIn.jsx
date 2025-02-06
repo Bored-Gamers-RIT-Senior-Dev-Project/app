@@ -61,7 +61,7 @@ const UserSignIn = () => {
         navigate("/"); // Redirect to home on successful sign-in
       }
     }
-  }, [actionData]);
+  }, [actionData, navigate]);
   return (
     <Box
       sx={{
