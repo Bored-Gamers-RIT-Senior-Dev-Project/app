@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router";
 import App from "../App";
-import { Home, NotFound, Search, UserSignIn, UserSignUp } from "../pages";
+import { Home, NotFound, Search, UserSignIn, UserSignUp, Rules} from "../pages";
 import { handleSignIn, handleSignUp, sendTest } from "./api";
 import { events } from "./events";
 
@@ -42,6 +42,10 @@ const router = createBrowserRouter([
       {
         path: "/about",
         element: "TODO: About Page",
+      },
+      {
+        path:"/rules",
+        element:<Rules />,
       },
       {
         path: "*",
