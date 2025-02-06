@@ -22,46 +22,42 @@ router.post("/signin", async (req, res) => {
 });
 
 router.post("/signup", async (req, res) => {
-  const {
-    idToken,
-    email,
-    //password,
-    username,
-    role,
-    schoolName,
-    teamOption,
-    teamName,
-  } = req.body;
-
-  try {
+    const { idToken, email, username } = req.body;
     if (!email || !username || !idToken) {
-      return res.status(400).json({ message: "Missing required fields" });
+        return res.status(400).json({ message: "Invalid request format." });
     }
 
-    const userRecord = await verifyFirebaseToken(idToken);
+    //Get UID from the firebase token
+    let uid;
+    try {
+        const userEntry = await verifyFirebaseToken(idToken);
 
-    // Create a new user in Firebase Authentication
-    // const userRecord = await admin.auth().createUser({
-    //   email,
-    //   password,
-    //   displayName: username,
-    // });
+        uid = userEntry.uid;
+    } catch {
+        return res.status(401).json({ message: "Invalid Firebase Token" });
+    }
 
+    //Create the user in the local database
+    try {
+        await db.query(
+            "INSERT INTO Users (Username, Email, FirebaseUID, RoleId) VALUES (?, ?, ?, ?)",
+            [username, email, uid, 1]
+        );
+        const userQuery = await db.query(
+            "SELECT Username, Email, RoleID, ProfileImageURL, TeamID, UniversityID FROM Users WHERE FirebaseUID = ?",
+            [uid]
+        );
     res.status(201).json({
       message: "Welcome!",
-      user: {
-        uid: userRecord.uid,
-        email: userRecord.email,
-        username: userRecord.displayName,
-        role,
-        schoolName,
-        teamOption,
-        teamName,
-      },
+            user: userQuery[0][0],
     });
   } catch (error) {
+        await admin.auth().deleteUser(uid);
     console.error("Error during sign-up:", error.message);
-    res.status(400).json({ message: "Sign-up failed", error: error.message });
+        res.status(500).json({
+            message: "Sign-up failed",
+            error: error.message,
+        });
   }
 });
 module.exports = router;
