@@ -35,7 +35,6 @@ router.post("/signin", async (req, res) => {
         }
         //Google sign-in logic
         else if (method === "google") {
-            console.log("Google sign-in logic");
             const { email, displayName, photoURL } = req.body;
             //If this is the google user's first log-in, they haven't been loaded into the local DB yet.
             if (dbUser[0].length === 0) {
