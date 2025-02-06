@@ -1,6 +1,7 @@
+//FIXME: Is this file being used right now?  (Everything done here seems to be in app.js)
 // app.js \\ HELP FROM https://expressjs.com/en/resources/middleware/cors.html
 const express = require("express");
-const cors = require("cors");  // Use the default CORS package
+const cors = require("cors"); // Use the default CORS package
 const users = require("../routes/users/index");
 
 const app = express();
@@ -11,8 +12,8 @@ app.use(express.json());
 
 // Debugging Middleware (Logs all incoming requests)
 app.use((req, res, next) => {
-  console.log(`Incoming Request: ${req.method} ${rrq.url}`);
-  next();
+    console.log(`Incoming Request: ${req.method} ${rrq.url}`);
+    next();
 });
 
 app.use("/api/users", users);
@@ -20,5 +21,5 @@ app.use("/api/users", users);
 // Start the server
 const PORT = 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });
