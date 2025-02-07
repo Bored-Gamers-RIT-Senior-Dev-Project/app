@@ -41,17 +41,7 @@ jobs:
       # Build the Docker image for the React application
       - name: Build Docker Image
         run: |
-          docker build --no-cache -t bg_frontend ./client  # Use ./client as the build context
-
-      # Fix log permissions if build fails
-      - name: Fix npm Log Permissions
-        if: failure()
-        run: sudo chmod -R a+r /root/.npm/_logs
-
-      # Display any errors from npm debug log
-      - name: Show npm Debug Log on Failure
-        if: failure()
-        run: cat /root/.npm/_logs/*.log
+          docker build --platform=linux/amd64 -t bg_frontend ./client  # Use ./client as the build context
 
 ### For running test.js later ###
 #      # Run tests inside the container
