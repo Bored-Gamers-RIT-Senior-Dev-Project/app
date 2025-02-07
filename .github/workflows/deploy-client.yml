@@ -41,7 +41,7 @@ jobs:
       # Build the Docker image for the React application
       - name: Build Docker Image
         run: |
-          docker buildx build --platform=linux/amd64 -t bg_frontend ./client  # Use ./client as the build context
+          docker buildx build --platform=linux/amd64 --network=host -t bg_frontend ./client  # Use ./client as the build context
 
 ### For running test.js later ###
 #      # Run tests inside the container
