@@ -43,6 +43,11 @@ jobs:
         run: |
           docker build --no-cache -t bg_frontend ./client  # Use ./client as the build context
 
+      # Display any errors from npm debug log
+      - name: Show npm Debug Log on Failure
+        if: failure()
+        run: cat /root/.npm/_logs/*.log
+
 ### For running test.js later ###
 #      # Run tests inside the container
 #      - name: Run Tests
