@@ -1,4 +1,4 @@
-name: Build and Deploy (React App) Frontend to Staging Host
+name: Build and Deploy Client to Staging Host
 
 on:
   # Trigger on push to the main branch
