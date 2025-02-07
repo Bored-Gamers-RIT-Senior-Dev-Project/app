@@ -13,16 +13,48 @@ import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
 import { signUpWithEmail } from "../utils/firebase/auth";
 
-const handleErrors = (error) => {
-    // Handle specific error messages here if needed
-    switch (error) {
-        default:
-            console.error("Sign-in error:", error);
-            events.publish("message", {
-                message: "An unexpected error occurred",
-                severity: "error",
-            });
+/**
+ * @class ErrorData a convenience for representing the data needed for an error
+ */
+class ErrorData {
+    /**
+     * Create a new ErrorData
+     * @param {string} message The user-facing message for this error
+     * @param {string} [severity] The severity, or "error" if not specified.
+     * Should be one of "info", "error", "warning", or "success", if provided
+     */
+    constructor(message, severity = "error") {
+        this.message = message;
+        const allowedErrors = ["info", "error", "warning", "success"];
+        if (!allowedErrors.includes(severity)) {
+            console.warn(`ErrorData: Unexpected severity ${severity}`);
+        }
+        this.severity = severity;
     }
+}
+
+/**
+ * Handle a sign up error from Firebase
+ * @param {*} error the error
+ */
+const handleFirebaseSignUpError = (error) => {
+    "use strict";
+    // Handle specific error messages here if needed
+    // The error code list is here:
+    // https://firebase.google.com/docs/reference/js/auth#autherrorcodes
+    const errorCodeLookup = {
+        "auth/email-already-in-use": new ErrorData("Email already in use"),
+        "auth/invalid-email": new ErrorData("Invalid Email"),
+        "auth/weak-password": new ErrorData(
+            "Password is too weak (too short?)"
+        ),
+    };
+    const errorData =
+        errorCodeLookup[error.code] ??
+        new ErrorData("An unexpected error occurred");
+
+    events.publish("message", errorData);
+    console.error("Sign-in error:", error);
 };
 
 const UserSignUp = () => {
@@ -73,7 +105,7 @@ const UserSignUp = () => {
                 username: signUpData.username,
             });
         } catch (error) {
-            handleErrors(error);
+            handleFirebaseSignUpError(error);
         } finally {
             events.publish("spinner.close");
         }
