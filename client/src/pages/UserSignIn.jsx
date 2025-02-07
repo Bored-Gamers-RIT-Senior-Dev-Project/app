@@ -1,4 +1,4 @@
-// Chatgpt helped me write funtion in this file and its the async funtion
+// Chatgpt helped me write function in this file and its the async function
 import { Google } from "@mui/icons-material";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
