@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm ci 2>&1
 
 # Serve the app
 RUN npm i -g serve
