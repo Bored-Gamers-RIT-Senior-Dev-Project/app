@@ -1,11 +1,14 @@
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import {
     Button,
+    colors,
     IconButton,
     InputAdornment,
+    LinearProgress,
     Paper,
     TextField,
     Typography,
+    Box,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useActionData, useNavigate } from "react-router";
@@ -55,6 +58,25 @@ const handleFirebaseSignUpError = (error) => {
 
     events.publish("message", errorData);
     console.error("Sign-in error:", error);
+};
+/**
+ * A component for the password bar
+ * @returns the password strength component
+ */
+const PasswordStrength = (signUpData) => {
+    return (
+        <Box sx={{ width: "100%", color: "red" }}>
+            <Typography color="inherit">
+                <b></b>
+            </Typography>
+            <LinearProgress
+                variant="determinate"
+                value={50}
+                color="inherit"
+            ></LinearProgress>
+            <Typography color="inherit">D</Typography>
+        </Box>
+    );
 };
 
 const UserSignUp = () => {
@@ -181,6 +203,7 @@ const UserSignUp = () => {
                     required
                     margin="normal"
                 />
+                <PasswordStrength signUpData={signUpData} />
                 <Button
                     type="submit"
                     variant="contained"
