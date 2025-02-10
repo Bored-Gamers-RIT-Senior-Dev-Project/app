@@ -14,7 +14,7 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.3",
     "@mui/material": "^6.4.3",
-    "firebase": "^11.2.0",
+    "firebase": "^11.3.0",
     "axios": "^1.7.9",
     "postal": "^2.0.6",
     "react": "^19.0.0",
