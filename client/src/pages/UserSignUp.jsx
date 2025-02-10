@@ -1,7 +1,6 @@
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import {
     Button,
-    colors,
     IconButton,
     InputAdornment,
     LinearProgress,
@@ -10,11 +9,16 @@ import {
     Typography,
     Box,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useDeferredValue } from "react";
 import { useActionData, useNavigate } from "react-router";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
 import { signUpWithEmail } from "../utils/firebase/auth";
+
+// From https://zxcvbn-ts.github.io/zxcvbn/guide/framework-examples/#react:
+import { ZxcvbnFactory } from "@zxcvbn-ts/core";
+import * as zxcvbnCommonPackage from "@zxcvbn-ts/language-common";
+import * as zxcvbnEnPackage from "@zxcvbn-ts/language-en";
 
 /**
  * @class ErrorData a convenience for representing the data needed for an error
@@ -59,6 +63,42 @@ const handleFirebaseSignUpError = (error) => {
     events.publish("message", errorData);
     console.error("Sign-in error:", error);
 };
+
+// From https://zxcvbn-ts.github.io/zxcvbn/guide/framework-examples/#react
+const options = {
+    // recommended
+    dictionary: {
+        ...zxcvbnCommonPackage.dictionary,
+        ...zxcvbnEnPackage.dictionary,
+    },
+    // recommended
+    graphs: zxcvbnCommonPackage.adjacencyGraphs,
+    // recommended
+    useLevenshteinDistance: true,
+};
+
+const zxcvbn = new ZxcvbnFactory(options);
+
+/**
+ * Score the given password
+ * From https://github.com/zxcvbn-ts/zxcvbn/tree/master/docs/guide/framework-examples
+ * @param {string} password The password to score
+ * @returns zxcvbn's password scoring
+ */
+const usePasswordStrength = (password) => {
+    const [result, setResult] = useState(null);
+    // NOTE: useDeferredValue is React v18 only, for v17 or lower use debouncing
+    const deferredPassword = useDeferredValue(password);
+
+    useEffect(() => {
+        zxcvbn
+            .checkAsync(deferredPassword)
+            .then((response) => setResult(response));
+    }, [deferredPassword]);
+
+    return result;
+};
+
 /**
  * A component for the password bar
  * @returns the password strength component
