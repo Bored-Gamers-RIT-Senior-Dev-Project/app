@@ -46,7 +46,7 @@ router.post("/signin", async (req, res) => {
             if (dbUser[0].length === 0) {
                 await db.query(
                     "INSERT INTO Users (FirebaseUID, Email, Username, FirstName, LastName, ProfileImageUrl, RoleId) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    [uid, email, username, firstName, "", photoURL, 1]
+                    [uid, email, username, firstName, lastName, photoURL, 1]
                 );
                 dbUser = await db.query(
                     "SELECT Username, Email, RoleID, ProfileImageURL, TeamID, UniversityID FROM Users WHERE FirebaseUID = ?",
