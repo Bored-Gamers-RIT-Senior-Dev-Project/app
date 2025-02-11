@@ -70,8 +70,8 @@ router.post("/signin", async (req, res) => {
 });
 
 router.post("/signup", async (req, res) => {
-    const { idToken, email, username } = req.body;
-    if (!email || !username || !idToken) {
+    const { idToken, email, username, firstName, lastName } = req.body;
+    if (!email || !username || !idToken || !firstName || !lastName) {
         return res.status(400).json({ message: "Invalid request format." });
     }
 
@@ -88,8 +88,8 @@ router.post("/signup", async (req, res) => {
     //Create the user in the local database
     try {
         await db.query(
-            "INSERT INTO Users (Username, Email, FirebaseUID, RoleId) VALUES (?, ?, ?, ?)",
-            [username, email, uid, 1]
+            "INSERT INTO Users (FirstName, LastName, Username, Email, FirebaseUID, RoleId) VALUES (?, ?, ?, ?, ?, ?)",
+            [firstName, lastName, username, email, uid, 1]
         );
         const userQuery = await db.query(
             "SELECT Username, Email, RoleID, ProfileImageURL, TeamID, UniversityID FROM Users WHERE FirebaseUID = ?",
