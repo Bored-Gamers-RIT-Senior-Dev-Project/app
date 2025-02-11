@@ -61,6 +61,8 @@ const UserSignUp = () => {
     const [signUpData, setSignUpData] = useState({
         email: "",
         username: "",
+        fname: "",
+        lname: "",
         password: "",
         repeatPassword: "",
     });
@@ -103,6 +105,8 @@ const UserSignUp = () => {
                 idToken,
                 email: signUpData.email,
                 username: signUpData.username,
+                firstName: signUpData.fname,
+                lastName: signUpData.lname,
             });
         } catch (error) {
             handleFirebaseSignUpError(error);
@@ -140,6 +144,24 @@ const UserSignUp = () => {
                     label="Username"
                     name="username"
                     value={signUpData.username}
+                    onChange={handleSignUpChange}
+                    fullWidth
+                    required
+                    margin="normal"
+                />
+                <TextField
+                    label="First Name"
+                    name="fname"
+                    value={signUpData.fname}
+                    onChange={handleSignUpChange}
+                    fullWidth
+                    required
+                    margin="normal"
+                />
+                <TextField
+                    label="Last Name"
+                    name="lname"
+                    value={signUpData.lname}
                     onChange={handleSignUpChange}
                     fullWidth
                     required
