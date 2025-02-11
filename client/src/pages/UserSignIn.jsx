@@ -1,4 +1,4 @@
-// Chatgpt helped me write funtion in this file and its the async funtion
+// Chatgpt helped me write function in this file and its the async function
 import { Google } from "@mui/icons-material";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -53,6 +53,7 @@ const UserSignIn = () => {
             const { displayName, photoURL, email } = user;
             submit({ idToken, displayName, photoURL, email, method: "google" });
         } catch (error) {
+            //TODO: If the user is new and an error took place in the API, we need to handle that case and erase the user from Firebase.
             handleErrors(error);
             events.publish("spinner.close");
         }

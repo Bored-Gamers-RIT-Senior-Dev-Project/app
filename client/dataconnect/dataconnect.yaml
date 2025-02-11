@@ -2,11 +2,11 @@ specVersion: "v1beta"
 serviceId: "client"
 location: "us-central1"
 schema:
-  source: "./schema"
-  datasource:
-    postgresql:
-      database: "fdcdb"
-      cloudSql:
-        instanceId: "client-fdc"
-      # schemaValidation: "COMPATIBLE"
+    source: "./schema"
+    datasource:
+        postgresql:
+            database: "fdcdb"
+            cloudSql:
+                instanceId: "client-fdc"
+            # schemaValidation: "COMPATIBLE"
 connectorDirs: ["./connector"]
