@@ -23,8 +23,6 @@ app.use(cookieParser());
 app.use(cors()); // Enable CORS
 app.use(bodyParser.json());
 
-// Load environment variables
-require("dotenv").config();
 app.use("/api/users", users);
 app.use("/api", test);
 app.use("/api/auth", auth);

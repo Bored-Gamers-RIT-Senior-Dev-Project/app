@@ -15,7 +15,6 @@ const getTest = async () => axios.get(url("users"));
  * AUTHENTICATION *
  ******************/
 const handleSignIn = async (params) => {
-    console.log(params);
     let { data } = await axios.post(url("users/signin"), params);
     return data;
 };

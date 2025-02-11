@@ -17,11 +17,7 @@ authProvider.addScope("profile");
 
 //Sign-in functions
 const signInWithGoogle = async () => {
-    const result = await signInWithPopup(auth, authProvider).then((result) => {
-        console.log("Sign in:", result);
-        return result;
-    });
-    console.log(result);
+    const result = await signInWithPopup(auth, authProvider);
     return result.user;
 };
 const signInWithEmail = async (email, password) => {

@@ -50,8 +50,8 @@ const UserSignIn = () => {
         try {
             const user = await signInWithGoogle();
             const idToken = await user.getIdToken();
-            const { displayName, photoUrl, email } = user;
-            submit({ idToken, displayName, photoUrl, email, method: "google" });
+            const { displayName, photoURL, email } = user;
+            submit({ idToken, displayName, photoURL, email, method: "google" });
         } catch (error) {
             //TODO: If the user is new and an error took place in the API, we need to handle that case and erase the user from Firebase.
             handleErrors(error);
