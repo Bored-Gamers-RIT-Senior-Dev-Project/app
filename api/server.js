@@ -10,8 +10,8 @@ app.use(express.json());
 
 // Test database connection
 db.getConnection()
-  .then(() => console.log("Connected to MySQL"))
-  .catch((err) => console.error("MySQL connection error:", err));
+    .then(() => console.log("Connected to MySQL"))
+    .catch((err) => console.error("MySQL connection error:", err));
 
 // Routes
 app.use("/api/auth", authRoutes);
