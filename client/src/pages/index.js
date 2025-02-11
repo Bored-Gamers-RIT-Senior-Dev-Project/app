@@ -1,10 +1,8 @@
 import { Home } from "./Home";
 import { NotFound } from "./NotFound";
 import { Search } from "./Search";
+import { University } from "./University";
 import { UserSignIn } from "./UserSignIn";
 import { UserSignUp } from "./UserSignUp";
-import { University } from "./University";
-import { Rules } from "./Rules";
-import {Schedule}  from "./Schedule";
-export { Home, NotFound, Search, UserSignIn, UserSignUp,University,Rules,Schedule};
 
+export { Home, NotFound, Search, University, UserSignIn, UserSignUp };
