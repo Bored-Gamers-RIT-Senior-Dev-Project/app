@@ -36,11 +36,17 @@ router.post("/signin", async (req, res) => {
         //Google sign-in logic
         else if (method === "google") {
             const { email, displayName, photoURL } = req.body;
+
+            const username = email.split("@")[0];
+            const names = displayName.split(" ");
+            const firstName = names[0];
+            const lastName = names.slice(1).join(" ");
+
             //If this is the google user's first log-in, they haven't been loaded into the local DB yet.
             if (dbUser[0].length === 0) {
                 await db.query(
-                    "INSERT INTO Users (FirebaseUID, Email, Username, ProfileImageUrl, RoleId) VALUES (?, ?, ?, ?, ?)",
-                    [uid, email, displayName, photoURL, 1]
+                    "INSERT INTO Users (FirebaseUID, Email, Username, FirstName, LastName, ProfileImageUrl, RoleId) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    [uid, email, username, firstName, "", photoURL, 1]
                 );
                 dbUser = await db.query(
                     "SELECT Username, Email, RoleID, ProfileImageURL, TeamID, UniversityID FROM Users WHERE FirebaseUID = ?",
