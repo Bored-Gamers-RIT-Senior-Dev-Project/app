@@ -92,7 +92,6 @@ zxcvbnOptions.setOptions(options);
  */
 const usePasswordStrength = (password) => {
     const [result, setResult] = useState(null);
-    // NOTE: useDeferredValue is React v18 only, for v17 or lower use debouncing
     const deferredPassword = useDeferredValue(password);
 
     useEffect(() => {
