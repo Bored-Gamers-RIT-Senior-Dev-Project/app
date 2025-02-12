@@ -5,7 +5,6 @@
         "start": "concurrently \"npm run dev --prefix client\" \"npm run dev --prefix api\""
     },
     "dependencies": {
-        "@zxcvbn-ts/core": "^3.0.4",
         "concurrently": "^9.1.2"
     }
 }
