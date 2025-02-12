@@ -1,5 +1,6 @@
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import {
+    Box,
     Button,
     IconButton,
     InputAdornment,
@@ -7,17 +8,16 @@ import {
     Paper,
     TextField,
     Typography,
-    Box,
 } from "@mui/material";
-import { useEffect, useState, useDeferredValue } from "react";
+import PropTypes from "prop-types";
+import { useDeferredValue, useEffect, useState } from "react";
 import { useActionData, useNavigate } from "react-router";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
 import { signUpWithEmail } from "../utils/firebase/auth";
-import PropTypes from "prop-types";
 
 // From https://zxcvbn-ts.github.io/zxcvbn/guide/framework-examples/#react:
-import { zxcvbnOptions, zxcvbnAsync } from "@zxcvbn-ts/core";
+import { zxcvbnAsync, zxcvbnOptions } from "@zxcvbn-ts/core";
 /**
  * @import { ZxcvbnResult, Score } from "@zxcvbn-ts/core"
  */
@@ -173,7 +173,7 @@ const PasswordStrength = ({ signUpData }) => {
                 variant="determinate"
                 value={(score / 4) * 100}
                 color="inherit"
-            ></LinearProgress>
+            />
             <Typography color="inherit">{reason}</Typography>
         </Box>
     );
