@@ -18,7 +18,7 @@ const createUser = async (
     firstName,
     lastName = "",
     username = email.split("@")[0],
-    profileImageUrl = `https://ui-avatars.com/api/?name=${FirstName}+${LastName}`,
+    profileImageUrl = `https://ui-avatars.com/api/?name=${firstName}+${lastName}`,
     roleId = 1 // Default role for new users is Spectator
 ) => {
     try {

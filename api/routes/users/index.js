@@ -23,7 +23,7 @@ router.post("/signin", async (req, res) => {
                 const firstName = names[0];
                 const lastName = names.slice(1).join(" ");
                 const output = await createUser(
-                    idToken,
+                    firebaseUser.uid,
                     email,
                     firstName,
                     lastName,
@@ -77,7 +77,7 @@ router.post("/signup", async (req, res) => {
         );
         console.log("Success: ", result);
 
-        const user = await getUserByUid(firebaseUser.uid);
+        const user = await getUser(firebaseUser.uid);
 
         res.status(201).json({
             message: "Welcome!",
