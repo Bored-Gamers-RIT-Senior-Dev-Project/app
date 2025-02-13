@@ -97,4 +97,3 @@ NavDrawer.propTypes = {
 };
 
 export { NavDrawer };
-
