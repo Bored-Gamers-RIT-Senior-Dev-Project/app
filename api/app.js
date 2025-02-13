@@ -11,7 +11,6 @@ const cors = require("cors");
 
 const users = require("./routes/users");
 const test = require("./routes/test");
-const auth = require("./routes/auth");
 
 const app = express();
 
@@ -25,7 +24,6 @@ app.use(bodyParser.json());
 
 app.use("/api/users", users);
 app.use("/api", test);
-app.use("/api/auth", auth);
 
 // catch 404 and forward to error handler
 app.use((_req, _res, next) => {
