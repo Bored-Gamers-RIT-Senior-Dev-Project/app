@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const admin = require("firebase-admin");
 const db = require("../../config/db");
-const { verifyFirebaseToken } = require("../../services/firebase");
+const { verifyFirebaseToken } = require("../../config/firebase");
 
 router.post("/signin", async (req, res) => {
     const { idToken, method } = req.body;
