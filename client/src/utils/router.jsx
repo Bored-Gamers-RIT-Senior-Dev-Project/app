@@ -40,7 +40,7 @@ const makeAction =
                   action: makeAction(sendTest),
               },
               {
-                path: "/university/*",
+                path: "/university/:universityId",
                 element: <University/>,
               },
               {
