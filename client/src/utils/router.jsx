@@ -47,7 +47,7 @@ const router = createBrowserRouter([
                 action: makeAction(sendTest),
             },
             {
-                path: "/University",
+                path: "/university/:universityId",
                 element: <University />,
             },
             {
