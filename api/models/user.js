@@ -49,14 +49,18 @@ const createUser = async (
  * @return {Promise<object>} The user object from the database.
  * @throws {Error} If the user is not found.
  */
-const getUserByUid = async (uid) => {
+const getUser = async (uid) => {
     try {
         const [rows] = await db.query(
-            `SELECT * FROM Users WHERE FirebaseUID = ?`,
-            [columns.join(" "), uid]
+            `
+            SELECT * 
+            FROM Users
+            WHERE FirebaseUID = ?
+        `,
+            [uid]
         );
         if (rows.length === 0) {
-            throw new Error("User not found");
+            return null;
         }
         return rows[0];
     } catch (error) {
@@ -65,20 +69,4 @@ const getUserByUid = async (uid) => {
     }
 };
 
-/**
- * Retrieve a user from the database by their Firebase authentication token..
- * @param {string} token The firebase authentication token.
- * @return {Promise<object>} The user object from the database.
- * @throws {Error} If the token is invalid or the user is not found.
- */
-const getUserByToken = async (token) => {
-    try {
-        const userEntry = await verifyFirebaseToken(token);
-        return await getUser(userEntry.uid);
-    } catch (error) {
-        console.error("Error decoding Firebase Token: ", error.message);
-        throw error;
-    }
-};
-
-module.exports = { createUser, getUserByUid, getUserByToken };
+module.exports = { createUser, getUser };
