@@ -36,7 +36,16 @@ const createUser = async (
                 roleId,
             ]
         );
-        return result;
+        return {
+            id: result.insertId,
+            firebaseUID,
+            email,
+            firstName,
+            lastName,
+            username,
+            profileImageUrl,
+            roleId,
+        };
     } catch (error) {
         console.error("Error creating user:", error.message);
         throw error;
