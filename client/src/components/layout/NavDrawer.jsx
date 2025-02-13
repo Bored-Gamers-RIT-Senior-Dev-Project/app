@@ -100,4 +100,3 @@ NavDrawer.propTypes = {
 };
 
 export { NavDrawer };
-
