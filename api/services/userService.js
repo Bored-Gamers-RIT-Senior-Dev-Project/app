@@ -23,7 +23,9 @@ const signIn = async (idToken) => {
 };
 
 const googleSignIn = async (idToken, email, displayName, photoURL) => {
-    let user = await getUser(idToken);
+    const firebaseUser = await verifyFirebaseToken(idToken);
+    let user = await User.readUser(firebaseUser.uid);
+
     if (!user) {
         const username = email.split("@")[0];
         const names = displayName.split(" ");
