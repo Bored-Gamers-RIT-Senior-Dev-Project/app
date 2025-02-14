@@ -58,7 +58,7 @@ const createUser = async (
  * @return {Promise<object>} The user object from the database.
  * @throws {Error} If the user is not found.
  */
-const getUser = async (uid) => {
+const readUser = async (uid) => {
     try {
         const [rows] = await db.query(
             `
@@ -78,4 +78,4 @@ const getUser = async (uid) => {
     }
 };
 
-module.exports = { createUser, getUser };
+module.exports = { createUser, readUser };

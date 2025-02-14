@@ -14,9 +14,8 @@ const signUp = async (idToken, email, username, firstName, lastName) => {
 };
 
 const signIn = async (idToken) => {
-    console.log("signIn called with idToken:", idToken);
     const firebaseUser = await verifyFirebaseToken(idToken);
-    let user = await User.getUser(firebaseUser.uid);
+    let user = await User.readUser(firebaseUser.uid);
 
     if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -24,7 +23,7 @@ const signIn = async (idToken) => {
 };
 
 const googleSignIn = async (idToken, email, displayName, photoURL) => {
-    let user = await getUser(idToken);
+    let user = await this.getUser(idToken);
     if (!user) {
         const username = email.split("@")[0];
         const names = displayName.split(" ");
@@ -44,7 +43,7 @@ const googleSignIn = async (idToken, email, displayName, photoURL) => {
 
 const getUser = async (idToken) => {
     const firebaseUser = await verifyFirebaseToken(idToken);
-    const user = await User.getUser(firebaseUser.uid);
+    const user = await User.readUser(firebaseUser.uid);
     return user;
 };
 
