@@ -14,7 +14,6 @@ const createError = require("http-errors");
 
 //Initialize Express
 const express = require("express");
-const HttpError = require("./models/httpError");
 const app = express();
 
 // Middleware
@@ -45,7 +44,7 @@ app.use((err, req, res, _next) => {
 
     // Send an error message
     res.status(err.status || 500).json({
-        message: err.message, // https://stackoverflow.com/a/32836884
+        message: err.message, // https://stackoverzflow.com/a/32836884
         error: error,
     });
 });

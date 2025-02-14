@@ -1,8 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const admin = require("firebase-admin");
 const UserService = require("../services/userService");
-const HttpError = require("../models/httpError");
+const createError = require("http-errors");
 
 router.post("/get", async (req, res, next) => {
     const { token } = req.body;
@@ -35,7 +34,7 @@ router.post("/signin", async (req, res, next) => {
             case "email":
                 user = await UserService.getUser(idToken);
                 if (!user) {
-                    throw new HttpError(404, "User not found.");
+                    throw createError(404, "User not found.");
                 }
                 break;
             default:
