@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const admin = require("firebase-admin");
-const UserService = require("../../services/users");
-const HttpError = require("../../models/httpError");
+const UserService = require("../../services/userService");
+const HttpError = require("../models/httpError");
 
 router.post("/", async (req, res) => {
     const { token } = req.body;

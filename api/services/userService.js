@@ -1,5 +1,5 @@
 const { verifyFirebaseToken } = require("../config/firebase");
-const User = require("../models/user");
+const User = require("../models/userModel");
 
 const signUp = async (idToken, email, username, firstName, lastName) => {
     const firebaseUser = await verifyFirebaseToken(idToken);
