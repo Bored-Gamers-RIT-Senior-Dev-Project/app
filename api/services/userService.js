@@ -1,4 +1,5 @@
 const { verifyFirebaseToken } = require("../config/firebase");
+const randomString = require("../config/randomString");
 const User = require("../models/userModel");
 
 const signUp = async (idToken, email, username, firstName, lastName) => {
@@ -24,7 +25,7 @@ const googleSignIn = async (idToken, email, displayName, photoURL) => {
     let user = await User.readUser(firebaseUser.uid);
 
     if (!user) {
-        const username = email.split("@")[0];
+        const username = email.split("@")[0] + "-" + randomString(4); //Add random string to username to avoid duplicates.
         const names = displayName.split(" ");
         const firstName = names[0];
         const lastName = names.slice(1).join(" ");

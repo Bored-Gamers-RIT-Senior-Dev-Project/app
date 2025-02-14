@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const randomString = require("../config/randomString");
 
 /**
  * Creates a user in the database.
@@ -17,8 +18,8 @@ const createUser = async (
     email,
     firstName,
     lastName = "",
-    username = email.split("@")[0],
-    profileImageUrl = `https://ui-avatars.com/api/?name=${firstName}+${lastName}`,
+    username = email.split("@")[0] + "-" + randomString(4),
+    profileImageUrl = `https://ui-avatars.com/api/?name=${firstName}+${lastName}?background=edca82`,
     roleId = 1 // Default role for new users is Spectator
 ) => {
     try {
