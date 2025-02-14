@@ -25,7 +25,6 @@ router.post("/signin", async (req, res, next) => {
             case "google":
                 user = await UserService.googleSignIn(
                     idToken,
-                    method,
                     email,
                     displayName,
                     photoUrl
