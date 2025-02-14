@@ -23,7 +23,7 @@ const signIn = async (idToken) => {
 };
 
 const googleSignIn = async (idToken, email, displayName, photoURL) => {
-    let user = await this.getUser(idToken);
+    let user = await getUser(idToken);
     if (!user) {
         const username = email.split("@")[0];
         const names = displayName.split(" ");
