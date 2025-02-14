@@ -4,23 +4,17 @@ const admin = require("firebase-admin");
 const UserService = require("../services/userService");
 const HttpError = require("../models/httpError");
 
-router.post("/get", async (req, res) => {
+router.post("/get", async (req, res, next) => {
     const { token } = req.body;
     try {
         const user = UserService.getUser(token);
         return res.status(200).json(user);
     } catch (error) {
-        if (error instanceof HttpError) {
-            return res.status(error.code).json({ message: error.message });
-        }
-        console.log("Error getting user information:", error.message);
-        return res
-            .status(500)
-            .json({ message: "Internal server error", error: error.message });
+        next(error);
     }
 });
 
-router.post("/signin", async (req, res) => {
+router.post("/signin", async (req, res, next) => {
     const { idToken, method, email, displayName, photoUrl } = req.body;
     if (!idToken || !method) {
         return res.status(400).json({ message: "Invalid request format." });
@@ -39,7 +33,10 @@ router.post("/signin", async (req, res) => {
                 );
                 break;
             case "email":
-                user = await UserService.signIn(idToken);
+                user = await UserService.getUser(idToken);
+                if (!user) {
+                    throw new HttpError(404, "User not found.");
+                }
                 break;
             default:
                 return res
@@ -51,17 +48,11 @@ router.post("/signin", async (req, res) => {
             user,
         }); //Successful sign-in.  Report to user and send the dbUser information for the frontend to store
     } catch (error) {
-        if (error instanceof HttpError) {
-            return res.status(error.code).json({ message: error.message });
-        }
-        console.log("Error during sign-in:", error.message);
-        return res
-            .status(500)
-            .json({ message: "Internal server error", error: error.message });
+        next(error);
     }
 });
 
-router.post("/signup", async (req, res) => {
+router.post("/signup", async (req, res, next) => {
     const { idToken, email, username, firstName, lastName } = req.body;
     if (!email || !username || !idToken || !firstName || !lastName) {
         return res.status(400).json({ message: "Invalid request format." });
@@ -80,13 +71,7 @@ router.post("/signup", async (req, res) => {
         });
     } catch (error) {
         await admin.auth().deleteUser(uid);
-        if (error instanceof HttpError) {
-            return res.status(error.code).json({ message: error.message });
-        }
-        console.log("Error during sign-up:", error.message);
-        return res
-            .status(500)
-            .json({ message: "Internal server error", error: error.message });
+        next(error);
     }
 });
 module.exports = router;
