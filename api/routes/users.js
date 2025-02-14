@@ -70,7 +70,6 @@ router.post("/signup", async (req, res, next) => {
             user: result,
         });
     } catch (error) {
-        await admin.auth().deleteUser(uid);
         next(error);
     }
 });

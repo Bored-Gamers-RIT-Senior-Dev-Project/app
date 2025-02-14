@@ -3,14 +3,20 @@ const User = require("../models/userModel");
 
 const signUp = async (idToken, email, username, firstName, lastName) => {
     const firebaseUser = await verifyFirebaseToken(idToken);
-    const result = await User.createUser(
-        firebaseUser.uid,
-        email,
-        firstName,
-        lastName,
-        username
-    );
-    return result;
+    try {
+        const result = await User.createUser(
+            firebaseUser.uid,
+            email,
+            firstName,
+            lastName,
+            username
+        );
+        return result;
+    } catch (error) {
+        //If there's an error adding the FirebaseUser to the local database, delete the record from Firebase to avoid mismatched records.
+        await admin.auth().deleteUser(firebaseUser.uid);
+        throw error;
+    }
 };
 
 const googleSignIn = async (idToken, email, displayName, photoURL) => {
