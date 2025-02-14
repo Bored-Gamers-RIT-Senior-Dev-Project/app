@@ -4,7 +4,7 @@ const admin = require("firebase-admin");
 const UserService = require("../../services/userService");
 const HttpError = require("../models/httpError");
 
-router.post("/", async (req, res) => {
+router.post("/get", async (req, res) => {
     const { token } = req.body;
     try {
         const user = UserService.getUser(token);
@@ -26,8 +26,8 @@ router.post("/signin", async (req, res) => {
         return res.status(400).json({ message: "Invalid request format." });
     }
     try {
-        console.log("Sign-in requested with idToken:", idToken);
         let user;
+        //TODO: change the way the front-end calls endpoints so that we don't need to do this.  Create a separate endpoint for Google sign-ups and use "/get" route for all user data retrieval.
         switch (method) {
             case "google":
                 user = await UserService.googleSignIn(
