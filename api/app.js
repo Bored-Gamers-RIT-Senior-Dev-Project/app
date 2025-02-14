@@ -33,23 +33,25 @@ app.use((_req, _res, next) => {
     next(createError(404));
 });
 
-// error handler
-app.use((err, req, res, _) => {
+// Error Handler
+app.use((err, req, res, _next) => {
+    //Handle custom HttpError class.  We defined the code and message, so they're safe to send.
     if (err instanceof HttpError) {
         res.status(err.status);
         return res.json({ message: err.message });
     }
 
+    //Handle other errors
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get("env") === "development" ? err : {};
 
-    // render the error page
+    // Send an error message
     res.status(err.status || 500);
     res.json({
         message: err.message, // https://stackoverflow.com/a/32836884
         error: err,
-    }); // FIXME: This is temporary, send to user friendly error page instead (Respond with an error response, React Router the frontend has the tools to do this.  -Nate)
+    });
 });
 
 module.exports = app;
