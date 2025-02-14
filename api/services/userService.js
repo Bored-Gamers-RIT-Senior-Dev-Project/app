@@ -13,15 +13,6 @@ const signUp = async (idToken, email, username, firstName, lastName) => {
     return result;
 };
 
-const signIn = async (idToken) => {
-    const firebaseUser = await verifyFirebaseToken(idToken);
-    let user = await User.readUser(firebaseUser.uid);
-
-    if (!user) {
-        return res.status(404).json({ message: "User not found" });
-    }
-};
-
 const googleSignIn = async (idToken, email, displayName, photoURL) => {
     const firebaseUser = await verifyFirebaseToken(idToken);
     let user = await User.readUser(firebaseUser.uid);
@@ -49,4 +40,4 @@ const getUser = async (idToken) => {
     return user;
 };
 
-module.exports = { signUp, signIn, getUser, googleSignIn };
+module.exports = { signUp, getUser, googleSignIn };
