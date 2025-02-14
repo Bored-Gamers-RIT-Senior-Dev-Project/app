@@ -13,9 +13,9 @@ import PropTypes from "prop-types";
 import { useDeferredValue, useEffect, useState } from "react";
 import { useActionData, useNavigate } from "react-router";
 import { usePostSubmit } from "../hooks/usePostSubmit";
-import { ErrorData } from "../utils/errorData";
 import { events } from "../utils/events";
 import { signUpWithEmail } from "../utils/firebase/auth";
+import { ErrorData, Severity } from "../utils/messageData";
 
 // From https://zxcvbn-ts.github.io/zxcvbn/guide/framework-examples/#react:
 import { zxcvbnAsync, zxcvbnOptions } from "@zxcvbn-ts/core";
@@ -194,10 +194,10 @@ const UserSignUp = () => {
 
         if (signUpData.password !== signUpData.repeatPassword) {
             //TODO: Make the form validate this automatically, rather than on submit.
-            events.publish("Message", {
-                message: "Passwords do not match",
-                severity: "warning",
-            });
+            events.publish(
+                "Message",
+                new ErrorData("Passwords do not match", Severity.WARNING)
+            );
             events.publish("spinner.close");
             return;
         }
