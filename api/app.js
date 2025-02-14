@@ -35,20 +35,12 @@ app.use((_req, _res, next) => {
 
 // Error Handler
 app.use((err, req, res, _next) => {
-    //Handle custom HttpError class.  We defined the code and message, so they're safe to send.
-    if (err instanceof HttpError) {
-        res.status(err.status);
-        return res.json({ message: err.message });
-    }
-
-    //Handle other errors
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get("env") === "development" ? err : {};
 
     // Send an error message
-    res.status(err.status || 500);
-    res.json({
+    res.status(err.status || 500).json({
         message: err.message, // https://stackoverflow.com/a/32836884
         error: err,
     });
