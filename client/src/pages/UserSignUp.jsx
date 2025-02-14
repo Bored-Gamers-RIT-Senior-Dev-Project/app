@@ -13,6 +13,7 @@ import PropTypes from "prop-types";
 import { useDeferredValue, useEffect, useState } from "react";
 import { useActionData, useNavigate } from "react-router";
 import { usePostSubmit } from "../hooks/usePostSubmit";
+import { ErrorData } from "../utils/errorData";
 import { events } from "../utils/events";
 import { signUpWithEmail } from "../utils/firebase/auth";
 
@@ -24,26 +25,6 @@ import { zxcvbnAsync, zxcvbnOptions } from "@zxcvbn-ts/core";
 import * as zxcvbnCommonPackage from "@zxcvbn-ts/language-common";
 import * as zxcvbnEnPackage from "@zxcvbn-ts/language-en";
 import { translations } from "@zxcvbn-ts/language-en";
-
-/**
- * @class ErrorData a convenience for representing the data needed for an error
- */
-class ErrorData {
-    /**
-     * Create a new ErrorData
-     * @param {string} message The user-facing message for this error
-     * @param {string} [severity] The severity, or "error" if not specified.
-     * Should be one of "info", "error", "warning", or "success", if provided
-     */
-    constructor(message, severity = "error") {
-        this.message = message;
-        const allowedErrors = ["info", "error", "warning", "success"];
-        if (!allowedErrors.includes(severity)) {
-            console.warn(`ErrorData: Unexpected severity ${severity}`);
-        }
-        this.severity = severity;
-    }
-}
 
 /**
  * Handle a sign up error from Firebase
