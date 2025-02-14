@@ -14,6 +14,7 @@ const createError = require("http-errors");
 
 //Initialize Express
 const express = require("express");
+const HttpError = require("./models/httpError");
 const app = express();
 
 // Middleware
@@ -34,6 +35,11 @@ app.use((_req, _res, next) => {
 
 // error handler
 app.use((err, req, res, _) => {
+    if (err instanceof HttpError) {
+        res.status(err.status);
+        return res.json({ message: err.message });
+    }
+
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get("env") === "development" ? err : {};
