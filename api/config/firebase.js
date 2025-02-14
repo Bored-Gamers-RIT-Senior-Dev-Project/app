@@ -21,7 +21,8 @@ const verifyFirebaseToken = async (idToken) => {
     try {
         return await admin.auth().verifyIdToken(idToken);
     } catch (error) {
-        throw new Error("Invalid Firebase ID token");
+        console.error("Error verifying Firebase token:", error.message);
+        throw error;
     }
 };
 
