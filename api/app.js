@@ -35,14 +35,18 @@ app.use((_req, _res, next) => {
 
 // Error Handler
 app.use((err, req, res, _next) => {
+    //Only provide error in development
+    const error = req.app.get("env") === "development" ? err : null;
+
     // set locals, only providing error in development
+
     res.locals.message = err.message;
-    res.locals.error = req.app.get("env") === "development" ? err : {};
+    res.locals.error = error || {};
 
     // Send an error message
     res.status(err.status || 500).json({
         message: err.message, // https://stackoverflow.com/a/32836884
-        error: err,
+        error: error,
     });
 });
 
