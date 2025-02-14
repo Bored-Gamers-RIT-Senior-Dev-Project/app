@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const admin = require("firebase-admin");
-const UserService = require("../../services/userService");
+const UserService = require("../services/userService");
 const HttpError = require("../models/httpError");
 
 router.post("/get", async (req, res) => {
