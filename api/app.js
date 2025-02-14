@@ -1,16 +1,19 @@
 // Adding for now to ban dumb things durning development, but we can remove
 // this later:
 "use strict";
-const createError = require("http-errors");
-const express = require("express");
-const path = require("path");
+
+//Require Middleware
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const cors = require("cors");
 
+// Require Routes
 const users = require("./routes/users");
 const test = require("./routes/test");
+const createError = require("http-errors");
 
+//Initialize Express
+const express = require("express");
 const app = express();
 
 // Middleware
@@ -19,10 +22,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cors()); // Enable CORS
+
+// Routes
 app.use("/api/users", users);
 app.use("/api", test);
 
-// catch 404 and forward to error handler
+//404 any routes not defined above
 app.use((_req, _res, next) => {
     next(createError(404));
 });
