@@ -25,6 +25,8 @@ const AuthProvider = ({ children }) => {
                 console.log(data);
                 setUserData(data);
             });
+        } else {
+            setUserData(null);
         }
     }, [token]);
 

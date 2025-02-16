@@ -34,7 +34,8 @@ const signUpWithEmail = async (email, password) => {
 
 const observeAuthState = (callback) => onAuthStateChanged(auth, callback);
 
-const signOut = () => auth.signOut().then(() => console.log("Signed Out!"));
+//TODO: .then() a snackbar confirming log-out was successful.
+const signOut = () => auth.signOut();
 
 export {
     observeAuthState,
