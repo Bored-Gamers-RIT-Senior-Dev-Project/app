@@ -1,6 +1,10 @@
 import { AccountCircle } from "@mui/icons-material";
-import { Box, Button } from "@mui/material";
+import { Avatar, Box, Button, Menu, MenuItem, Typography } from "@mui/material";
+import PropTypes from "prop-types";
+import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useAuth } from "../../hooks/useAuth";
+import { signOut } from "../../utils/firebase/auth";
 
 const LogInButton = ({ navigate, desktop }) => {
     return (
@@ -85,7 +89,7 @@ const DesktopAccountIcon = ({ navigate, user }) => {
 
 const AccountIcon = ({ desktop }) => {
     const navigate = useNavigate();
-    const user = false; // TODO: Replace with actual user state
+    const user = useAuth(); // TODO: Replace with actual user state
 
     return (
         <Box sx={{ position: "absolute", right: { lg: 25, xs: 10 } }}>
