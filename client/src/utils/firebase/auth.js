@@ -34,10 +34,13 @@ const signUpWithEmail = async (email, password) => {
 
 const observeAuthState = (callback) => onAuthStateChanged(auth, callback);
 
+const signOut = () => auth.signOut().then(() => console.log("Signed Out!"));
+
 export {
     observeAuthState,
     // googleAuthProvider as authProvider,
     signInWithEmail,
     signInWithGoogle,
+    signOut,
     signUpWithEmail,
 };
