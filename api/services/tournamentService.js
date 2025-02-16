@@ -34,6 +34,14 @@ const createMatch = async () => {
 };
 
 /**
+ * Read information about tournament matches from the database.
+ */
+const readTournamentMatches = async () => {
+    // TODO: Implement querying tournament matches
+    throw new Error("Not implemented");
+};
+
+/**
  * Sets the winner of a match in the database.
  */
 const setMatchWinner = async () => {
@@ -54,6 +62,7 @@ module.exports = {
     readTournament,
     updateTournament,
     createMatch,
+    readTournamentMatches,
     setMatchWinner,
     nextRound,
 };
