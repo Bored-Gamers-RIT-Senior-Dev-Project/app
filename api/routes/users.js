@@ -6,7 +6,7 @@ const createError = require("http-errors");
 router.post("/get", async (req, res, next) => {
     const { token } = req.body;
     try {
-        const user = UserService.getUser(token);
+        const user = await UserService.getUser(token);
         return res.status(200).json(user);
     } catch (error) {
         next(error);
