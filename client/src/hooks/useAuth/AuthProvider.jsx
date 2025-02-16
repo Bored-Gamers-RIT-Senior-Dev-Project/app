@@ -12,7 +12,8 @@ const AuthProvider = ({ children }) => {
     // Uses firebase onAuthStateChanged via firebase/auth.js to subscribe to auth state changes.
     // Tracks user token state.
     useEffect(() => {
-        observeAuthState(async (firebaseUser) => {
+        //Returns unsubscribe function as per Copilot recommendation.
+        return observeAuthState(async (firebaseUser) => {
             if (firebaseUser) {
                 const token = await firebaseUser.getIdToken();
                 setToken(token);
