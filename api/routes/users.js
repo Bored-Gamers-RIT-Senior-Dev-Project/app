@@ -14,7 +14,7 @@ router.post("/get", async (req, res, next) => {
 });
 
 router.post("/signin", async (req, res, next) => {
-    const { idToken, method, email, displayName, photoUrl } = req.body;
+    const { idToken, method, email, displayName, photoURL } = req.body;
     if (!idToken || !method) {
         return res.status(400).json({ message: "Invalid request format." });
     }
@@ -27,7 +27,7 @@ router.post("/signin", async (req, res, next) => {
                     idToken,
                     email,
                     displayName,
-                    photoUrl
+                    photoURL
                 );
                 break;
             case "email":

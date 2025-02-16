@@ -1,9 +1,9 @@
-const { verifyFirebaseToken } = require("../config/firebase");
+const { verifyUser, deleteUser } = require("../config/firebase");
 const randomString = require("../config/randomString");
 const User = require("../models/userModel");
 
 const signUp = async (idToken, email, username, firstName, lastName) => {
-    const firebaseUser = await verifyFirebaseToken(idToken);
+    const firebaseUser = await verifyUser(idToken);
     try {
         const result = await User.createUser(
             firebaseUser.uid,
@@ -15,13 +15,13 @@ const signUp = async (idToken, email, username, firstName, lastName) => {
         return result;
     } catch (error) {
         //If there's an error adding the FirebaseUser to the local database, delete the record from Firebase to avoid mismatched records.
-        await admin.auth().deleteUser(firebaseUser.uid);
+        await deleteUser(firebaseUser.uid);
         throw error;
     }
 };
 
 const googleSignIn = async (idToken, email, displayName, photoURL) => {
-    const firebaseUser = await verifyFirebaseToken(idToken);
+    const firebaseUser = await verifyUser(idToken);
     let user = await User.readUser(firebaseUser.uid);
 
     if (!user) {
@@ -29,6 +29,7 @@ const googleSignIn = async (idToken, email, displayName, photoURL) => {
         const names = displayName.split(" ");
         const firstName = names[0];
         const lastName = names.slice(1).join(" ");
+
         user = await User.createUser(
             firebaseUser.uid,
             email,
@@ -42,7 +43,7 @@ const googleSignIn = async (idToken, email, displayName, photoURL) => {
 };
 
 const getUser = async (idToken) => {
-    const firebaseUser = await verifyFirebaseToken(idToken);
+    const firebaseUser = await verifyUser(idToken);
     const user = await User.readUser(firebaseUser.uid);
     return user;
 };
