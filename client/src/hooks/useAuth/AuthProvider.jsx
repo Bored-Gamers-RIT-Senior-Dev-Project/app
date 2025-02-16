@@ -22,7 +22,9 @@ const AuthProvider = ({ children }) => {
         });
     }, []);
 
-    // useEffect with token deps will update whenever the token state is changed.  Get user data from the API and store it in userData state.  Sub
+    // useEffect with token deps will update whenever the token state is changed.
+    // - Get user data from the API and store it in userData state.
+    // - If token updates to null (logged out), user follows suit and updates to null.
     useEffect(() => {
         if (token) {
             getUserData(token).then((data) => setUserData(data));
