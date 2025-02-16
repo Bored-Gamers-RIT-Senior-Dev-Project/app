@@ -8,6 +8,9 @@ const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(null);
     const [userData, setUserData] = useState(null);
 
+    // useEffect with empty array only runs on component initialization.
+    // Uses firebase onAuthStateChanged via firebase/auth.js to subscribe to auth state changes.
+    // Tracks user token state.
     useEffect(() => {
         observeAuthState(async (firebaseUser) => {
             if (firebaseUser) {
@@ -19,20 +22,14 @@ const AuthProvider = ({ children }) => {
         });
     }, []);
 
+    // useEffect with token deps will update whenever the token state is changed.  Get user data from the API and store it in userData state.  Sub
     useEffect(() => {
         if (token) {
-            getUserData(token).then((data) => {
-                console.log(data);
-                setUserData(data);
-            });
+            getUserData(token).then((data) => setUserData(data));
         } else {
             setUserData(null);
         }
     }, [token]);
-
-    useEffect(() => {
-        console.log(userData);
-    }, [userData]);
 
     return (
         <AuthContext.Provider value={userData}>{children}</AuthContext.Provider>
