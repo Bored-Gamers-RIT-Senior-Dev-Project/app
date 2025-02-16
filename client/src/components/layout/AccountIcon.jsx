@@ -17,16 +17,51 @@ const LogInButton = ({ navigate, desktop }) => {
 };
 
 const MobileAccountIcon = ({ navigate, user }) => {
-    if (!user) {
+    const [anchor, setAnchor] = useState(null);
+    const open = Boolean(anchor);
+
+    const toggleOpen = (event) => {
+        setAnchor(!open ? event.currentTarget : null);
+    };
+
+    const closeMenu = () => setAnchor(null);
+
         return (
+        <>
             <Button
-                size="small"
-                variant="contained"
-                color="secondary"
-                onClick={() => navigate("/signin")}
+                id="mobile-account-icon"
+                sx={{ margin: "2%" }}
+                aria-controls={open ? "basic-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? "true" : undefined}
+                onClick={toggleOpen}
             >
-                Sign In
+                <Avatar
+                    src={user.ProfileImageURL}
+                    alt={`${user.FirstName} ${user.LastName}`}
+                    sx={{ height: "96%" }}
+                />
             </Button>
+            <Menu
+                open={open}
+                onClose={closeMenu}
+                anchorEl={anchor}
+                closeAfterTransition
+            >
+                <MenuItem
+                    onClick={() =>
+                        closeMenu() || navigate("./user_preferences")
+                    }
+                >
+                    User Settings
+                </MenuItem>
+                <MenuItem
+                    onClick={() => closeMenu() || signOut().then(() => true)}
+                >
+                    Log Out
+                </MenuItem>
+            </Menu>
+        </>
         );
     }
 };
@@ -54,7 +89,7 @@ const AccountIcon = ({ desktop }) => {
 
     return (
         <Box sx={{ position: "absolute", right: { lg: 25, xs: 10 } }}>
-            {!user ? (
+            {!user.Username ? (
                 <LogInButton navigate={navigate} desktop={desktop} />
             ) : desktop ? (
                 <DesktopAccountIcon navigate={navigate} user={user} />
@@ -63,6 +98,24 @@ const AccountIcon = ({ desktop }) => {
             )}
         </Box>
     );
+};
+
+MobileAccountIcon.propTypes = {
+    navigate: PropTypes.func.isRequired,
+    user: PropTypes.shape({
+        ProfileImageURL: PropTypes.string,
+        FirstName: PropTypes.string,
+        LastName: PropTypes.string,
+    }).isRequired,
+};
+
+AccountIcon.propTypes = {
+    desktop: PropTypes.bool.isRequired,
+};
+
+LogInButton.propTypes = {
+    navigate: PropTypes.func.isRequired,
+    desktop: PropTypes.bool.isRequired,
 };
 
 export { AccountIcon };
