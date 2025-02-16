@@ -44,7 +44,7 @@ const setMatchWinner = async () => {
  * Inserts new matches for the next round into the database.
  */
 const insertNextRoundMatches = async () => {
-    // TODO: Implement adding matches to next of tournament
+    // TODO: Implement adding matches to next round of tournament
     throw new Error("Not implemented");
 };
 
