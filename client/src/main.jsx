@@ -2,7 +2,7 @@ import { ThemeProvider } from "@mui/material";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router";
-import { AuthProvider } from "./hooks/Auth/AuthProvider.jsx";
+import { AuthProvider } from "./hooks/useAuth/AuthProvider.jsx";
 import "./index.css";
 import { router } from "./utils/router.jsx";
 import { theme } from "./utils/theme.js";
