@@ -24,4 +24,9 @@ const handleSignUp = async (params) => {
     return data;
 };
 
-export { getTest, handleSignIn, handleSignUp, sendTest };
+const getUserData = async (token) => {
+    let { data } = await axios.post(url("users/get"), { token });
+    return data;
+};
+
+export { getTest, getUserData, handleSignIn, handleSignUp, sendTest };
