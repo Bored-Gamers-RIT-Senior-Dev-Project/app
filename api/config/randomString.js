@@ -1,5 +1,5 @@
 /**
- * Generate a random string of specified length using uppercase letters and digits.
+ * Generate a random string of specified length using digits.
  * @param {number} [length=4] - The length of the random string to generate.
  * @return {string} - The generated random string.
  */
