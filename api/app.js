@@ -9,6 +9,7 @@ const cors = require("cors");
 
 // Require Routes
 const users = require("./routes/users");
+const tournament = require("./routes/tournament");
 const test = require("./routes/test");
 const createError = require("http-errors");
 
@@ -25,6 +26,7 @@ app.use(cors()); // Enable CORS
 
 // Routes
 app.use("/api/users", users);
+app.use("/api/tournament", tournament);
 app.use("/api", test);
 
 //404 any routes not defined above

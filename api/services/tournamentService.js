@@ -3,9 +3,26 @@ const TournamentModel = require("../models/tournamentModel");
 /**
  * Creates a new tournament in the database.
  */
-const createTournament = async () => {
-    // TODO: Implement tournament creation
-    throw new Error("Not implemented");
+const createTournament = async (
+    tournamentName,
+    startDate,
+    endDate,
+    status,
+    location
+) => {
+    try {
+        // Create the tournament in the database.
+        const tournament = await TournamentModel.createTournament(
+            tournamentName,
+            startDate,
+            endDate,
+            status,
+            location
+        );
+        return tournament;
+    } catch (error) {
+        throw error;
+    }
 };
 
 /**

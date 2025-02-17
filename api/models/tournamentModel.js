@@ -3,9 +3,29 @@ const db = require("../config/db");
 /**
  * Creates a new tournament in the database.
  */
-const createTournament = async () => {
-    // TODO: Implement tournament creation
-    throw new Error("Not implemented");
+const createTournament = async (
+    tournamentName,
+    startDate,
+    endDate,
+    status,
+    location
+) => {
+    console.log(
+        "Processing request to create tournament '" +
+            tournamentName +
+            "' in database."
+    );
+    try {
+        const [result] = await db.query(
+            `INSERT INTO Tournaments (TournamentName, StartDate, EndDate, Status, Location)
+             VALUES (?, ?, ?, ?, ?)`,
+            [tournamentName, startDate, endDate, status, location]
+        );
+        console.log(Date.now() + "- Tournament created. ID:" + result.insertId);
+    } catch (error) {
+        console.error("Error creating tournament:", error);
+        throw error;
+    }
 };
 
 /**
