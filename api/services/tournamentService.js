@@ -29,15 +29,34 @@ const createTournament = async (
  * If tournamentID is specified, all other search terms are ignored.
  * If tournamentID is specified and is not an integer, this function will return error.
  */
-const searchTournament = async (
+const searchTournaments = async (
     tournamentID = null,
     startDate = null,
     endDate = null,
     status = null,
     location = null
 ) => {
-    if (!Number.isInteger(tournamentID, 10)) {
-        throw new Error("Invalid tournamentID. Variable must be numeric.");
+    try {
+        const id = Number(tournamentID);
+        if (!Number.isInteger(id)) {
+            const error = new Error(
+                "Invalid tournamentID. Value must be integer."
+            );
+            error.status = 400;
+            throw error;
+        }
+        if (tournamentID !== null) {
+            const tournament = await TournamentModel.searchTournaments(
+                tournamentID,
+                startDate,
+                endDate,
+                status,
+                location
+            );
+            return tournament;
+        }
+    } catch (error) {
+        throw error;
     }
 };
 
@@ -83,7 +102,7 @@ const nextRound = async () => {
 
 module.exports = {
     createTournament,
-    searchTournament,
+    searchTournaments,
     updateTournament,
     createMatch,
     readTournamentMatches,

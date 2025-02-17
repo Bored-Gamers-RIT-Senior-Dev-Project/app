@@ -48,6 +48,27 @@ const searchTournaments = async (
     location = null
 ) => {
     try {
+        if (tournamentID !== null) {
+            const [rows] = await db.query(
+                `
+                SELECT * 
+                FROM Tournaments
+                WHERE TournamentID = ?
+            `,
+                [tournamentID]
+            );
+            if (rows.length === 0) {
+                return null;
+            } else if (rows.length > 1) {
+                console.error(
+                    "Error fetching tournamentID:" +
+                        tournamentID +
+                        ". Unexpected value. Expected 0 or 1 result."
+                );
+                return null;
+            }
+            return rows[0];
+        }
     } catch (error) {
         console.error("Error searching for tournament:", error.message);
         throw error;
@@ -89,7 +110,7 @@ const insertNextRoundMatches = async () => {
 module.exports = {
     createTournament,
     createMatch,
-    readTournamentMatches,
+    searchTournaments,
     setMatchWinner,
     insertNextRoundMatches,
 };

@@ -15,9 +15,21 @@ router.post("/create", async (req, res, next) => {
             location
         );
         res.status(201).json({
-            message: "Tournament created",
+            message: "Tournament created successfully",
             tournament,
         });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get("/getByID", async (req, res, next) => {
+    const { tournamentID } = req.body;
+    try {
+        const tournament = await TournamentService.searchTournaments(
+            tournamentID
+        );
+        res.status(200).json(tournament);
     } catch (error) {
         next(error);
     }
