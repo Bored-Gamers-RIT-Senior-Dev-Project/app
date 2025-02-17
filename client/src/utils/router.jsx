@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router";
 import App from "../App";
-import { Home, NotFound, Search, UserSignIn, UserSignUp,University, Rules, Schedule} from "../pages";
+import { Home, NotFound, Search, UserSignIn, UserSignUp,University, Rules} from "../pages";
 import { handleSignIn, handleSignUp, sendTest } from "./api";
 import { events } from "./events";
 
@@ -40,8 +40,8 @@ const makeAction =
                   action: makeAction(sendTest),
               },
               {
-                  path: "/university/:universityId",
-                  element: <University/>,
+                path: "/university/:universityId",
+                element: <University/>,
               },
               {
                   path: "/about",
@@ -51,11 +51,7 @@ const makeAction =
                   path:"/rules",
                   element:<Rules />,
               },
-              {
-                  path: "/Schedule",
-                  element: <Schedule />,
-              },
-              {
+             {
                   path: "*",
                   element: <NotFound />,
               },
