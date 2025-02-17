@@ -136,9 +136,45 @@ const updateTournament = async () => {
 /**
  * Creates a match for the tournament in the database.
  */
-const createMatch = async () => {
-    // TODO: Implement match creation
-    throw new Error("Not implemented");
+const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
+    try {
+        // Convert IDs to numbers.
+        const tournamentIDInt = Number(tournamentID);
+        const team1IDInt = Number(team1ID);
+        const team2IDInt = Number(team2ID);
+        // Validate that the IDs are integers
+        if (!Number.isInteger(tournamentIDInt)) {
+            const error = new Error(
+                "Invalid tournamentID. Value must be integer."
+            );
+            error.status = 400;
+            throw error;
+        }
+        if (!Number.isInteger(team1IDInt) || !Number.isInteger(team2IDInt)) {
+            const error = new Error(
+                "Invalid team IDs. Both team1ID and team2ID must be integers."
+            );
+            error.status = 400;
+            throw error;
+        }
+        const formattedMatchTime = new Date(matchTime)
+            .toISOString() // "2025-02-17T00:00:00.000Z"
+            .slice(0, 19) // "2025-02-17T00:00:00"
+            .replace("T", " ");
+        // TODOs:
+        // - Validate tournamentID
+        // - Validate matchTime > tournament StartTime
+        // - Validate team IDs in tournament
+        const match = await TournamentModel.createMatch(
+            tournamentIDInt,
+            team1IDInt,
+            team2IDInt,
+            formattedMatchTime
+        );
+        return match;
+    } catch (error) {
+        throw error;
+    }
 };
 
 /**

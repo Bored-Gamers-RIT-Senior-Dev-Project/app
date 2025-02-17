@@ -118,9 +118,24 @@ const searchTournaments = async (
 /**
  * Creates a match for the tournament in the database.
  */
-const createMatch = async () => {
-    // TODO: Implement match creation
-    throw new Error("Not implemented");
+const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
+    try {
+        const [result] = await db.query(
+            `INSERT INTO Matches (tournamentID, team1ID, team2ID, matchTime)
+             VALUES (?, ?, ?, ?)`,
+            [tournamentID, team1ID, team2ID, matchTime]
+        );
+        return {
+            id: result.insertId,
+            tournamentID,
+            team1ID,
+            team2ID,
+            matchTime,
+        };
+    } catch (error) {
+        console.error("Error creating match:", error);
+        throw error;
+    }
 };
 
 /**
