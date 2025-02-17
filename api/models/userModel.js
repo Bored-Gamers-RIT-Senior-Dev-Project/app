@@ -17,8 +17,8 @@ const createUser = async (
     firebaseUID,
     email,
     firstName,
-    lastName = "",
-    username = email.split("@")[0] + "-" + randomString(4),
+    lastName,
+    username,
     profileImageUrl = `https://ui-avatars.com/api/?name=${firstName}+${lastName}?background=edca82`,
     roleId = 1 // Default role for new users is Spectator
 ) => {
@@ -79,4 +79,68 @@ const readUser = async (uid) => {
     }
 };
 
-module.exports = { createUser, readUser };
+/**
+ * Generates a list of usernames that start with the given "base" username.
+ * @param {String} username The username to check for duplicates.
+ * @returns  {Promise<Array>} An array of usernames that start with the given string.
+ */
+const sharedUserNames = async (username) => {
+    try {
+        //Select all usernames that start with the given username
+        const [rows] = await db.query(
+            `SELECT Username FROM Users WHERE lower(Username) LIKE lower(?)`,
+            [username + "%"]
+        );
+        //Return those rows.
+        return rows.map((row) => row.Username);
+    } catch (error) {
+        console.error("Error checking username:", error.message);
+        throw error;
+    }
+};
+
+/**
+ * Generates a unique username based on the given "base" username.
+ * @param {String} username The "base" username to use.
+ * @returns {Promise<String>} A unique username.
+ */
+const generateUsername = async (username, sharedUsernames = null) => {
+    // Get all usernames that start with the given username
+    if (!sharedUsernames) sharedUsernames = await sharedUserNames(username);
+
+    // If the username is not taken, return it
+    if (!sharedUsernames.includes(username)) {
+        return username;
+    }
+
+    // Otherwise, append a number to the username until we find a unique one
+    let i = 1;
+    while (sharedUsernames.contains(`${username}-${i}`)) {
+        i++;
+        if (i > 100)
+            console.error(
+                `Error reserving username ${username}.  An unreasonable number of usernames were found with that prefix.`
+            );
+        throw new Error(
+            "Error reserving a username based on the information provided."
+        );
+    }
+    return `${username}-${i}`;
+};
+
+/**
+ * Checks a username for availability and generates a unique username if necessary.
+ * @param {String} username The username to check.
+ * @param {Boolean} strict If true, the function will throw an error if the username is already taken.
+ * @returns {Promise<String>} A unique username.
+ * @throws {Error} If the username is taken and strict is true.
+ */
+const checkUsername = async (username, strict = false) => {
+    const sharedUsernames = await sharedUserNames(username);
+    if (sharedUsernames.includes(username) && strict) {
+        throw new Error("Username is taken");
+    }
+    return await generateUsername(username, sharedUsernames);
+};
+
+module.exports = { createUser, readUser, checkUsername };
