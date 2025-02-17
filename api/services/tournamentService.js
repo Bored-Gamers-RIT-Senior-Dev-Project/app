@@ -31,6 +31,7 @@ const createTournament = async (
  */
 const searchTournaments = async (
     tournamentID = null,
+    tournamentName,
     startDate = null,
     endDate = null,
     status = null,
@@ -58,7 +59,7 @@ const searchTournaments = async (
         } else {
             const tournament = await TournamentModel.searchTournaments(
                 null,
-                tournamentName,
+                decodeURIComponent(tournamentName),
                 startDate,
                 endDate,
                 status,

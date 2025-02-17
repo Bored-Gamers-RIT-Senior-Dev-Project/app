@@ -24,10 +24,18 @@ router.post("/create", async (req, res, next) => {
 });
 
 router.get("/search", async (req, res, next) => {
-    const { tournamentID, startDate, endDate, status, location } = req.query;
+    const {
+        tournamentID,
+        tournamentName,
+        startDate,
+        endDate,
+        status,
+        location,
+    } = req.query;
     try {
         const tournament = await TournamentService.searchTournaments(
             tournamentID || null,
+            tournamentName || null,
             startDate || null,
             endDate || null,
             status || null,

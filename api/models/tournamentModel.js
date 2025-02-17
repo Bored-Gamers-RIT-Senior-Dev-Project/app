@@ -42,6 +42,7 @@ const createTournament = async (
  */
 const searchTournaments = async (
     tournamentID = null,
+    tournamentName = null,
     startDate = null,
     endDate = null,
     status = null,
@@ -69,6 +70,7 @@ const searchTournaments = async (
             }
             return rows[0];
         } else {
+            console.log(tournamentName);
             let search = "SELECT * FROM Tournaments WHERE 1=1";
             const params = [];
 
@@ -76,6 +78,10 @@ const searchTournaments = async (
             if (tournamentID !== null) {
                 search += " AND TournamentID = ?";
                 params.push(tournamentID);
+            }
+            if (tournamentName !== null) {
+                search += " AND TournamentName = ?";
+                params.push(tournamentName);
             }
             if (startDate !== null) {
                 search += " AND StartDate >= ?";
