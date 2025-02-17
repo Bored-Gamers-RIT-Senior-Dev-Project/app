@@ -37,15 +37,15 @@ const searchTournaments = async (
     location = null
 ) => {
     try {
-        const id = Number(tournamentID);
-        if (!Number.isInteger(id)) {
-            const error = new Error(
-                "Invalid tournamentID. Value must be integer."
-            );
-            error.status = 400;
-            throw error;
-        }
         if (tournamentID !== null) {
+            const id = Number(tournamentID);
+            if (!Number.isInteger(id)) {
+                const error = new Error(
+                    "Invalid tournamentID. Value must be integer."
+                );
+                error.status = 400;
+                throw error;
+            }
             const tournament = await TournamentModel.searchTournaments(
                 tournamentID,
                 startDate,
