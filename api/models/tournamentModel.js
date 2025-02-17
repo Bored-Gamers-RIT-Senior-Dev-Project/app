@@ -147,7 +147,18 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
 };
 
 /**
- * Search tournament matches from the database.
+ * Searches tournament matches from the database.
+ *
+ * This function retrieves match records from the Matches table based on the provided criteria.
+ * If a matchID is provided (not null), it returns a single match record (or null if not found).
+ * @param {number|null} matchID - ID for the match. When provided, all other criteria are ignored.
+ * @param {number|null} tournamentID - ID for the tournament.
+ * @param {number|null} teamID - ID for a team. Searches for matches where this team is either team1 or team2.
+ * @param {string|null} matchTime - The match time in a format acceptable by the database ("YYYY-MM-DD HH:MM:SS").
+ * @returns {Promise<object|null|object[]>}
+ *          If matchID is provided, returns a single match object or null if not found.
+ *          Otherwise, returns an array of match objects matching the criteria, or null if no matches are found.
+ * @throws {Error} Throws an error if multiple matches are found for a given matchID or if a database error occurs.
  */
 const searchMatches = async (
     matchID = null,
@@ -156,13 +167,14 @@ const searchMatches = async (
     matchTime = null
 ) => {
     try {
+        // If a matchID is provided, perform a search based solely on matchID.
         if (matchID !== null) {
             const [rows] = await db.query(
                 `
                 SELECT * 
                 FROM Matches
                 WHERE MatchID = ?
-            `,
+                `,
                 [matchID]
             );
             if (rows.length === 0) {
@@ -172,22 +184,26 @@ const searchMatches = async (
             }
             return rows[0];
         } else {
+            // Build the dynamic SQL query based on provided criteria.
             let search = "SELECT * FROM Matches WHERE 1=1";
             const params = [];
 
-            // Only add a search parameter if the parameter is not null
+            // Add condition for tournamentID if provided.
             if (tournamentID !== null) {
                 search += " AND TournamentID = ?";
                 params.push(tournamentID);
             }
+            // Add condition for teamID if provided: checks both Team1ID and Team2ID.
             if (teamID !== null) {
                 search += " AND (Team1ID = ? OR Team2ID = ?)";
                 params.push(teamID, teamID);
             }
+            // Add condition for matchTime if provided.
             if (matchTime !== null) {
                 search += " AND matchTime = ?";
                 params.push(matchTime);
             }
+            // Execute the query with the dynamically built conditions.
             const [rows] = await db.query(search, params);
 
             if (rows.length === 0) {
@@ -202,16 +218,22 @@ const searchMatches = async (
 };
 
 /**
- * Sets the winner of a match in the database.
+ * Sets the winner of a match and updates match results in the database.
+ * @param {number} matchID - ID of the match to update.
+ * @param {number} winnerID - ID for the winning team.
+ * @param {number} team1Score - Score for team one.
+ * @param {number} team2Score - Score for team two.
+ * @returns {Promise<object>} Returns a promise to an object containing the updated match result.
+ * @throws {Error} Throws an error if the update query fails.
  */
 const updateMatchResult = async (matchID, winnerID, team1Score, team2Score) => {
     try {
-        // Execute the UPDATE query to update a match's results.
+        // Execute the UPDATE query to update the match results.
         const [result] = await db.query(
             `UPDATE Matches SET Score1 = ?, Score2 = ?, WinnerID = ? WHERE MatchID = ?;`,
             [team1Score, team2Score, winnerID, matchID]
         );
-        // Return an object representing the created match.
+        // Return an object representing the updated match.
         return {
             matchID,
             winnerID,
@@ -219,7 +241,7 @@ const updateMatchResult = async (matchID, winnerID, team1Score, team2Score) => {
             team2Score,
         };
     } catch (error) {
-        console.error("Error creating match:", error);
+        console.error("Error updating match result:", error);
         throw error;
     }
 };

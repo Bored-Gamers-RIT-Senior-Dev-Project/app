@@ -182,13 +182,21 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
         );
         return match;
     } catch (error) {
-        // Propagate any errors encountered.
         throw error;
     }
 };
 
 /**
- * Search information about tournament matches from the database.
+ * Searches for tournament matches based on provided criteria.
+ * If matchID is specified (not null), this function validates it and uses it exclusively
+ * to search for a specific match. If matchID is null, it searches based on the other criteria.
+ * @param {number|string|null} matchID - ID for the match. When provided, other criteria are ignored.
+ * @param {number|string|null} tournamentID - ID for the tournament.
+ * @param {number|string|null} teamID - ID for a team. This will search for matches where the team is either team1 or team2.
+ * @param {string|null} matchTime - The match time in a format acceptable by the database ("YYYY-MM-DD HH:MM:SS").
+ * @returns {Promise<object|object[]|null>} Returns a single match object if matchID is provided, an array of match objects
+ *                                          if searching by other criteria, or null if no match is found.
+ * @throws {Error} Throws an error with status 400 if matchID is provided and is not a valid integer.
  */
 const searchMatches = async (
     matchID = null,
@@ -209,6 +217,7 @@ const searchMatches = async (
                 error.status = 400;
                 throw error;
             }
+            // Call the model function using only matchID.
             const match = await TournamentModel.searchMatches(
                 matchID,
                 null,
@@ -217,7 +226,7 @@ const searchMatches = async (
             );
             return match;
         } else {
-            // When matchID is null, build search query based on other criteria.
+            // When matchID is null, build the query using the additional search criteria.
             const match = await TournamentModel.searchMatches(
                 null,
                 tournamentID,
@@ -232,28 +241,35 @@ const searchMatches = async (
 };
 
 /**
- * Sets the winner of a match in the database.
+ * Updates the match result in the database based on matchID
+ * @param {number|string} matchID - ID for the match to update.
+ * @param {number|string} winnerID - ID for the winning team.
+ * @param {number|string} Score1 - Score for team one.
+ * @param {number|string} Score2 - Score for team two.
+ * @returns {Promise<object>} Returns a promise that resolves to an object containing the updated match result.
+ * @throws {Error} Throws an error with status 400 if any of the IDs or scores are not valid integers.
  */
 const updateMatchResult = async (matchID, winnerID, Score1, Score2) => {
     try {
-        // Convert the provided params to numbers.
+        // Convert parameters to numbers.
         const matchIDInt = Number(matchID);
         const winnerIDInt = Number(winnerID);
         const Score1Int = Number(Score1);
         const Score2Int = Number(Score2);
-        // Validate that the matchID is an integer.
+
+        // Validate that matchID is an integer.
         if (!Number.isInteger(matchIDInt)) {
             const error = new Error("Invalid matchID. Value must be integer.");
             error.status = 400;
             throw error;
         }
-        // Validate that the winnerID is an integer.
+        // Validate that winnerID is an integer.
         if (!Number.isInteger(winnerIDInt)) {
             const error = new Error("Invalid winnerID. Value must be integer.");
             error.status = 400;
             throw error;
         }
-        // Validate that both team1ID and team2ID are integers.
+        // Validate that both Score1 and Score2 are integers.
         if (!Number.isInteger(Score1Int) || !Number.isInteger(Score2Int)) {
             const error = new Error(
                 "Invalid score. Both scores must be integers."
@@ -261,8 +277,6 @@ const updateMatchResult = async (matchID, winnerID, Score1, Score2) => {
             error.status = 400;
             throw error;
         }
-        // TODO:
-        // - Validate matchID exists
         const match = await TournamentModel.updateMatchResult(
             matchIDInt,
             winnerIDInt,
