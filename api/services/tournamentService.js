@@ -69,7 +69,7 @@ const searchTournaments = async (
                 startDate,
                 endDate,
                 status,
-                location
+                safeDecode(location)
             );
             return tournament;
         }
