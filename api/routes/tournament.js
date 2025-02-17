@@ -12,8 +12,8 @@ router.post("/create", async (req, res, next) => {
             "- Body: " +
             JSON.stringify(req.body)
     );
-    const { tournamentName, startDate, endDate, status, location } = req.body;
-    if (!tournamentName || !startDate || !endDate || !status || !location) {
+    const { tournamentName, startDate, endDate, location } = req.body;
+    if (!tournamentName || !startDate || !endDate || !location) {
         return res.status(400).json({ message: "Invalid request format." });
     }
     try {
@@ -21,7 +21,6 @@ router.post("/create", async (req, res, next) => {
             tournamentName,
             startDate,
             endDate,
-            status,
             location
         );
         res.status(201).json({

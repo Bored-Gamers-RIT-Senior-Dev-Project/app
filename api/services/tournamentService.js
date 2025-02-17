@@ -7,7 +7,6 @@ const createTournament = async (
     tournamentName,
     startDate,
     endDate,
-    status,
     location
 ) => {
     try {
@@ -16,7 +15,7 @@ const createTournament = async (
             tournamentName,
             startDate,
             endDate,
-            status,
+            "Upcoming",
             location
         );
         return tournament;
