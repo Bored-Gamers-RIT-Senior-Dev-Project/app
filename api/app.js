@@ -23,43 +23,41 @@ app.use(cookieParser());
 app.use(cors()); // Enable CORS
 app.use(bodyParser.json());
 
-// Load environment variables
-require("dotenv").config();
 app.use("/api/users", users);
 app.use("/api", test);
 app.use("/api/auth", auth);
 
 // catch 404 and forward to error handler
 app.use((_req, _res, next) => {
-  next(createError(404));
+    next(createError(404));
 });
 
 // error handler
 app.use((err, req, res, _) => {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get("env") === "development" ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.json({
-    message: err.message, // https://stackoverflow.com/a/32836884
-    error: err,
-  }); // FIXME: This is temporary, send to user friendly error page instead (Respond with an error response, React Router the frontend has the tools to do this.  -Nate)
+    // render the error page
+    res.status(err.status || 500);
+    res.json({
+        message: err.message, // https://stackoverflow.com/a/32836884
+        error: err,
+    }); // FIXME: This is temporary, send to user friendly error page instead (Respond with an error response, React Router the frontend has the tools to do this.  -Nate)
 });
 
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {
-  next(createError(404));
+    next(createError(404));
 });
 
 // Error handler
 app.use((err, req, res, next) => {
-  res.status(err.status || 500);
-  res.json({
-    message: err.message,
-    error: req.app.get("env") === "development" ? err : {}, // Hide stack trace in production
-  });
+    res.status(err.status || 500);
+    res.json({
+        message: err.message,
+        error: req.app.get("env") === "development" ? err : {}, // Hide stack trace in production
+    });
 });
 
 module.exports = app;
