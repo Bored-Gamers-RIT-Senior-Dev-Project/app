@@ -116,15 +116,23 @@ const searchTournaments = async (
 };
 
 /**
- * Creates a match for the tournament in the database.
+ * Creates a match record for the tournament in the database.
+ * @param {number} tournamentID - The ID for the tournament.
+ * @param {number} team1ID - Team 1 ID.
+ * @param {number} team2ID - Team 2 ID.
+ * @param {string} matchTime - The match time in MySQL DATETIME format ("YYYY-MM-DD HH:MM:SS").
+ * @returns {Promise<object>} Returns a promise that resolves to the created match object.
+ * @throws {Error} Throws an error if the match cannot be created.
  */
 const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
     try {
+        // Execute the INSERT query to create a match record.
         const [result] = await db.query(
             `INSERT INTO Matches (tournamentID, team1ID, team2ID, matchTime)
              VALUES (?, ?, ?, ?)`,
             [tournamentID, team1ID, team2ID, matchTime]
         );
+        // Return an object representing the created match.
         return {
             id: result.insertId,
             tournamentID,
@@ -133,6 +141,7 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
             matchTime,
         };
     } catch (error) {
+        // Log the error and rethrow it to be handled by the calling function.
         console.error("Error creating match:", error);
         throw error;
     }

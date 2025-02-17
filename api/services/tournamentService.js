@@ -135,14 +135,20 @@ const updateTournament = async () => {
 
 /**
  * Creates a match for the tournament in the database.
+ * @param {number|string} tournamentID - The tournament ID.
+ * @param {number|string} team1ID - Team 1 ID.
+ * @param {number|string} team2ID - Team 2 ID.
+ * @param {string} matchTime - The match time as an ISO 8601 string ("2025-02-17T00:00:00Z").
+ * @returns {Promise<object>} Returns a promise that resolves to the created match record.
+ * @throws {Error} Throws an error with status 400 if any of the IDs are not valid integers, or if the match cannot be created.
  */
 const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
     try {
-        // Convert IDs to numbers.
+        // Convert the provided IDs to numbers.
         const tournamentIDInt = Number(tournamentID);
         const team1IDInt = Number(team1ID);
         const team2IDInt = Number(team2ID);
-        // Validate that the IDs are integers
+        // Validate that the tournamentID is an integer.
         if (!Number.isInteger(tournamentIDInt)) {
             const error = new Error(
                 "Invalid tournamentID. Value must be integer."
@@ -150,6 +156,7 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
             error.status = 400;
             throw error;
         }
+        // Validate that both team1ID and team2ID are integers.
         if (!Number.isInteger(team1IDInt) || !Number.isInteger(team2IDInt)) {
             const error = new Error(
                 "Invalid team IDs. Both team1ID and team2ID must be integers."
@@ -157,14 +164,16 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
             error.status = 400;
             throw error;
         }
+        // Convert matchTime from an ISO 8601 string to MySQL DATETIME format ("YYYY-MM-DD HH:MM:SS").
         const formattedMatchTime = new Date(matchTime)
-            .toISOString() // "2025-02-17T00:00:00.000Z"
-            .slice(0, 19) // "2025-02-17T00:00:00"
-            .replace("T", " ");
-        // TODOs:
-        // - Validate tournamentID
-        // - Validate matchTime > tournament StartTime
-        // - Validate team IDs in tournament
+            .toISOString() // Converts to "2025-02-17T00:00:00.000Z"
+            .slice(0, 19) // Trims to "2025-02-17T00:00:00"
+            .replace("T", " "); // Replaces the "T" with a space
+        // TODO:
+        // - Validate that the tournamentID exists.
+        // - Validate matchTime
+        // - Validate that matchTime is greater than the tournament's StartTime.
+        // - Validate that team1ID and team2ID are associated with teams in the tournament.
         const match = await TournamentModel.createMatch(
             tournamentIDInt,
             team1IDInt,
@@ -173,6 +182,7 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
         );
         return match;
     } catch (error) {
+        // Propagate any errors encountered.
         throw error;
     }
 };
