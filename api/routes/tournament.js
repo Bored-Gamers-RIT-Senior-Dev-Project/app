@@ -35,4 +35,16 @@ router.get("/getByID/:tournamentID", async (req, res, next) => {
     }
 });
 
+router.get("/getByName/:tournamentName", async (req, res, next) => {
+    const { tournamentName } = req.params;
+    try {
+        const tournament = await TournamentService.searchTournaments(
+            tournamentName
+        );
+        res.status(200).json(tournament);
+    } catch (error) {
+        next(error);
+    }
+});
+
 module.exports = router;
