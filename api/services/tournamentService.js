@@ -48,13 +48,23 @@ const searchTournaments = async (
             }
             const tournament = await TournamentModel.searchTournaments(
                 tournamentID,
+                null,
+                null,
+                null,
+                null,
+                null
+            );
+            return tournament;
+        } else {
+            const tournament = await TournamentModel.searchTournaments(
+                null,
+                tournamentName,
                 startDate,
                 endDate,
                 status,
                 location
             );
             return tournament;
-        } else {
         }
     } catch (error) {
         throw error;
