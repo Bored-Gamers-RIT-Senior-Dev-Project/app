@@ -141,7 +141,6 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
             matchTime,
         };
     } catch (error) {
-        // Log the error and rethrow it to be handled by the calling function.
         console.error("Error creating match:", error);
         throw error;
     }
@@ -205,17 +204,24 @@ const searchMatches = async (
 /**
  * Sets the winner of a match in the database.
  */
-const setMatchWinner = async () => {
-    // TODO: Implement settings match results
-    throw new Error("Not implemented");
-};
-
-/**
- * Inserts new matches for the next round into the database.
- */
-const insertNextRoundMatches = async () => {
-    // TODO: Implement adding matches to next round of tournament
-    throw new Error("Not implemented");
+const updateMatchResult = async (matchID, winnerID, team1Score, team2Score) => {
+    try {
+        // Execute the UPDATE query to update a match's results.
+        const [result] = await db.query(
+            `UPDATE Matches SET Score1 = ?, Score2 = ?, WinnerID = ? WHERE MatchID = ?;`,
+            [team1Score, team2Score, winnerID, matchID]
+        );
+        // Return an object representing the created match.
+        return {
+            matchID,
+            winnerID,
+            team1Score,
+            team2Score,
+        };
+    } catch (error) {
+        console.error("Error creating match:", error);
+        throw error;
+    }
 };
 
 module.exports = {
@@ -223,5 +229,5 @@ module.exports = {
     searchTournaments,
     createMatch,
     searchMatches,
-    setMatchWinner,
+    updateMatchResult,
 };

@@ -234,9 +234,45 @@ const searchMatches = async (
 /**
  * Sets the winner of a match in the database.
  */
-const setMatchWinner = async () => {
-    // TODO: Implement setting match results
-    throw new Error("Not implemented");
+const updateMatchResult = async (matchID, winnerID, Score1, Score2) => {
+    try {
+        // Convert the provided params to numbers.
+        const matchIDInt = Number(matchID);
+        const winnerIDInt = Number(winnerID);
+        const Score1Int = Number(Score1);
+        const Score2Int = Number(Score2);
+        // Validate that the matchID is an integer.
+        if (!Number.isInteger(matchIDInt)) {
+            const error = new Error("Invalid matchID. Value must be integer.");
+            error.status = 400;
+            throw error;
+        }
+        // Validate that the winnerID is an integer.
+        if (!Number.isInteger(winnerIDInt)) {
+            const error = new Error("Invalid winnerID. Value must be integer.");
+            error.status = 400;
+            throw error;
+        }
+        // Validate that both team1ID and team2ID are integers.
+        if (!Number.isInteger(Score1Int) || !Number.isInteger(Score2Int)) {
+            const error = new Error(
+                "Invalid score. Both scores must be integers."
+            );
+            error.status = 400;
+            throw error;
+        }
+        // TODO:
+        // - Validate matchID exists
+        const match = await TournamentModel.updateMatchResult(
+            matchIDInt,
+            winnerIDInt,
+            Score1Int,
+            Score2Int
+        );
+        return match;
+    } catch (error) {
+        throw error;
+    }
 };
 
 module.exports = {
@@ -245,5 +281,5 @@ module.exports = {
     updateTournament,
     createMatch,
     searchMatches,
-    setMatchWinner,
+    updateMatchResult,
 };

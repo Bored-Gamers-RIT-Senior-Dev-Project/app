@@ -55,7 +55,7 @@ router.get("/search", async (req, res, next) => {
     }
 });
 
-router.post("/matches/create", async (req, res, next) => {
+router.post("/match/create", async (req, res, next) => {
     const { tournamentID, team1ID, team2ID, matchTime } = req.body;
     if (!tournamentID || !team1ID || !team2ID || !matchTime) {
         return res.status(400).json({ message: "Invalid request format." });
@@ -76,7 +76,7 @@ router.post("/matches/create", async (req, res, next) => {
     }
 });
 
-router.get("/matches/search", async (req, res, next) => {
+router.get("/match/search", async (req, res, next) => {
     const { matchID, tournamentID, teamID, matchTime } = req.query;
     try {
         const matches = await TournamentService.searchMatches(
@@ -92,6 +92,27 @@ router.get("/matches/search", async (req, res, next) => {
             return res.status(200).json([]);
         }
         return res.status(200).json(matches);
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post("/match/setResult", async (req, res, next) => {
+    const { matchID, winnerID, score1, score2 } = req.body;
+    if (!matchID || !winnerID) {
+        return res.status(400).json({ message: "Invalid request format." });
+    }
+    try {
+        const match = await TournamentService.updateMatchResult(
+            matchID,
+            winnerID,
+            score1 || null,
+            score2 || null
+        );
+        res.status(201).json({
+            message: "Match updated successfully",
+            match,
+        });
     } catch (error) {
         next(error);
     }
