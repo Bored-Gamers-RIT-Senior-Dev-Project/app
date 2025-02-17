@@ -1,5 +1,4 @@
 const TournamentModel = require("../models/tournamentModel");
-const { Tournament } = require("tournament-organizer");
 
 /**
  * Creates a new tournament in the database.
