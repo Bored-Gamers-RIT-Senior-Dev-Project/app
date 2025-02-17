@@ -7,9 +7,28 @@ const createTournament = async (
     tournamentName,
     startDate,
     endDate,
-    location
+    location,
+    userRoleID
 ) => {
     try {
+        const roleID = Number(userRoleID);
+        if (!Number.isInteger(roleID)) {
+            const error = new Error(
+                "Invalid user role. Value must be integer."
+            );
+            error.status = 400;
+            throw error;
+        }
+
+        // Check userRoleID for super admin or administrative employee
+        if (roleID !== 2 && roleID !== 3) {
+            const error = new Error(
+                "Unauthorized. Invalid userRoleID for tournament creation."
+            );
+            error.status = 401;
+            throw error;
+        }
+
         // Create the tournament in the database.
         const tournament = await TournamentModel.createTournament(
             tournamentName,
