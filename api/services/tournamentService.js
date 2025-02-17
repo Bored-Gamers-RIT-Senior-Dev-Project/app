@@ -1,7 +1,15 @@
 const TournamentModel = require("../models/tournamentModel");
 
 /**
- * Creates a new tournament in the database.
+ * Creates a new tournament in the database with the status of "Upcoming".
+ * This function validates the user role to ensure that only authorized users (with roleID 2 or 3).
+ * @param {string} tournamentName - Name of the tournament.
+ * @param {string} startDate - Start date of the tournament in YYYY-MM-DD format.
+ * @param {string} endDate - End date of the tournament in YYYY-MM-DD format.
+ * @param {string} location - The location of the tournament (likely an address or university name).
+ * @param {string|number} userRoleID - The role ID of the user attempting to create the tournament.
+ * @returns {Promise<object>} Returns a promise that resolves to the created tournament record.
+ * @throws {Error} Throws an error with status 400 if userRoleID is not an integer, or with status 401 if the role is unauthorized.
  */
 const createTournament = async (
     tournamentName,
@@ -11,7 +19,9 @@ const createTournament = async (
     userRoleID
 ) => {
     try {
+        // Convert userRoleID to a number.
         const roleID = Number(userRoleID);
+        // Validate that the roleID is an integer.
         if (!Number.isInteger(roleID)) {
             const error = new Error(
                 "Invalid user role. Value must be integer."
@@ -19,8 +29,7 @@ const createTournament = async (
             error.status = 400;
             throw error;
         }
-
-        // Check userRoleID for super admin or administrative employee
+        // Check if the user has an authorized role (2 or 3).
         if (roleID !== 2 && roleID !== 3) {
             const error = new Error(
                 "Unauthorized. Invalid userRoleID for tournament creation."
@@ -28,8 +37,7 @@ const createTournament = async (
             error.status = 401;
             throw error;
         }
-
-        // Create the tournament in the database.
+        // Call the model to create the tournament with status "Upcoming".
         const tournament = await TournamentModel.createTournament(
             tournamentName,
             startDate,
@@ -50,9 +58,20 @@ const safeDecode = (value) => {
 };
 
 /**
- * Searches tournaments in database.
- * If tournamentID is specified, all other search terms are ignored.
- * If tournamentID is specified and is not an integer, this function will return error.
+ * Searches tournaments in the database based on provided parameters.
+ * If tournamentID is specified (not null), all other search parameters are ignored and the function
+ * returns a single tournament record. If tournamentID is provided but is not a valid integer, an error
+ * with a 400 status is thrown. If tournamentID is null, the function searches based on the other criteria
+ * @param {number|string|null} tournamentID - Tournament ID. Solely used for search if value is provided.
+ * @param {string|null} tournamentName - Name of the tournament.
+ * @param {string|null} startDate - Start date in YYYY-MM-DD format.
+ * @param {string|null} endDate - End date in YYYY-MM-DD format.
+ * @param {string|null} status - Tournament status.
+ * @param {string|null} location - Location of the tournament (address or university name).
+ * @returns {Promise<object|object[]|null>}
+ *          If tournamentID is specified, returns a single tournament object or null if not found.
+ *          Otherwise, returns an array of tournament objects that match the criteria, or null if none are found.
+ * @throws {Error} Throws an error if tournamentID is provided and is not a valid integer, or if the query fails.
  */
 const searchTournaments = async (
     tournamentID = null,
@@ -63,8 +82,11 @@ const searchTournaments = async (
     location = null
 ) => {
     try {
+        // If tournamentID is provided, use it exclusively for the search.
         if (tournamentID !== null) {
+            // Convert the tournamentID to a number for validation.
             const id = Number(tournamentID);
+            // Check if the conversion results in an integer.
             if (!Number.isInteger(id)) {
                 const error = new Error(
                     "Invalid tournamentID. Value must be integer."
@@ -82,6 +104,7 @@ const searchTournaments = async (
             );
             return tournament;
         } else {
+            // When tournamentID is null, build search query based on other criteria.
             const tournament = await TournamentModel.searchTournaments(
                 null,
                 safeDecode(tournamentName),
