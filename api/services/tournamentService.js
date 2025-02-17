@@ -31,17 +31,17 @@ const createTournament = async (
 ) => {
     try {
         // Convert userRoleID to a number.
-        const roleID = Number(userRoleID);
+        const userRoleIDnum = Number(userRoleID);
         // Validate that the roleID is an integer.
-        if (!Number.isInteger(roleID)) {
+        if (!Number.isInteger(userRoleIDnum)) {
             const error = new Error(
                 "Invalid user role. Value must be integer."
             );
             error.status = 400;
             throw error;
         }
-        // Check if the user has an authorized role (2 or 3).
-        if (roleID !== 2 && roleID !== 3) {
+        // Check if the user has an authorized role (2=SuperAdmin or 3=AdminEmployee).
+        if (userRoleIDnum !== 2 && userRoleIDnum !== 3) {
             const error = new Error(
                 "Unauthorized. Invalid userRoleID for tournament creation."
             );
