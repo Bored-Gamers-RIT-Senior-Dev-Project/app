@@ -116,9 +116,9 @@ const createMatch = async () => {
 };
 
 /**
- * Read information about tournament matches from the database.
+ * Search tournament matches from the database.
  */
-const readTournamentMatches = async () => {
+const searchTournamentMatches = async () => {
     // TODO: Implement querying tournament matches
     throw new Error("Not implemented");
 };
@@ -143,6 +143,6 @@ module.exports = {
     createTournament,
     createMatch,
     searchTournaments,
+    searchTournamentMatches,
     setMatchWinner,
-    insertNextRoundMatches,
 };
