@@ -36,7 +36,7 @@ const searchTournament = async (
     status = null,
     location = null
 ) => {
-    if (Number.isInteger(tournamentID, 10)) {
+    if (!Number.isInteger(tournamentID, 10)) {
         throw new Error("Invalid tournamentID. Variable must be numeric.");
     }
 };
