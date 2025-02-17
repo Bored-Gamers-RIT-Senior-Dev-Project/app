@@ -22,6 +22,14 @@ const createTournament = async (
             [tournamentName, startDate, endDate, status, location]
         );
         console.log(Date.now() + "- Tournament created. ID:" + result.insertId);
+        return {
+            id: result.insertId,
+            tournamentName,
+            startDate,
+            endDate,
+            status,
+            location,
+        };
     } catch (error) {
         console.error("Error creating tournament:", error);
         throw error;
