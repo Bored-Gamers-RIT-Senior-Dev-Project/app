@@ -150,9 +150,56 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
 /**
  * Search tournament matches from the database.
  */
-const searchTournamentMatches = async () => {
-    // TODO: Implement querying tournament matches
-    throw new Error("Not implemented");
+const searchMatches = async (
+    matchID = null,
+    tournamentID = null,
+    teamID = null,
+    matchTime = null
+) => {
+    try {
+        if (matchID !== null) {
+            const [rows] = await db.query(
+                `
+                SELECT * 
+                FROM Matches
+                WHERE MatchID = ?
+            `,
+                [matchID]
+            );
+            if (rows.length === 0) {
+                return null;
+            } else if (rows.length > 1) {
+                throw Error("Search error for match ID: " + matchID);
+            }
+            return rows[0];
+        } else {
+            let search = "SELECT * FROM Matches WHERE 1=1";
+            const params = [];
+
+            // Only add a search parameter if the parameter is not null
+            if (tournamentID !== null) {
+                search += " AND TournamentID = ?";
+                params.push(tournamentID);
+            }
+            if (teamID !== null) {
+                search += " AND (Team1ID = ? OR Team2ID = ?)";
+                params.push(teamID, teamID);
+            }
+            if (matchTime !== null) {
+                search += " AND matchTime = ?";
+                params.push(matchTime);
+            }
+            const [rows] = await db.query(search, params);
+
+            if (rows.length === 0) {
+                return null;
+            }
+            return rows;
+        }
+    } catch (error) {
+        console.error("Error searching for match:", error.message);
+        throw error;
+    }
 };
 
 /**
@@ -173,8 +220,8 @@ const insertNextRoundMatches = async () => {
 
 module.exports = {
     createTournament,
-    createMatch,
     searchTournaments,
-    searchTournamentMatches,
+    createMatch,
+    searchMatches,
     setMatchWinner,
 };

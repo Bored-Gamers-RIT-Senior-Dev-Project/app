@@ -188,11 +188,47 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
 };
 
 /**
- * Read information about tournament matches from the database.
+ * Search information about tournament matches from the database.
  */
-const readTournamentMatches = async () => {
-    // TODO: Implement querying tournament matches
-    throw new Error("Not implemented");
+const searchMatches = async (
+    matchID = null,
+    tournamentID = null,
+    teamID = null,
+    matchTime = null
+) => {
+    try {
+        // If matchID is provided, use it exclusively for the search.
+        if (matchID !== null) {
+            // Convert the matchID to a number for validation.
+            const id = Number(matchID);
+            // Check if the conversion results in an integer.
+            if (!Number.isInteger(id)) {
+                const error = new Error(
+                    "Invalid matchID. Value must be integer."
+                );
+                error.status = 400;
+                throw error;
+            }
+            const match = await TournamentModel.searchMatches(
+                matchID,
+                null,
+                null,
+                null
+            );
+            return match;
+        } else {
+            // When matchID is null, build search query based on other criteria.
+            const match = await TournamentModel.searchMatches(
+                null,
+                tournamentID,
+                teamID,
+                matchTime
+            );
+            return match;
+        }
+    } catch (error) {
+        throw error;
+    }
 };
 
 /**
@@ -203,20 +239,11 @@ const setMatchWinner = async () => {
     throw new Error("Not implemented");
 };
 
-/**
- * Inserts new matches for the next round into the database.
- */
-const nextRound = async () => {
-    // TODO: Implement adding matches to next round of tournament
-    throw new Error("Not implemented");
-};
-
 module.exports = {
     createTournament,
     searchTournaments,
     updateTournament,
     createMatch,
-    readTournamentMatches,
+    searchMatches,
     setMatchWinner,
-    nextRound,
 };

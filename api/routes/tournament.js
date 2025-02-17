@@ -55,7 +55,7 @@ router.get("/search", async (req, res, next) => {
     }
 });
 
-router.post("/match/create", async (req, res, next) => {
+router.post("/matches/create", async (req, res, next) => {
     const { tournamentID, team1ID, team2ID, matchTime } = req.body;
     if (!tournamentID || !team1ID || !team2ID || !matchTime) {
         return res.status(400).json({ message: "Invalid request format." });
@@ -71,6 +71,27 @@ router.post("/match/create", async (req, res, next) => {
             message: "Match created successfully",
             match,
         });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get("/matches/search", async (req, res, next) => {
+    const { matchID, tournamentID, teamID, matchTime } = req.query;
+    try {
+        const matches = await TournamentService.searchMatches(
+            matchID || null,
+            tournamentID || null,
+            teamID || null,
+            matchTime || null
+        );
+        if (matchID && matches === null) {
+            return res.status(404).json({ error: "Match not found." });
+        }
+        if (!matchID && matches === null) {
+            return res.status(200).json([]);
+        }
+        return res.status(200).json(matches);
     } catch (error) {
         next(error);
     }
