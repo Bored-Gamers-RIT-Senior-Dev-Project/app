@@ -25,11 +25,20 @@ const createTournament = async (
 };
 
 /**
- * Read basic information about a tournament from the database by ID.
+ * Searches tournaments in database.
+ * If tournamentID is specified, all other search terms are ignored.
+ * If tournamentID is specified and is not an integer, this function will return error.
  */
-const searchTournament = async () => {
-    // TODO: Implement querying tournament info
-    throw new Error("Not implemented");
+const searchTournament = async (
+    tournamentID = null,
+    startDate = null,
+    endDate = null,
+    status = null,
+    location = null
+) => {
+    if (Number.isInteger(tournamentID, 10)) {
+        throw new Error("Invalid tournamentID. Variable must be numeric.");
+    }
 };
 
 /**

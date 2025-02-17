@@ -39,7 +39,6 @@ const createTournament = async (
 
 /**
  * Search tournaments by name, start date, end date, status and/or location.
- * NOTE: If tournamentID is specified, all other search terms are ignored.
  */
 const searchTournaments = async (
     tournamentID = null,
@@ -49,9 +48,6 @@ const searchTournaments = async (
     location = null
 ) => {
     try {
-        if (Number.isInteger(tournamentID, 10)) {
-            throw new Error("Invalid tournamentID. Variable must be numeric.");
-        }
     } catch (error) {
         console.error("Error searching for tournament:", error.message);
         throw error;
