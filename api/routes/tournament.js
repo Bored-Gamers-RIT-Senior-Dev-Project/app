@@ -39,28 +39,4 @@ router.get("/search", async (req, res, next) => {
     }
 });
 
-router.get("/getByName/:tournamentName", async (req, res, next) => {
-    const { tournamentName } = req.params;
-    try {
-        const tournament = await TournamentService.searchTournaments(
-            tournamentName
-        );
-        res.status(200).json(tournament);
-    } catch (error) {
-        next(error);
-    }
-});
-
-router.get("/getByStartDate/:tournamentStartDate", async (req, res, next) => {
-    const { tournamentStartDate } = req.params[0];
-    try {
-        const tournament = await TournamentService.searchTournaments(
-            tournamentName
-        );
-        res.status(200).json(tournament);
-    } catch (error) {
-        next(error);
-    }
-});
-
 module.exports = router;
