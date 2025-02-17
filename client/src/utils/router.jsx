@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router";
 import App from "../App";
-import { Home, NotFound, Search, UserSignIn, UserSignUp,University, Rules, Schedule,About} from "../pages";
+import { Home, NotFound, Search, UserSignIn, UserSignUp,University, Rules, Schedule, About} from "../pages";
 import { handleSignIn, handleSignUp, sendTest } from "./api";
 import { events } from "./events";
 
