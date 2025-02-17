@@ -1,0 +1,25 @@
+name: Build and Deploy API to Staging Host
+
+on:
+#  # Trigger on push to the main branch
+#  push:
+#    branches:
+#      - main
+
+  # Allows manual execution from any branch
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to deploy"  # User chooses the branch to deploy
+        required: false
+        default: "main"  # Default branch if no input is provided
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Placeholder
+        run: echo This is a placeholder workflow

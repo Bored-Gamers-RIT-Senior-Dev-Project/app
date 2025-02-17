@@ -4,5 +4,8 @@ import { Search } from "./Search";
 import { UserSignIn } from "./UserSignIn";
 import { UserSignUp } from "./UserSignUp";
 import {About} from "./About";
+import { University } from "./University";
+import { Rules } from "./Rules";
+import {Schedule}  from "./Schedule";
+export { Home, NotFound, Search, UserSignIn, UserSignUp,University,Rules,Schedule,About};
 
-export { Home, NotFound, Search, UserSignIn, UserSignUp, About };

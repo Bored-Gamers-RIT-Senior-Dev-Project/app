@@ -1,84 +1,33 @@
 name: Build and Deploy (React App) Frontend to Staging Host
 
 on:
-  # Trigger on push to the main branch
-  push:
-    branches:
-      - main
-
-  # Allows manual execution from any branch
   workflow_dispatch:
     inputs:
       branch:
-        description: "Branch to deploy"  # User chooses the branch to deploy
+        description: "Branch to deploy"
         required: false
-        default: "main"  # Default branch if no input is provided
+        default: "main"
 
 jobs:
-  build-and-test:
+  build-and-deploy:
     runs-on: self-hosted
 
     steps:
-      # Checkout the selected branch
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch || github.ref_name }}  # Uses input branch or current branch
+          ref: ${{ github.event.inputs.branch || github.ref_name }}
 
-      # Create the .env file in the client directory using GitHub secrets
-      - name: Create .env file for client
-        run: |
-          cat <<EOF > ./client/.env
-          VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }}
-          VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
-          VITE_FIREBASE_PROJECT_ID=${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET=${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
-          VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
-          VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }}
-          VITE_FIREBASE_MEASUREMENT_ID=${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
-          EOF
-
-      # Build the Docker image for the React application
       - name: Build Docker Image
         run: |
-          docker build -t bg_frontend ./client  # Use ./client as the build context
+          docker build -t bg_frontend ./client
 
-### For running test.js later ###
-#      # Run tests inside the container
-#      - name: Run Tests
-#        run: |
-#          docker run --rm bg_frontend npm test
-
-      # Save the Docker image as a .tar archive
-      - name: Save Docker Image as Tar Archive
+      - name: Save and Transfer Docker Image to Server
         run: |
           docker save bg_frontend -o bg_frontend.tar
-
-      # Upload the image as an artifact for later deployment
-      - name: Upload Image Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: docker-image
-          path: bg_frontend.tar
-
-  deploy:
-    runs-on: self-hosted
-    needs: build-and-test  # Deployment only runs if build and test succeed
-
-    steps:
-      # Download the Docker image artifact
-      - name: Download Docker Image Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: docker-image
-
-      # Securely copy the Docker image to the remote server using SCP
-      - name: Copy Docker Image to Server
-        run: |
           ssh-keyscan -t ed25519 ${{ secrets.SSH_STAGING_HOST }} >> ~/.ssh/known_hosts
           scp bg_frontend.tar ${{ secrets.SSH_USER }}@${{ secrets.SSH_STAGING_HOST }}:/tmp/bg_frontend.tar
 
-      # Deploy the application on the app server using SSH
       - name: Deploy Application via SSH
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_STAGING_HOST }} << 'EOF'
