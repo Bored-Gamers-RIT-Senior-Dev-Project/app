@@ -23,8 +23,8 @@ router.post("/create", async (req, res, next) => {
     }
 });
 
-router.get("/getByID", async (req, res, next) => {
-    const { tournamentID } = req.body;
+router.get("/getByID/:tournamentID", async (req, res, next) => {
+    const { tournamentID } = req.params;
     try {
         const tournament = await TournamentService.searchTournaments(
             tournamentID
