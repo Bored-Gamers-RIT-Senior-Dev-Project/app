@@ -3,9 +3,9 @@ import { NotFound } from "./NotFound";
 import { Search } from "./Search";
 import { UserSignIn } from "./UserSignIn";
 import { UserSignUp } from "./UserSignUp";
-import {About} from "./About";
+import { About } from "./About";
 import { University } from "./University";
 import { Rules } from "./Rules";
-import {Schedule}  from "./Schedule";
-export { Home, NotFound, Search, UserSignIn, UserSignUp,University,Rules,Schedule,About};
+import { Schedule }  from "./Schedule";
+export { Home, NotFound, Search, UserSignIn, UserSignUp,University,Rules,Schedule,About };
 
