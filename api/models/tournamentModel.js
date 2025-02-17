@@ -68,6 +68,38 @@ const searchTournaments = async (
                 return null;
             }
             return rows[0];
+        } else {
+            let search = "SELECT * FROM Tournaments WHERE 1=1";
+            const params = [];
+
+            // Only add a search parameter if the parameter is not null
+            if (tournamentID !== null) {
+                search += " AND TournamentID = ?";
+                params.push(tournamentID);
+            }
+            if (startDate !== null) {
+                search += " AND StartDate >= ?";
+                params.push(startDate);
+            }
+            if (endDate !== null) {
+                search += " AND EndDate <= ?";
+                params.push(endDate);
+            }
+            if (status !== null) {
+                search += " AND Status = ?";
+                params.push(status);
+            }
+            if (location !== null) {
+                search += " AND Location = ?";
+                params.push(location);
+            }
+
+            const [rows] = await db.query(search, params);
+
+            if (rows.length === 0) {
+                return null;
+            }
+            return rows;
         }
     } catch (error) {
         console.error("Error searching for tournament:", error.message);

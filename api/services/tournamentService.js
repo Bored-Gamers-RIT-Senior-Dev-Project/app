@@ -54,6 +54,7 @@ const searchTournaments = async (
                 location
             );
             return tournament;
+        } else {
         }
     } catch (error) {
         throw error;
