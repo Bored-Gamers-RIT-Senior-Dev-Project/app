@@ -10,18 +10,12 @@ const createTournament = async (
     status,
     location
 ) => {
-    console.log(
-        "Processing request to create tournament '" +
-            tournamentName +
-            "' in database."
-    );
     try {
         const [result] = await db.query(
             `INSERT INTO Tournaments (TournamentName, StartDate, EndDate, Status, Location)
              VALUES (?, ?, ?, ?, ?)`,
             [tournamentName, startDate, endDate, status, location]
         );
-        console.log(Date.now() + "- Tournament created. ID:" + result.insertId);
         return {
             id: result.insertId,
             tournamentName,

@@ -3,15 +3,6 @@ const router = express.Router();
 const TournamentService = require("../services/tournamentService");
 
 router.post("/create", async (req, res, next) => {
-    console.log(
-        Date.now() +
-            " - endpoint:/api/tournament/create - Method:" +
-            req.method +
-            " - IP:" +
-            req.ip +
-            "- Body: " +
-            JSON.stringify(req.body)
-    );
     const { tournamentName, startDate, endDate, location } = req.body;
     if (!tournamentName || !startDate || !endDate || !location) {
         return res.status(400).json({ message: "Invalid request format." });
