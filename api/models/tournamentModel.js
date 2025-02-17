@@ -2,6 +2,13 @@ const db = require("../config/db");
 
 /**
  * Creates a new tournament in the database.
+ * @param {string} tournamentName Name of the tournament.
+ * @param {string} startDate Start date of tournament in YYYY-MM-DD format.
+ * @param {string} endDate End date of tournament in YYYY-MM-DD format.
+ * @param {string} status Status of the tournament. Should always be "Upcoming" when creating a tournament.
+ * @param {string} location The location of the tournament. Likely an address or university name.
+ * @returns {Promise<object>} Returns the created tournament record.
+ * @throws {Error} Error if the tournament cannot be inserted into the database.
  */
 const createTournament = async (
     tournamentName,
