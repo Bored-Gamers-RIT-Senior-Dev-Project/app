@@ -5,6 +5,6 @@ import { UserSignIn } from "./UserSignIn";
 import { UserSignUp } from "./UserSignUp";
 import { University } from "./University";
 import { Rules } from "./Rules";
-export { Home, NotFound, Search, UserSignIn, UserSignUp,University,Rules};
-
+import {Schedule}  from "./Schedule";
+export { Home, NotFound, Search, UserSignIn, UserSignUp,University,Rules,Schedule};
 
