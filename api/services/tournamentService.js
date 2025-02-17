@@ -1,5 +1,7 @@
 const TournamentModel = require("../models/tournamentModel");
 
+/* Helper Functions */
+
 /**
  * Safely decodes a URI-encoded string.
  * @param {string|null|undefined} value - The URI-encoded string to decode.
@@ -10,6 +12,22 @@ const safeDecode = (value) => {
         ? decodeURIComponent(value)
         : null;
 };
+
+/**
+ * Validates that a given value is an integer.
+ * @param {number} value - The value to validate.
+ * @param {string} fieldName - The name of the field (used in the error message).
+ * @throws {Error} Throws an error with status 400 if the value is not an integer.
+ */
+const validateInteger = (value, fieldName) => {
+    if (!Number.isInteger(value)) {
+        const error = new Error(`Invalid ${fieldName}. Value must be integer.`);
+        error.status = 400;
+        throw error;
+    }
+};
+
+/* End Helper Functions */
 
 /**
  * Creates a new tournament in the database with the status of "Upcoming".
@@ -32,14 +50,7 @@ const createTournament = async (
     try {
         // Convert userRoleID to a number.
         const userRoleIDnum = Number(userRoleID);
-        // Validate that the roleID is an integer.
-        if (!Number.isInteger(userRoleIDnum)) {
-            const error = new Error(
-                "Invalid user role. Value must be integer."
-            );
-            error.status = 400;
-            throw error;
-        }
+        validateInteger(userRoleIDnum, "userRoleID");
         // Check if the user has an authorized role (2=SuperAdmin or 3=AdminEmployee).
         if (userRoleIDnum !== 2 && userRoleIDnum !== 3) {
             const error = new Error(
@@ -92,13 +103,7 @@ const searchTournaments = async (
             // Convert the tournamentID to a number for validation.
             const id = Number(tournamentID);
             // Check if the conversion results in an integer.
-            if (!Number.isInteger(id)) {
-                const error = new Error(
-                    "Invalid tournamentID. Value must be integer."
-                );
-                error.status = 400;
-                throw error;
-            }
+            validateInteger(id, "tournamentID");
             const tournament = await TournamentModel.searchTournaments(
                 tournamentID,
                 null,
@@ -148,22 +153,9 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
         const tournamentIDInt = Number(tournamentID);
         const team1IDInt = Number(team1ID);
         const team2IDInt = Number(team2ID);
-        // Validate that the tournamentID is an integer.
-        if (!Number.isInteger(tournamentIDInt)) {
-            const error = new Error(
-                "Invalid tournamentID. Value must be integer."
-            );
-            error.status = 400;
-            throw error;
-        }
-        // Validate that both team1ID and team2ID are integers.
-        if (!Number.isInteger(team1IDInt) || !Number.isInteger(team2IDInt)) {
-            const error = new Error(
-                "Invalid team IDs. Both team1ID and team2ID must be integers."
-            );
-            error.status = 400;
-            throw error;
-        }
+        validateInteger(tournamentIDInt, "tournamentID");
+        validateInteger(team1IDInt, "team1ID");
+        validateInteger(team2IDInt, "team2ID");
         // Convert matchTime from an ISO 8601 string to MySQL DATETIME format ("YYYY-MM-DD HH:MM:SS").
         const formattedMatchTime = new Date(matchTime)
             .toISOString() // Converts to "2025-02-17T00:00:00.000Z"
@@ -209,14 +201,7 @@ const searchMatches = async (
         if (matchID !== null) {
             // Convert the matchID to a number for validation.
             const id = Number(matchID);
-            // Check if the conversion results in an integer.
-            if (!Number.isInteger(id)) {
-                const error = new Error(
-                    "Invalid matchID. Value must be integer."
-                );
-                error.status = 400;
-                throw error;
-            }
+            validateInteger(id, "matchID");
             // Call the model function using only matchID.
             const match = await TournamentModel.searchMatches(
                 matchID,
@@ -244,44 +229,27 @@ const searchMatches = async (
  * Updates the match result in the database based on matchID
  * @param {number|string} matchID - ID for the match to update.
  * @param {number|string} winnerID - ID for the winning team.
- * @param {number|string} Score1 - Score for team one.
- * @param {number|string} Score2 - Score for team two.
+ * @param {number|string} score1 - Score for team one.
+ * @param {number|string} score2 - Score for team two.
  * @returns {Promise<object>} Returns a promise that resolves to an object containing the updated match result.
  * @throws {Error} Throws an error with status 400 if any of the IDs or scores are not valid integers.
  */
-const updateMatchResult = async (matchID, winnerID, Score1, Score2) => {
+const updateMatchResult = async (matchID, winnerID, score1, score2) => {
     try {
         // Convert parameters to numbers.
         const matchIDInt = Number(matchID);
         const winnerIDInt = Number(winnerID);
-        const Score1Int = Number(Score1);
-        const Score2Int = Number(Score2);
-
-        // Validate that matchID is an integer.
-        if (!Number.isInteger(matchIDInt)) {
-            const error = new Error("Invalid matchID. Value must be integer.");
-            error.status = 400;
-            throw error;
-        }
-        // Validate that winnerID is an integer.
-        if (!Number.isInteger(winnerIDInt)) {
-            const error = new Error("Invalid winnerID. Value must be integer.");
-            error.status = 400;
-            throw error;
-        }
-        // Validate that both Score1 and Score2 are integers.
-        if (!Number.isInteger(Score1Int) || !Number.isInteger(Score2Int)) {
-            const error = new Error(
-                "Invalid score. Both scores must be integers."
-            );
-            error.status = 400;
-            throw error;
-        }
+        const score1Int = Number(score1);
+        const score2Int = Number(score2);
+        validateInteger(matchIDInt, "matchID");
+        validateInteger(winnerIDInt, "winnerID");
+        validateInteger(score1Int, "score1");
+        validateInteger(score2Int, "score2");
         const match = await TournamentModel.updateMatchResult(
             matchIDInt,
             winnerIDInt,
-            Score1Int,
-            Score2Int
+            score1Int,
+            score2Int
         );
         return match;
     } catch (error) {
