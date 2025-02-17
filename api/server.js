@@ -1,3 +1,4 @@
+//FIXME: I genuinely can't tell.  Is this file currently being used?
 const express = require("express");
 const dotenv = require("dotenv");
 const authRoutes = require("./routes/auth.routes"); // Ensure this matches your file path
@@ -10,8 +11,8 @@ app.use(express.json());
 
 // Test database connection
 db.getConnection()
-  .then(() => console.log("Connected to MySQL"))
-  .catch((err) => console.error("MySQL connection error:", err));
+    .then(() => console.log("Connected to MySQL"))
+    .catch((err) => console.error("MySQL connection error:", err));
 
 // Routes
 app.use("/api/auth", authRoutes);
