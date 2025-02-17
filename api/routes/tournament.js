@@ -41,7 +41,13 @@ router.get("/search", async (req, res, next) => {
             status || null,
             location || null
         );
-        res.status(200).json(tournament);
+        if (tournamentID && tournament === null) {
+            return res.status(404).json({ error: "Tournament not found." });
+        }
+        if (!tournamentID && tournament === null) {
+            return res.status(200).json([]);
+        }
+        return res.status(200).json(tournament);
     } catch (error) {
         next(error);
     }
