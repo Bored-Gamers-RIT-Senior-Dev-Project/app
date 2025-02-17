@@ -24,6 +24,12 @@ const createTournament = async (
     }
 };
 
+const safeDecode = (value) => {
+    return value !== null && value !== undefined
+        ? decodeURIComponent(value)
+        : null;
+};
+
 /**
  * Searches tournaments in database.
  * If tournamentID is specified, all other search terms are ignored.
@@ -31,7 +37,7 @@ const createTournament = async (
  */
 const searchTournaments = async (
     tournamentID = null,
-    tournamentName,
+    tournamentName = null,
     startDate = null,
     endDate = null,
     status = null,
@@ -59,7 +65,7 @@ const searchTournaments = async (
         } else {
             const tournament = await TournamentModel.searchTournaments(
                 null,
-                decodeURIComponent(tournamentName),
+                safeDecode(tournamentName),
                 startDate,
                 endDate,
                 status,

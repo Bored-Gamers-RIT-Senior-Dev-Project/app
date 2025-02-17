@@ -38,7 +38,19 @@ const createTournament = async (
 };
 
 /**
- * Search tournaments by name, start date, end date, status and/or location.
+ * Searches tournaments by one or more optional criteria.
+ * If tournamentID is provided (not null), this function returns the single tournament
+ * record with that ID. Otherwise, it uses any of the provided parameters (tournamentName,
+ * startDate, endDate, status, location) to filter the tournaments.
+ * @param {number|null} tournamentID ID for the tournament. If provided, only the tournament with this ID is returned.
+ * @param {string|null} tournamentName Name of the tournament.
+ * @param {string|null} startDate Start date of the tournament in YYYY-MM-DD format. Returns tournaments starting on or after this date.
+ * @param {string|null} endDate End date of the tournament in YYYY-MM-DD format. Returns tournaments ending on or before this date.
+ * @param {string|null} status Status of the tournament (e.g., "Upcoming", "Active", etc.).
+ * @param {string|null} location The location of the tournament, such as an address or university name.
+ * @returns {Promise<object|null|object[]>} Returns a single tournament object if tournamentID is provided, an array of tournament objects
+ *                                          matching the search criteria otherwise, or null if no tournaments are found.
+ * @throws {Error} Throws an error if the database query fails.
  */
 const searchTournaments = async (
     tournamentID = null,
@@ -61,24 +73,14 @@ const searchTournaments = async (
             if (rows.length === 0) {
                 return null;
             } else if (rows.length > 1) {
-                console.error(
-                    "Error fetching tournamentID:" +
-                        tournamentID +
-                        ". Unexpected value. Expected 0 or 1 result."
-                );
-                return null;
+                throw Error("Search error for tournament ID: " + tournamentID);
             }
             return rows[0];
         } else {
-            console.log(tournamentName);
             let search = "SELECT * FROM Tournaments WHERE 1=1";
             const params = [];
 
             // Only add a search parameter if the parameter is not null
-            if (tournamentID !== null) {
-                search += " AND TournamentID = ?";
-                params.push(tournamentID);
-            }
             if (tournamentName !== null) {
                 search += " AND TournamentName = ?";
                 params.push(tournamentName);
@@ -99,7 +101,7 @@ const searchTournaments = async (
                 search += " AND Location = ?";
                 params.push(location);
             }
-
+            console.log("My Search: " + search + params);
             const [rows] = await db.query(search, params);
 
             if (rows.length === 0) {
