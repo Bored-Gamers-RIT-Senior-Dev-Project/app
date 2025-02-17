@@ -38,19 +38,24 @@ const createTournament = async (
 };
 
 /**
- * Read basic information about a tournament from the database by ID.
+ * Search tournaments by name, start date, end date, status and/or location.
+ * NOTE: If tournamentID is specified, all other search terms are ignored.
  */
-const readTournament = async () => {
-    // TODO: Implement querying tournament info
-    throw new Error("Not implemented");
-};
-
-/**
- * Updates the tournament state in the database.
- */
-const updateTournament = async () => {
-    // TODO: Implement updating tournament state
-    throw new Error("Not implemented");
+const searchTournaments = async (
+    tournamentID = null,
+    startDate = null,
+    endDate = null,
+    status = null,
+    location = null
+) => {
+    try {
+        if (Number.isInteger(tournamentID, 10)) {
+            throw new Error("Invalid tournamentID. Variable must be numeric.");
+        }
+    } catch (error) {
+        console.error("Error searching for tournament:", error.message);
+        throw error;
+    }
 };
 
 /**
@@ -87,8 +92,6 @@ const insertNextRoundMatches = async () => {
 
 module.exports = {
     createTournament,
-    readTournament,
-    updateTournament,
     createMatch,
     readTournamentMatches,
     setMatchWinner,

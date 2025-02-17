@@ -27,7 +27,7 @@ const createTournament = async (
 /**
  * Read basic information about a tournament from the database by ID.
  */
-const readTournament = async () => {
+const searchTournament = async () => {
     // TODO: Implement querying tournament info
     throw new Error("Not implemented");
 };
@@ -74,7 +74,7 @@ const nextRound = async () => {
 
 module.exports = {
     createTournament,
-    readTournament,
+    searchTournament,
     updateTournament,
     createMatch,
     readTournamentMatches,
