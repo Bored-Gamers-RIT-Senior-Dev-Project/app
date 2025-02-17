@@ -1,6 +1,17 @@
 const TournamentModel = require("../models/tournamentModel");
 
 /**
+ * Safely decodes a URI-encoded string.
+ * @param {string|null|undefined} value - The URI-encoded string to decode.
+ * @returns {string|null} The decoded string, or null if the input is null or undefined.
+ */
+const safeDecode = (value) => {
+    return value !== null && value !== undefined
+        ? decodeURIComponent(value)
+        : null;
+};
+
+/**
  * Creates a new tournament in the database with the status of "Upcoming".
  * This function validates the user role to ensure that only authorized users (with roleID 2 or 3).
  * @param {string} tournamentName - Name of the tournament.
@@ -49,12 +60,6 @@ const createTournament = async (
     } catch (error) {
         throw error;
     }
-};
-
-const safeDecode = (value) => {
-    return value !== null && value !== undefined
-        ? decodeURIComponent(value)
-        : null;
 };
 
 /**
