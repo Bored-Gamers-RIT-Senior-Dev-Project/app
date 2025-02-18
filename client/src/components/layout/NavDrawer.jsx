@@ -14,7 +14,6 @@ import { useLocation, useNavigate } from "react-router";
 import { useAuth } from "../../hooks/useAuth";
 
 const buildNavLinks = (user) => {
-    console.log(user);
     const links = [
         {
             label: null,
@@ -88,11 +87,10 @@ const buildNavLinks = (user) => {
             ],
         });
     }
-    console.log("LINKS:", links);
     return links;
 };
 
-const NavDrawer = ({ open, onClose, desktop }) => {
+const NavDrawer = ({ open, setOpen, desktop }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useAuth();
@@ -100,13 +98,13 @@ const NavDrawer = ({ open, onClose, desktop }) => {
 
     //When the location changes, close the drawer on mobile.
     useEffect(() => {
-        if (!desktop) onClose();
-    }, [location, desktop, onClose]);
+        if (!desktop) setOpen(false);
+    }, [location, setOpen, desktop]);
 
     return (
         <Drawer
             open={open}
-            onClose={onClose}
+            onClose={() => setOpen(false)}
             elevation={8}
             // hideBackdrop={desktop}
             variant={desktop ? "persistent" : "temporary"}
@@ -138,7 +136,7 @@ const NavDrawer = ({ open, onClose, desktop }) => {
 
 NavDrawer.propTypes = {
     desktop: PropTypes.bool.isRequired,
-    onClose: PropTypes.func.isRequired,
+    setOpen: PropTypes.func.isRequired,
     open: PropTypes.bool.isRequired,
 };
 
