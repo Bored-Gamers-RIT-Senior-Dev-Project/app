@@ -1,5 +1,6 @@
 import {
     createUserWithEmailAndPassword,
+    getAdditionalUserInfo,
     getAuth,
     GoogleAuthProvider,
     onAuthStateChanged,
@@ -19,7 +20,8 @@ authProvider.addScope("profile");
 //Sign-in functions
 const signInWithGoogle = async () => {
     const result = await signInWithPopup(auth, authProvider);
-    return result.user;
+    const additionalUserInfo = getAdditionalUserInfo(result);
+    return { ...result, additionalUserInfo };
 };
 const signInWithEmail = async (email, password) => {
     const result = await signInWithEmailAndPassword(auth, email, password);
