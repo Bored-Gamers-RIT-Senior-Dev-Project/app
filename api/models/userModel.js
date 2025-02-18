@@ -1,5 +1,4 @@
 const db = require("../config/db");
-const randomString = require("../config/randomString");
 
 /**
  * Creates a user in the database.
