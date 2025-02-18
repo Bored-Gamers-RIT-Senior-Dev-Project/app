@@ -37,6 +37,9 @@ const createUser = async (
                 roleId,
             ]
         );
+        if (result[0].affectedRows === 0) {
+            throw new Error("User not created.");
+        }
         return await readUser(firebaseUID);
     } catch (error) {
         console.error("Error creating user:", error.message);
