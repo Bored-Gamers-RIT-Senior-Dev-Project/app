@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router";
 import App from "../App";
 
-import { Home, NotFound, Search, UserSignIn, UserSignUp, UserSettings} from "../pages";
+import { Home, NotFound, Search, UserSignIn, UserSignUp, UserSettings } from "../pages";
 
 import { Home, NotFound, Search, UserSignIn, UserSignUp,University, Rules, Schedule} from "../pages";
 
