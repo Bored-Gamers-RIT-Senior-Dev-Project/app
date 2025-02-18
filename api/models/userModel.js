@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const { makeObjectCamelCase } = require("../utils");
 
 /**
  * Creates a user in the database.
@@ -71,7 +72,7 @@ const readUser = async (uid) => {
         if (rows.length === 0) {
             return null;
         }
-        return rows[0];
+        return makeObjectCamelCase(rows[0]);
     } catch (error) {
         console.error("Error fetching user:", error.message);
         throw error;
