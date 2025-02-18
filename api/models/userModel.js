@@ -57,9 +57,11 @@ const readUser = async (uid) => {
     try {
         const [rows] = await db.query(
             `
-            SELECT * 
-            FROM Users
-            WHERE FirebaseUID = ?
+        SELECT user.*, uni.UniversityName, team.TeamName
+            FROM users AS user
+            LEFT JOIN universities AS uni ON user.UniversityID = uni.UniversityId
+            LEFT JOIN teams AS team ON user.TeamID = team.TeamId
+            WHERE user.FirebaseUID = ?;
         `,
             [uid]
         );
@@ -109,7 +111,7 @@ const generateUsername = async (username, sharedUsernames = null) => {
 
     // Otherwise, append a number to the username until we find a unique one
     let i = 1;
-    while (sharedUsernames.contains(`${username}-${i}`)) {
+    while (sharedUsernames.includes(`${username}-${i}`)) {
         i++;
         if (i > 100)
             console.error(
