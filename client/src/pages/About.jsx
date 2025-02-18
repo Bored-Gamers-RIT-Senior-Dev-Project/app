@@ -16,19 +16,39 @@ import {
 import { ArrowBack, ArrowForward, Close } from "@mui/icons-material";
 
 const playerRoles = [
-  {
-    title: "PLACE HOLDER1",
-    description: "YOOYOOYOYYOO",
+   {
+    title: "Expedition Leader:",
+    description: "This team member will make decisions on when and how action cards are played. They facilitate the team’s joint strategic planning and manage the expedition budget.",
     image: "https://placehold.co/600x300",
   },
   {
-    title: "PLACE HOLDER2",
-    description: "YOOOYOYO",
+    title: "Resource Specialist",
+    description: "This team member is responsible for obtaining the resources required for survival on arrival and the establishment of a base on the new world. ",
     image: "https://placehold.co/600x300",
   },
   {
-    title: "PLACE HOLDER3",
-    description: "YOOYOOYY",
+    title: "Scientist:",
+    description: "This team member collects knowledge cards that allow the team an advantage in knowing how to overcome obstacles and which actions are most likely to succeed. ",
+    image: "https://placehold.co/600x300",
+  },
+  {
+    title: "Technician:",
+    description: "This team member uses tool and technology cards to create the team base and repair machines and weapons as needed. ",
+    image: "https://placehold.co/600x300",
+  },
+  {
+    title: "Chronicler:",
+    description: "This team member is responsible for all communications with Home Base, for researching historic data cards that may aid the quest and for creating a chronicle of the current expedition.",
+    image: "https://placehold.co/600x300",
+  },
+  {
+    title: "Weapons Specialist:",
+    description: "This team member leads the team defense strategies and works to gain points to raise each team member’s skill level on the weapon classes best suited to the current habitat.",
+    image: "https://placehold.co/600x300",
+  },
+  {
+    title: "Physician:",
+    description: " This team member is responsible for the physical and mental health of expedition members, treating injuries and illness when determined by cards for encounters with native wildlife, hostile forces, space adaptation syndrome, etc.",
     image: "https://placehold.co/600x300",
   },
 ];
@@ -113,7 +133,12 @@ const About = () => {
           </Box>
           <Box sx={{ flex: 1 }}>
             <Typography sx={{ textAlign: "justify", lineHeight: "1.5" }}>
-              A New World requires a team of 4-7 players who will work together to score as many points as possible after being dropped into a new, unpopulated world. The habitats will vary, and the team will not know in advance where they will land.
+            A New World requires a team of 4-7 players who will work together to score as many points as possible after being dropped into a new, unpopulated world.<br />
+            The habitats will vary and the team will not know in advance where they will land.<br /><br />
+            Environments could be a desert planet, an underwater location, a water world with scattered islands, an ice-covered mountain range, or a jungle full of predatory animals and dangerous plant life.<br /><br />
+            <b>(Advance News! Expansion Pack 1 is in the design phase with additional worlds and resources!)</b><br/><br />
+            The game is best played in a head-to-head competition with a second team seeking to survive in its own New World but competing for the same resources.<br />
+            However, with the modifications described for solo team play, it is possible to enjoy striving to beat your own prior scores.
             </Typography>
           </Box>
         </Box>
