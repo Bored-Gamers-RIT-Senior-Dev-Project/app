@@ -77,7 +77,9 @@ const searchTournaments = async (
             }
             return rows[0];
         } else {
-            let search = "SELECT * FROM Tournaments WHERE 1=1";
+            let search =
+                //Remove the time from query output: "SELECT TournamentID, TournamentName, DATE(StartDate) AS StartDate, DATE(EndDate) AS EndDate, Status, Location FROM Tournaments WHERE 1=1";
+                "SELECT * FROM Tournaments WHERE 1=1";
             const params = [];
 
             // Only add a search parameter if the parameter is not null
