@@ -7,5 +7,5 @@ import { About } from "./About";
 import { University } from "./University";
 import { Rules } from "./Rules";
 import { Schedule }  from "./Schedule";
-export { Home, NotFound, Search, UserSignIn, UserSignUp, University, Rules, Schedule, About};
+export { Home, NotFound, Search, UserSignIn, UserSignUp, University, Rules, Schedule, About };
 
