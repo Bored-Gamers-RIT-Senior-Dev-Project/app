@@ -57,9 +57,11 @@ const readUser = async (uid) => {
     try {
         const [rows] = await db.query(
             `
-            SELECT * 
-            FROM Users
-            WHERE FirebaseUID = ?
+        SELECT user.*, uni.UniversityName, team.TeamName
+            FROM users AS user
+            LEFT JOIN universities AS uni ON user.UniversityID = uni.UniversityId
+            LEFT JOIN teams AS team ON user.TeamID = team.TeamId
+            WHERE user.FirebaseUID = ?;
         `,
             [uid]
         );

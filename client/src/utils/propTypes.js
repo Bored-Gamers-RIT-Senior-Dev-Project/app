@@ -15,6 +15,8 @@ const User = PropTypes.shape({
     roleID: PropTypes.bool,
     universityID: PropTypes.number,
     isValidated: PropTypes.bool,
+    teamName: PropTypes.string,
+    universityName: PropTypes.string,
 });
 
 export default { ...PropTypes, User };
