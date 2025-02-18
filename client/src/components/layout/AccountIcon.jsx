@@ -49,8 +49,8 @@ const MobileAccountIcon = ({ navigate, user }) => {
                 onClick={toggleOpen}
             >
                 <Avatar
-                    src={user.ProfileImageURL}
-                    alt={`${user.FirstName} ${user.LastName}`}
+                    src={user.profileImageUrl}
+                    alt={`${user.firstName} ${user.lastName}`}
                     sx={{ height: "96%" }}
                 />
             </Button>
@@ -108,15 +108,15 @@ const DesktopAccountIcon = ({ navigate, user }) => {
             >
                 <Box>
                     <Typography variant="h6" sx={{ color: "white" }}>
-                        {user.Username}
+                        {user.username}
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
-                        {user.FirstName} {user.LastName}
+                        {user.firstName} {user.lastName}
                     </Typography>
                 </Box>
                 <Avatar
-                    src={user.ProfileImageURL}
-                    alt={user.Username}
+                    src={user.profileImageUrl}
+                    alt={user.username}
                     sx={{
                         width: 56,
                         height: 56,
@@ -154,7 +154,7 @@ const AccountIcon = ({ desktop }) => {
 
     return (
         <Box sx={{ position: "absolute", right: { lg: 25, xs: 10 } }}>
-            {!user.Username ? (
+            {!user ? (
                 <LogInButton navigate={navigate} desktop={desktop} />
             ) : desktop ? (
                 <DesktopAccountIcon navigate={navigate} user={user} />
