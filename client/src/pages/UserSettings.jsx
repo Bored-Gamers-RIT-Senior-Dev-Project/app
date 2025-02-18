@@ -89,6 +89,21 @@ const UserSettings = () => {
                     renderInput={(params) => <TextField {...params} label="Select your University" />}
                 />
             </FormControl>
+
+            {/* Team Selection */}
+            <Paper variant="outlined" sx={{ mt: 3, padding: 2 }}>
+                <FormControl component="fieldset">
+                    <FormLabel>Team</FormLabel>
+                    <RadioGroup value={selectedTeamOption} onChange={(e) => setSelectedTeamOption(e.target.value)}>
+                        <FormControlLabel value="Start" control={<Radio />} label="Start a New Team" />
+                        <FormControlLabel value="Join" control={<Radio />} label="Join an Existing Team" />
+                        <FormControlLabel value="Later" control={<Radio />} label="I'll do this later" />
+                    </RadioGroup>
+                    {selectedTeamOption === "Join" || selectedTeamOption === "Start" ? (
+                        <TextField label="Enter Team Name" fullWidth margin="dense" sx={{ mt: 2 }} />
+                    ) : null}
+                </FormControl>
+            </Paper>
         </Paper>
     );
 };
