@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const UserService = require("../services/userService");
 const createError = require("http-errors");
-const { makeObjectCamelCase } = require("../utils");
 
 router.post("/get", async (req, res, next) => {
     const { token } = req.body;
