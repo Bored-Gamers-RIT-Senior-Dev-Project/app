@@ -3,6 +3,7 @@ import { Button, Paper, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
+import { MessageData, Severity } from "../utils/messageData";
 
 const Search = () => {
     const [searchBar, setSearchBar] = useState("");
@@ -33,11 +34,14 @@ const Search = () => {
             </Button>
             <Button
                 onClick={() =>
-                    events.publish("message", {
-                        title: "Success!",
-                        message: "Message sent!",
-                        severity: "success",
-                    })
+                    events.publish(
+                        "message",
+                        MessageData(
+                            "Success!",
+                            "Message sent!",
+                            Severity.SUCCESS
+                        )
+                    )
                 }
                 variant="contained"
                 color="secondary"
@@ -46,12 +50,13 @@ const Search = () => {
             </Button>
             <Button
                 onClick={() =>
-                    events.publish("message", {
-                        message: "Oh, no!",
-                        severity: "error",
-                        icon: <Error />,
-                        autoHideDuration: 5000,
-                    })
+                    events.publish(
+                        "message",
+                        ErrorData("Oh, no!", Severity.ERROR, {
+                            icon: <Error />,
+                            autoHideDuration: 5000,
+                        })
+                    )
                 }
                 variant="contained"
                 color="primary"
@@ -60,9 +65,7 @@ const Search = () => {
             </Button>
             <Button
                 onClick={() =>
-                    events.publish("message", {
-                        message: "Hooray!",
-                    })
+                    events.publish("message", MessageData(undefined, "Hooray!"))
                 }
                 variant="contained"
                 color="secondary"

@@ -16,12 +16,16 @@ export class MessageData {
      * Create a new MessageData
      * @param {string | undefined} title The title of this message
      * @param {string} message The user-facing message for this message
-     * @param {string} severity The Severity
+     * @param {string} [severity] The Severity
+     * @param {object} [more] Add more arbitrary keys to this object
      */
-    constructor(title, message, severity) {
+    constructor(title, message, severity, more = undefined) {
         this.title = title;
         this.message = message;
         this.severity = severity;
+        if (more) {
+            Object.assign(this, more);
+        }
     }
 }
 
@@ -33,9 +37,10 @@ export class ErrorData {
      * Create a new ErrorData
      * @param {string} message The user-facing message for this error
      * @param {string} [string] The Severity, or Severity.ERROR if not specified.
+     * @param {more} [more] Add more arbitrary keys to this object
      */
-    constructor(message, severity = Severity.ERROR) {
-        const messageData = new MessageData(undefined, message, severity);
+    constructor(message, severity = Severity.ERROR, more = undefined) {
+        const messageData = new MessageData(undefined, message, severity, more);
         Object.assign(this, messageData);
     }
 }
