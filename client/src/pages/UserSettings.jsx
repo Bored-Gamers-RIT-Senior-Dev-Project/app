@@ -33,6 +33,15 @@ const UserSettings = () => {
     return (
         <Paper sx={{ padding: 3, maxWidth: 800, margin: "auto" }}>
             <Typography variant="h4" textAlign="center">User Settings</Typography>
+
+            {/* Profile Picture Upload */}
+            <FormControl fullWidth sx={{ mt: 3 }}>
+                <FormLabel>Profile Picture</FormLabel>
+                <Button variant="outlined" component="label" startIcon={<CloudUploadIcon />}>
+                    Upload / Drag & Drop
+                    <input type="file" hidden />
+                </Button>
+            </FormControl>
         </Paper>
     );
 };
