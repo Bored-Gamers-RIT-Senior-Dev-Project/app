@@ -59,7 +59,8 @@ const searchTournaments = async (
     endDate = null,
     status = null,
     location = null,
-    sortBy = null
+    sortBy = null,
+    sortAsDescending = false
 ) => {
     try {
         if (tournamentID !== null) {
@@ -107,6 +108,10 @@ const searchTournaments = async (
             if (sortBy !== null) {
                 search += " ORDER BY " + sortBy;
             }
+            if (sortBy !== null && sortAsDescending) {
+                search += " DESC";
+            }
+            console.log("Tournament Search Query: " + search + params);
             const [rows] = await db.query(search, params);
 
             if (rows.length === 0) {
@@ -170,7 +175,8 @@ const searchMatches = async (
     tournamentID = null,
     teamID = null,
     matchTime = null,
-    sortBy = null
+    sortBy = null,
+    sortAsDescending = false
 ) => {
     try {
         // If a matchID is provided, perform a search based solely on matchID.
@@ -207,6 +213,9 @@ const searchMatches = async (
             }
             if (sortBy !== null) {
                 search += " ORDER BY " + sortBy;
+            }
+            if (sortBy !== null && sortAsDescending) {
+                search += " DESC";
             }
             const [rows] = await db.query(search, params);
 

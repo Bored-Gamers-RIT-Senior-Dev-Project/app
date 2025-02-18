@@ -96,7 +96,8 @@ const searchTournaments = async (
     endDate = null,
     status = null,
     location = null,
-    sortBy = null
+    sortBy = null,
+    sortAsDescending = null
 ) => {
     try {
         // If tournamentID is provided, use it exclusively for the search.
@@ -116,6 +117,14 @@ const searchTournaments = async (
             );
             return tournament;
         } else {
+            // TODO: There's probably a better way to check if the param is set to true
+            if (
+                sortAsDescending === "true" ||
+                sortAsDescending === "True" ||
+                sortAsDescending === "TRUE"
+            ) {
+                sortAsDescending = true;
+            }
             // When tournamentID is null, build search query based on other criteria.
             const tournament = await TournamentModel.searchTournaments(
                 null,
@@ -124,7 +133,8 @@ const searchTournaments = async (
                 endDate,
                 status,
                 safeDecode(location),
-                sortBy
+                sortBy,
+                sortAsDescending
             );
             return tournament;
         }
@@ -198,7 +208,8 @@ const searchMatches = async (
     tournamentID = null,
     teamID = null,
     matchTime = null,
-    sortBy = null
+    sortBy = null,
+    sortAsDescending = false
 ) => {
     try {
         // If matchID is provided, use it exclusively for the search.
@@ -217,13 +228,22 @@ const searchMatches = async (
             );
             return match;
         } else {
+            // TODO: There's probably a better way to check if the param is set to true
+            if (
+                sortAsDescending === "true" ||
+                sortAsDescending === "True" ||
+                sortAsDescending === "TRUE"
+            ) {
+                sortAsDescending = true;
+            }
             // When matchID is null, build the query using the additional search criteria.
             const match = await TournamentModel.searchMatches(
                 null,
                 tournamentID,
                 teamID,
                 matchTime,
-                sortBy
+                sortBy,
+                sortAsDescending
             );
             return match;
         }
