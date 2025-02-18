@@ -44,7 +44,7 @@ const makeAction =
                   element: <University/>,
               },
               {
-                  path: "/About",
+                  path: "/about",
                   element: <About/>
               },
               {
