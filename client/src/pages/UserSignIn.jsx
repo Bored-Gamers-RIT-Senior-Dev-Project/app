@@ -6,15 +6,16 @@ import { useActionData, useNavigate } from "react-router";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
 import { signInWithEmail, signInWithGoogle } from "../utils/firebase/auth";
+import { ErrorData, MessageData, Severity } from "../utils/messageData";
 
 const handleErrors = (error) => {
     switch (error.message) {
         default:
             console.error("Sign-in error:", error);
-            events.publish("message", {
-                message: "An unexpected error occurred",
-                severity: "error",
-            });
+            events.publish(
+                "message",
+                ErrorData("An unexpected error occurred", Severity.ERROR)
+            );
     }
 };
 
@@ -42,7 +43,6 @@ const UserSignIn = () => {
             handleErrors(error);
             events.publish("spinner.close");
         }
-        // events.publish("spinner.close");
     };
 
     const handleGoogleSignIn = async () => {
@@ -64,7 +64,10 @@ const UserSignIn = () => {
     useEffect(() => {
         if (actionData) {
             events.publish("spinner.close");
-            events.publish("message", { message: actionData.message });
+            events.publish(
+                "message",
+                MessageData(undefined, actionData.message)
+            );
             if (actionData.message === "Signin successful") {
                 navigate("/"); // Redirect to home on successful sign-in
             }

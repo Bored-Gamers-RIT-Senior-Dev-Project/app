@@ -15,7 +15,7 @@ import { useActionData, useNavigate } from "react-router";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
 import { signUpWithEmail } from "../utils/firebase/auth";
-import { ErrorData, Severity } from "../utils/messageData";
+import { ErrorData, MessageData, Severity } from "../utils/messageData";
 
 // From https://zxcvbn-ts.github.io/zxcvbn/guide/framework-examples/#react:
 import { zxcvbnAsync, zxcvbnOptions } from "@zxcvbn-ts/core";
@@ -225,7 +225,10 @@ const UserSignUp = () => {
     useEffect(() => {
         if (actionData) {
             events.publish("spinner.close");
-            events.publish("message", { message: actionData.message });
+            events.publish(
+                "message",
+                MessageData(undefined, actionData.message)
+            );
             if (actionData.message === "Welcome!") {
                 navigate("/"); // Redirect to home on successful sign-up
             }
