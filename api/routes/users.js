@@ -2,11 +2,13 @@ const express = require("express");
 const router = express.Router();
 const UserService = require("../services/userService");
 const createError = require("http-errors");
+const { makeObjectCamelCase } = require("../utils");
 
 router.post("/get", async (req, res, next) => {
     const { token } = req.body;
     try {
-        const user = await UserService.getUser(token);
+        let user = await UserService.getUser(token);
+        user = makeObjectCamelCase(user);
         return res.status(200).json(user);
     } catch (error) {
         next(error);
@@ -41,6 +43,7 @@ router.post("/signin", async (req, res, next) => {
                     .status(400)
                     .json({ message: "Invalid sign-in method." });
         }
+        user = makeObjectCamelCase(user);
         return res.status(200).json({
             message: "Sign-in successful!",
             user,
@@ -56,16 +59,17 @@ router.post("/signup", async (req, res, next) => {
         return res.status(400).json({ message: "Invalid request format." });
     }
     try {
-        const result = await UserService.signUp(
+        let user = await UserService.signUp(
             idToken,
             email,
             username,
             firstName,
             lastName
         );
+        user = makeObjectCamelCase(result);
         res.status(201).json({
             message: "Welcome!",
-            user: result,
+            user,
         });
     } catch (error) {
         next(error);
