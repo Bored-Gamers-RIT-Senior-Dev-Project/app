@@ -3,7 +3,7 @@ import { Button, Paper, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
-import { MessageData, Severity } from "../utils/messageData";
+import { ErrorData, MessageData, Severity } from "../utils/messageData";
 
 const Search = () => {
     const [searchBar, setSearchBar] = useState("");
