@@ -6,7 +6,7 @@ import { useActionData, useNavigate } from "react-router";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
 import { signInWithEmail, signInWithGoogle } from "../utils/firebase/auth";
-import { ErrorData, MessageData, Severity } from "../utils/messageData";
+import { ErrorData, MessageData } from "../utils/messageData";
 
 const handleErrors = (error) => {
     switch (error.message) {
@@ -14,7 +14,7 @@ const handleErrors = (error) => {
             console.error("Sign-in error:", error);
             events.publish(
                 "message",
-                ErrorData("An unexpected error occurred", Severity.ERROR)
+                ErrorData("An unexpected error occurred")
             );
     }
 };
