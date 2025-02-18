@@ -104,6 +104,17 @@ const UserSettings = () => {
                     ) : null}
                 </FormControl>
             </Paper>
+
+            {/* Payment Section (Placeholder) */}
+            <Paper variant="outlined" sx={{ mt: 3, padding: 2 }}>
+                <Typography variant="h6">Payment Portal</Typography>
+                <Typography variant="body2">(Payment integration will be added here.)</Typography>
+            </Paper>
+
+            {/* Save Changes Button */}
+            <Button variant="contained" color="primary" fullWidth sx={{ mt: 3 }}>
+                Save Changes
+            </Button>
         </Paper>
     );
 };
