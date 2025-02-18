@@ -19,8 +19,6 @@ const nav_links = [
     { key: "about", text: 'About "A New World"', path: "/about" },
     { key: "rules", text: "Rules", path: "/rules" },
     { key: "faq", text: "FAQ", path: "/faq" },
-    { key: "settings", text: "UserSettings", path: "/settings" },
-    
 ];
 
 const admin_links = [
