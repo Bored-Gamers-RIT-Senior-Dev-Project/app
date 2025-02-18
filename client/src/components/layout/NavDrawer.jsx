@@ -90,6 +90,32 @@ const buildNavLinks = (user) => {
     return links;
 };
 
+const ListSection = ({ label, links, navigate, index }) => (
+    <>
+        {label && <Divider key={`label_${index}`}>{label}</Divider>}
+        {links.map(({ key, text, path }) => (
+            <ListItem key={key} onClick={() => navigate(path)}>
+                <ListItemButton>
+                    <ListItemText primary={text} />
+                </ListItemButton>
+            </ListItem>
+        ))}
+    </>
+);
+
+ListSection.propTypes = {
+    index: PropTypes.number.isRequired,
+    key: PropTypes.string.isRequired,
+    label: PropTypes.string,
+    links: PropTypes.arrayOf(
+        PropTypes.shape({
+            key: PropTypes.string.isRequired,
+            text: PropTypes.string.isRequired,
+        })
+    ).isRequired,
+    navigate: PropTypes.func.isRequired,
+};
+
 const NavDrawer = ({ open, setOpen, desktop }) => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -113,20 +139,14 @@ const NavDrawer = ({ open, setOpen, desktop }) => {
             <Toolbar />
             <Box px={2}>
                 <List>
-                    {navLinks.map(({ label, links }) => (
-                        <>
-                            {label && <Divider>{label}</Divider>}
-                            {links.map(({ key, text, path }) => (
-                                <ListItem
-                                    key={key}
-                                    onClick={() => navigate(path)}
-                                >
-                                    <ListItemButton>
-                                        <ListItemText primary={text} />
-                                    </ListItemButton>
-                                </ListItem>
-                            ))}
-                        </>
+                    {navLinks.map(({ label, links }, index) => (
+                        <ListSection
+                            key={index}
+                            index={index}
+                            label={label}
+                            links={links}
+                            navigate={navigate}
+                        />
                     ))}
                 </List>
             </Box>
