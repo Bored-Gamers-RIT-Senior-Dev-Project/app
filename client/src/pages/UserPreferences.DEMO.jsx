@@ -1,20 +1,18 @@
-import { Error } from "@mui/icons-material";
 import { Button, Paper, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from "../hooks/useAuth";
 import { usePostSubmit } from "../hooks/usePostSubmit";
-import { events } from "../utils/events";
 
 const UserPreferences = () => {
-    const { user } = useAuth();
+    const { user, idToken } = useAuth();
     const [usernameBar, setUsernameBar] = useState(user?.username);
     const submit = usePostSubmit();
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!user) navigate("/signin");
-    }, [user, navigate]);
+        if (idToken === null) navigate("/signin");
+    }, [idToken, navigate]);
 
     return (
         <Paper
@@ -33,49 +31,83 @@ const UserPreferences = () => {
                 value={usernameBar}
                 onChange={(event) => setUsernameBar(event.target.value)}
                 onKeyDown={(event) =>
-                    event.key === "Enter" && submit({ usernameBar })
+                    event.key === "Enter" &&
+                    submit({ idToken, username: usernameBar })
                 }
             />
-            <Button onClick={() => submit({ usernameBar })} variant="contained">
-                Search
+            <Button
+                onClick={() => submit({ idToken, username: usernameBar })}
+                variant="contained"
+            >
+                Update Username
             </Button>
             <Button
                 onClick={() =>
-                    events.publish("message", {
-                        title: "Success!",
-                        message: "Message sent!",
-                        severity: "success",
+                    submit({
+                        idToken,
+                        teamId: 1,
+                        roleId: 4,
                     })
                 }
                 variant="contained"
                 color="secondary"
             >
-                Click here to send a message!
+                Make me a Participant on Team 1!
             </Button>
             <Button
                 onClick={() =>
-                    events.publish("message", {
-                        message: "Oh, no!",
-                        severity: "error",
-                        icon: <Error />,
-                        autoHideDuration: 5000,
+                    submit({
+                        idToken,
+                        teamId: 7,
+                        roleId: 4,
+                    })
+                }
+                variant="contained"
+                color="secondary"
+            >
+                Make me a participant on Team #49!
+            </Button>
+            <Button
+                onClick={() =>
+                    submit({
+                        idToken,
+                        teamId: 49,
+                        roleId: 3,
+                        universityId: null,
                     })
                 }
                 variant="contained"
                 color="primary"
             >
-                Click here to send a different message!
+                Make me a superadmin!
             </Button>
             <Button
                 onClick={() =>
-                    events.publish("message", {
-                        message: "Hooray!",
+                    submit({
+                        idToken,
+                        teamId: null,
+                        roleId: 3,
+                        universityId: 1,
                     })
                 }
                 variant="contained"
                 color="secondary"
             >
-                Click here to send a third message!
+                Make me a representative from University 1!
+            </Button>
+            <Button
+                onClick={() =>
+                    submit({
+                        idToken,
+                        teamId: null,
+                        roleId: 3,
+                        universityId: 7,
+                    })
+                }
+                variant="contained"
+                color="secondary"
+            >
+                Make me a representative from University #7!
             </Button>
         </Paper>
     );
