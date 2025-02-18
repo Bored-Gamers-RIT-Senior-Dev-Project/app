@@ -1,3 +1,4 @@
+const createHttpError = require("http-errors");
 const db = require("../config/db");
 const { makeObjectCamelCase } = require("../utils");
 
@@ -75,9 +76,36 @@ const readUser = async (uid) => {
     }
 };
 
+const VALID_KEYS = [
+    "USERID",
+    "FIRSTNAME",
+    "LASTNAME",
+    "USERNAME",
+    "EMAIL",
+    "FIREBASEUID",
+    "PROFILEIMAGEURL",
+    "BIO",
+    "CREATEDAT",
+    "PAID",
+    "TEAMID",
+    "ROLEID",
+    "UNIVERSITYID",
+    "ISVALIDATED",
+    "UNIVERSITYNAME",
+    "TEAMNAME",
+];
 const updateUser = async (firebaseUid, body) => {
-    //FIXME: Used for demo purposes only.  DO NOT approve this into main until keys are filtered to acceptable values and sanitized.
     if (body.username) body.username = await generateUsername(body.username);
+    const updates = [];
+    for (const key of Object.keys(body)) {
+        if (VALID_KEYS.includes(key.toUpperCase())) {
+            updates.push(`${key} = ?`);
+        } else {
+            console.error("Error fulfilling update request:", body);
+            console.error("Invalid key:", key);
+            throw createHttpError(400, "Invalid attempt to update user.");
+        }
+    }
     const keys = Object.keys(body)
         .map((key) => `${key} = ?`)
         .join(", ");
