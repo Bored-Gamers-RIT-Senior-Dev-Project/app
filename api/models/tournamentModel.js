@@ -58,7 +58,8 @@ const searchTournaments = async (
     startDate = null,
     endDate = null,
     status = null,
-    location = null
+    location = null,
+    sortBy = null
 ) => {
     try {
         if (tournamentID !== null) {
@@ -103,7 +104,9 @@ const searchTournaments = async (
                 search += " AND Location = ?";
                 params.push(location);
             }
-            console.log("My Search: " + search + params);
+            if (sortBy !== null) {
+                search += " ORDER BY " + sortBy;
+            }
             const [rows] = await db.query(search, params);
 
             if (rows.length === 0) {
@@ -166,7 +169,8 @@ const searchMatches = async (
     matchID = null,
     tournamentID = null,
     teamID = null,
-    matchTime = null
+    matchTime = null,
+    sortBy = null
 ) => {
     try {
         // If a matchID is provided, perform a search based solely on matchID.
@@ -186,26 +190,24 @@ const searchMatches = async (
             }
             return rows[0];
         } else {
-            // Build the dynamic SQL query based on provided criteria.
             let search = "SELECT * FROM Matches WHERE 1=1";
             const params = [];
 
-            // Add condition for tournamentID if provided.
             if (tournamentID !== null) {
                 search += " AND TournamentID = ?";
                 params.push(tournamentID);
             }
-            // Add condition for teamID if provided: checks both Team1ID and Team2ID.
             if (teamID !== null) {
                 search += " AND (Team1ID = ? OR Team2ID = ?)";
                 params.push(teamID, teamID);
             }
-            // Add condition for matchTime if provided.
             if (matchTime !== null) {
                 search += " AND matchTime = ?";
                 params.push(matchTime);
             }
-            // Execute the query with the dynamically built conditions.
+            if (sortBy !== null) {
+                search += " ORDER BY " + sortBy;
+            }
             const [rows] = await db.query(search, params);
 
             if (rows.length === 0) {

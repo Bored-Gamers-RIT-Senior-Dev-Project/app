@@ -33,6 +33,7 @@ router.get("/search", async (req, res, next) => {
         endDate,
         status,
         location,
+        sortBy,
     } = req.query;
     try {
         const tournament = await TournamentService.searchTournaments(
@@ -41,7 +42,8 @@ router.get("/search", async (req, res, next) => {
             startDate || null,
             endDate || null,
             status || null,
-            location || null
+            location || null,
+            sortBy || null
         );
         if (tournamentID && tournament === null) {
             return res.status(404).json({ error: "Tournament not found." });
@@ -77,13 +79,14 @@ router.post("/match/create", async (req, res, next) => {
 });
 
 router.get("/match/search", async (req, res, next) => {
-    const { matchID, tournamentID, teamID, matchTime } = req.query;
+    const { matchID, tournamentID, teamID, matchTime, sortBy } = req.query;
     try {
         const matches = await TournamentService.searchMatches(
             matchID || null,
             tournamentID || null,
             teamID || null,
-            matchTime || null
+            matchTime || null,
+            sortBy || null
         );
         if (matchID && matches === null) {
             return res.status(404).json({ error: "Match not found." });

@@ -95,7 +95,8 @@ const searchTournaments = async (
     startDate = null,
     endDate = null,
     status = null,
-    location = null
+    location = null,
+    sortBy = null
 ) => {
     try {
         // If tournamentID is provided, use it exclusively for the search.
@@ -106,6 +107,7 @@ const searchTournaments = async (
             validateInteger(id, "tournamentID");
             const tournament = await TournamentModel.searchTournaments(
                 tournamentID,
+                null,
                 null,
                 null,
                 null,
@@ -121,7 +123,8 @@ const searchTournaments = async (
                 startDate,
                 endDate,
                 status,
-                safeDecode(location)
+                safeDecode(location),
+                sortBy
             );
             return tournament;
         }
@@ -194,7 +197,8 @@ const searchMatches = async (
     matchID = null,
     tournamentID = null,
     teamID = null,
-    matchTime = null
+    matchTime = null,
+    sortBy = null
 ) => {
     try {
         // If matchID is provided, use it exclusively for the search.
@@ -207,6 +211,8 @@ const searchMatches = async (
                 matchID,
                 null,
                 null,
+                null,
+                null,
                 null
             );
             return match;
@@ -216,7 +222,8 @@ const searchMatches = async (
                 null,
                 tournamentID,
                 teamID,
-                matchTime
+                matchTime,
+                sortBy
             );
             return match;
         }
