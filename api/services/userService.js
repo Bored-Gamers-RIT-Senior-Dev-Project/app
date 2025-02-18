@@ -47,4 +47,10 @@ const getUser = async (idToken) => {
     return user;
 };
 
-module.exports = { signUp, getUser, googleSignIn };
+const updateUser = async (idToken, body) => {
+    const { uid } = await verifyUser(idToken);
+    const user = await User.updateUser(uid, body);
+    return user;
+};
+
+module.exports = { signUp, getUser, googleSignIn, updateUser };

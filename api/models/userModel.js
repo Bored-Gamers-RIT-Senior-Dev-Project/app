@@ -75,6 +75,25 @@ const readUser = async (uid) => {
     }
 };
 
+const updateUser = async (firebaseUid, body) => {
+    //FIXME: Used for demo purposes only.  DO NOT approve this into main until keys are filtered to acceptable values and sanitized.
+    if (body.username) body.username = await generateUsername(body.username);
+    const keys = Object.keys(body)
+        .map((key) => `${key} = ?`)
+        .join(", ");
+
+    const [rows] = await db.query(
+        `UPDATE Users SET ${keys} WHERE FirebaseUID = ?`,
+        [...Object.values(body), firebaseUid]
+    );
+
+    if (rows.affectedRows === 0) {
+        throw new Error("User not updated.");
+    }
+
+    return await readUser(firebaseUid);
+};
+
 /**
  * Generates a list of usernames that start with the given "base" username.
  * @param {String} username The username to check for duplicates.
@@ -139,4 +158,4 @@ const checkUsername = async (username, strict = false) => {
     return await generateUsername(username, sharedUsernames);
 };
 
-module.exports = { createUser, readUser, checkUsername };
+module.exports = { createUser, readUser, updateUser, checkUsername };
