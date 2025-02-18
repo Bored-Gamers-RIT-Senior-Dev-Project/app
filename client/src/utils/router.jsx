@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router";
 import App from "../App";
-import { Home, NotFound, Search, UserSignIn, UserSignUp } from "../pages";
+import { Home, NotFound, Search, UserSignIn, UserSignUp, UserSettings} from "../pages";
 import { handleSignIn, handleSignUp, sendTest } from "./api";
 import { events } from "./events";
 
@@ -46,6 +46,10 @@ const router = createBrowserRouter([
             {
                 path: "*",
                 element: <NotFound />,
+            },
+            {
+                path: "/settings",
+                element: <UserSettings />,
             },
         ],
     },
