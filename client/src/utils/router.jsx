@@ -8,6 +8,7 @@ import {
     UserSignIn,
     UserSignUp,
 } from "../pages";
+import { UserPreferences } from "../pages/UserPreferences.DEMO";
 import { handleSignIn, handleSignUp, sendTest } from "./api";
 import { events } from "./events";
 
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
             {
                 path: "/about",
                 element: "TODO: About Page",
+            },
+            {
+                path: "/user_preferences",
+                element: <UserPreferences />,
             },
             {
                 path: "*",
