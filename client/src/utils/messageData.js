@@ -19,7 +19,7 @@ export class MessageData {
      * @param {string} [severity] The Severity
      * @param {object} [more] Add more arbitrary keys to this object
      */
-    constructor(title, message, severity, more = undefined) {
+    constructor(title, message, severity, more) {
         this.title = title;
         this.message = message;
         this.severity = severity;
@@ -39,7 +39,7 @@ export class ErrorData {
      * @param {string} [string] The Severity, or Severity.ERROR if not specified.
      * @param {more} [more] Add more arbitrary keys to this object
      */
-    constructor(message, severity = Severity.ERROR, more = undefined) {
+    constructor(message, severity = Severity.ERROR, more) {
         const messageData = new MessageData(undefined, message, severity, more);
         Object.assign(this, messageData);
     }
