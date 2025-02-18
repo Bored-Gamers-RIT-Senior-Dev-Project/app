@@ -42,6 +42,14 @@ const UserSettings = () => {
                     <input type="file" hidden />
                 </Button>
             </FormControl>
+
+            {/* Change Password */}
+            <FormControl fullWidth sx={{ mt: 3 }}>
+                <FormLabel>Change Password</FormLabel>
+                <TextField label="Email" fullWidth margin="dense" />
+                <TextField label="Old Password" type="password" fullWidth margin="dense" />
+                <TextField label="New Password" type="password" fullWidth margin="dense" />
+            </FormControl>
         </Paper>
     );
 };
