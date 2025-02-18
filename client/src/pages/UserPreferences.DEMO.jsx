@@ -58,7 +58,7 @@ const UserPreferences = () => {
                 onClick={() =>
                     submit({
                         idToken,
-                        teamId: 7,
+                        teamId: 49,
                         roleId: 4,
                     })
                 }
@@ -71,8 +71,8 @@ const UserPreferences = () => {
                 onClick={() =>
                     submit({
                         idToken,
-                        teamId: 49,
-                        roleId: 3,
+                        teamId: null,
+                        roleId: 2,
                         universityId: null,
                     })
                 }
