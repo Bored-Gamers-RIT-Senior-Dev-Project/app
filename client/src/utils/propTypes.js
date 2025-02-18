@@ -1,20 +1,20 @@
 import PropTypes from "prop-types";
 
 const User = PropTypes.shape({
-    UserID: PropTypes.number.isRequired,
-    FirstName: PropTypes.string.isRequired,
-    LastName: PropTypes.string.isRequired,
-    Username: PropTypes.string.isRequired,
-    Email: PropTypes.string.isRequired,
-    FirebaseUID: PropTypes.string.isRequired,
-    ProfileImageURL: PropTypes.string.isRequired,
-    Bio: PropTypes.string,
-    CreatedAt: PropTypes.string,
-    Paid: PropTypes.bool,
-    TeamID: PropTypes.number,
-    RoleID: PropTypes.bool,
-    UniversityID: PropTypes.number,
-    IsValidated: PropTypes.bool,
+    userId: PropTypes.number.isRequired,
+    firstName: PropTypes.string.isRequired,
+    lastName: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    firebaseUid: PropTypes.string.isRequired,
+    profileImageURL: PropTypes.string.isRequired,
+    bio: PropTypes.string,
+    createdAt: PropTypes.string,
+    paid: PropTypes.bool,
+    teamID: PropTypes.number,
+    roleID: PropTypes.bool,
+    universityID: PropTypes.number,
+    isValidated: PropTypes.bool,
 });
 
 export default { ...PropTypes, User };
