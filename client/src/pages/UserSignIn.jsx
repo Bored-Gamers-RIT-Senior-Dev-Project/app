@@ -23,7 +23,7 @@ const handleErrors = (error) => {
 const UserSignIn = () => {
     const [signInData, setSignInData] = useState({ email: "", password: "" });
     const actionData = useActionData();
-    const user = useAuth();
+    const { user, setUser } = useAuth();
     const submit = usePostSubmit();
     const navigate = useNavigate();
 
@@ -53,10 +53,10 @@ const UserSignIn = () => {
     const handleGoogleSignIn = async () => {
         events.publish("spinner.open");
         try {
-            const user = await signInWithGoogle();
-            if (user.additionalUserInfo.isNewUser) {
-                const idToken = await user.getIdToken();
-                const { displayName, photoURL, email } = user;
+            const signIn = await signInWithGoogle();
+            if (signIn.additionalUserInfo.isNewUser) {
+                const idToken = await signIn.user.getIdToken();
+                const { displayName, photoURL, email } = signIn.user;
                 submit({
                     idToken,
                     displayName,
@@ -81,11 +81,9 @@ const UserSignIn = () => {
                 "message",
                 new MessageData(undefined, actionData.message)
             );
-            if (actionData.message === "Signin successful") {
-                navigate("/"); // Redirect to home on successful sign-in
-            }
+            setUser(actionData.user);
         }
-    }, [actionData, navigate]);
+    }, [actionData, navigate, setUser]);
 
     //If the user is already signed in, redirect to home
     // TODO: Redirect to previously viewed page, home if this is the user's first stop on the site
