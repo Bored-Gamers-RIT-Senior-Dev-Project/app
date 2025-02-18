@@ -24,6 +24,7 @@ import { zxcvbnAsync, zxcvbnOptions } from "@zxcvbn-ts/core";
 import * as zxcvbnCommonPackage from "@zxcvbn-ts/language-common";
 import * as zxcvbnEnPackage from "@zxcvbn-ts/language-en";
 import { translations } from "@zxcvbn-ts/language-en";
+import { useAuth } from "../hooks/useAuth";
 
 /**
  * @class ErrorData a convenience for representing the data needed for an error
@@ -184,6 +185,7 @@ PasswordStrength.propTypes = {
 };
 
 const UserSignUp = () => {
+    const { user, setUser } = useAuth();
     const [signUpData, setSignUpData] = useState({
         email: "",
         username: "",
@@ -245,11 +247,15 @@ const UserSignUp = () => {
         if (actionData) {
             events.publish("spinner.close");
             events.publish("message", { message: actionData.message });
-            if (actionData.message === "Welcome!") {
-                navigate("/"); // Redirect to home on successful sign-up
-            }
+            setUser(actionData.user);
         }
-    }, [actionData, navigate]);
+    }, [actionData, navigate, setUser]);
+
+    useEffect(() => {
+        if (user) {
+            navigate("/");
+        }
+    }, [user, navigate]);
 
     return (
         <Paper elevation={6} sx={{ p: 4, maxWidth: 600 }}>
