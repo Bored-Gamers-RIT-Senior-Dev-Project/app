@@ -66,6 +66,18 @@ const UserSettings = () => {
                     </FormGroup>
                 </FormControl>
             </Paper>
+
+            {/* Role Selection */}
+            <Paper variant="outlined" sx={{ mt: 3, padding: 2 }}>
+                <FormControl component="fieldset">
+                    <FormLabel>I want to:</FormLabel>
+                    <RadioGroup value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
+                        <FormControlLabel value="Follow" control={<Radio />} label="Follow the Tournament" />
+                        <FormControlLabel value="Participate" control={<Radio />} label="Participate" />
+                        <FormControlLabel value="Represent" control={<Radio />} label="Represent a University" />
+                    </RadioGroup>
+                </FormControl>
+            </Paper>
         </Paper>
     );
 };
