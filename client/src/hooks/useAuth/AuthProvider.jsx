@@ -5,7 +5,7 @@ import { observeAuthState } from "../../utils/firebase/auth";
 import { AuthContext } from "./AuthContext";
 
 const AuthProvider = ({ children }) => {
-    const [token, setToken] = useState(null);
+    const [token, setToken] = useState("");
     const [user, setUser] = useState(null);
 
     // useEffect with empty array only runs on component initialization.
@@ -35,7 +35,7 @@ const AuthProvider = ({ children }) => {
     }, [token]);
 
     return (
-        <AuthContext.Provider value={{ user, setUser }}>
+        <AuthContext.Provider value={{ user, idToken: token, setUser }}>
             {children}
         </AuthContext.Provider>
     );
