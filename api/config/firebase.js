@@ -17,12 +17,22 @@ admin.initializeApp({
     }),
 });
 
-const verifyFirebaseToken = async (idToken) => {
+const verifyUser = async (idToken) => {
     try {
         return await admin.auth().verifyIdToken(idToken);
     } catch (error) {
-        throw new Error("Invalid Firebase ID token");
+        console.error("Error verifying Firebase token:", error.message);
+        throw error;
     }
 };
 
-module.exports = { verifyFirebaseToken };
+const deleteUser = async (uid) => {
+    try {
+        return await admin.auth().deleteUser(uid);
+    } catch (error) {
+        console.error("Error deleting Firebase user:", error.message);
+        throw error;
+    }
+};
+
+module.exports = { deleteUser, verifyUser };
