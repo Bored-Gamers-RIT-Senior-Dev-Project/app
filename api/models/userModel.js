@@ -114,7 +114,7 @@ const generateUsername = async (username, sharedUsernames = null) => {
 
     // Otherwise, append a number to the username until we find a unique one
     let i = 1;
-    while (sharedUsernames.contains(`${username}-${i}`)) {
+    while (sharedUsernames.includes(`${username}-${i}`)) {
         i++;
         if (i > 100)
             console.error(
