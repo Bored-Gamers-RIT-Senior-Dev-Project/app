@@ -1,6 +1,10 @@
 import { createBrowserRouter } from "react-router";
 import App from "../App";
+
 import { Home, NotFound, Search, UserSignIn, UserSignUp, UserSettings} from "../pages";
+
+import { Home, NotFound, Search, UserSignIn, UserSignUp,University, Rules, Schedule} from "../pages";
+
 import { handleSignIn, handleSignUp, sendTest } from "./api";
 import { events } from "./events";
 
@@ -14,6 +18,7 @@ const makeAction =
         if (spinner) events.publish("spinner.close");
         return response;
     };
+
 
 const router = createBrowserRouter([
     {
@@ -54,5 +59,54 @@ const router = createBrowserRouter([
         ],
     },
 ]);
+
+    const router = createBrowserRouter([
+      {
+          path: "/",
+          element: <App />,
+          children: [
+              {
+                  path: "/",
+                  element: <Home />,
+              },
+              {
+                  path: "/signin",
+                  element: <UserSignIn />,
+                  action: makeAction(handleSignIn),
+              },
+              {
+                  path: "/signup",
+                  element: <UserSignUp />,
+                  action: makeAction(handleSignUp),
+              },
+              {
+                  path: "/search",
+                  element: <Search />,
+                  action: makeAction(sendTest),
+              },
+              {
+                  path: "/university/:universityId",
+                  element: <University/>,
+              },
+              {
+                  path: "/about",
+                  element: "TODO: About Page",
+              },
+              {
+                  path:"/rules",
+                  element:<Rules />,
+              },
+              {
+                  path: "/Schedule",
+                  element: <Schedule />,
+              },
+              {
+                  path: "*",
+                  element: <NotFound />,
+              },
+          ],
+      },
+  ]);
+
 
 export { router };

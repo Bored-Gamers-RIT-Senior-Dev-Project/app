@@ -35,8 +35,11 @@ const participant_links = [
 ];
 
 const university_links = [
-    { key: "repDashboard", text: "Dashboard", path: "/representative" },
-    { key: "uniPage", text: "University Page", path: "/university/1" },
+
+  { key: "repDashboard", text: "Dashboard", path: "/representative" },
+  { key: "uniPage", text: "University Page", path: "/university/1" },
+
+
 ];
 
 const NavDrawer = ({ open, onClose, desktop }) => {
