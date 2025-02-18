@@ -14,6 +14,7 @@ import { useLocation, useNavigate } from "react-router";
 import { useAuth } from "../../hooks/useAuth";
 
 const buildNavLinks = (user) => {
+    console.log(user);
     const links = [
         {
             label: null,
@@ -33,8 +34,8 @@ const buildNavLinks = (user) => {
     ];
     if (!user) return links;
 
-    const { role, universityName, universityId, teamName, teamId } = user;
-    if (role === 2) {
+    const { roleId, universityName, universityId, teamName, teamId } = user;
+    if (roleId === 2) {
         //Super Admin role
         links.push({
             label: "Admin",
@@ -52,7 +53,7 @@ const buildNavLinks = (user) => {
                 },
             ],
         });
-    } else if (role == 3) {
+    } else if (roleId == 3) {
         //University admin role
         links.push({
             label: universityName ?? "University Representative",
@@ -69,7 +70,7 @@ const buildNavLinks = (user) => {
                 },
             ],
         });
-    } else if (role == 4) {
+    } else if (roleId == 4) {
         //Student/Participant Role
         links.push({
             label: "Participant",
@@ -87,13 +88,14 @@ const buildNavLinks = (user) => {
             ],
         });
     }
+    console.log("LINKS:", links);
     return links;
 };
 
 const NavDrawer = ({ open, onClose, desktop }) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user } = useAuth;
+    const { user } = useAuth();
     const navLinks = useMemo(() => buildNavLinks(user), [user]);
 
     //When the location changes, close the drawer on mobile.
