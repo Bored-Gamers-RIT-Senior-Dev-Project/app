@@ -48,7 +48,6 @@ const createTournament = async (
     userRoleID
 ) => {
     try {
-        // Convert userRoleID to a number.
         const userRoleIDnum = Number(userRoleID);
         validateInteger(userRoleIDnum, "userRoleID");
         // Check if the user has an authorized role (2=SuperAdmin or 3=AdminEmployee).
@@ -59,7 +58,6 @@ const createTournament = async (
             error.status = 401;
             throw error;
         }
-        // Call the model to create the tournament with status "Upcoming".
         const tournament = await TournamentModel.createTournament(
             tournamentName,
             startDate,
@@ -84,6 +82,8 @@ const createTournament = async (
  * @param {string|null} endDate - End date in YYYY-MM-DD format.
  * @param {string|null} status - Tournament status.
  * @param {string|null} location - Location of the tournament (address or university name).
+ * @param {string|null} sortBy - Field to sort the results by.
+ * @param {string|boolean|null} sortAsDescending - If true, sorts the results by DESCENDING. Defaults to ASCENDING.
  * @returns {Promise<object|object[]|null>}
  *          If tournamentID is specified, returns a single tournament object or null if not found.
  *          Otherwise, returns an array of tournament objects that match the criteria, or null if none are found.
@@ -97,14 +97,12 @@ const searchTournaments = async (
     status = null,
     location = null,
     sortBy = null,
-    sortAsDescending = null
+    sortAsDescending = false
 ) => {
     try {
         // If tournamentID is provided, use it exclusively for the search.
         if (tournamentID !== null) {
-            // Convert the tournamentID to a number for validation.
             const id = Number(tournamentID);
-            // Check if the conversion results in an integer.
             validateInteger(id, "tournamentID");
             const tournament = await TournamentModel.searchTournaments(
                 tournamentID,
@@ -117,7 +115,7 @@ const searchTournaments = async (
             );
             return tournament;
         } else {
-            // TODO: There's probably a better way to check if the param is set to true
+            // TODO: There's probably a cleaner way to covert string to boolean
             if (
                 sortAsDescending === "true" ||
                 sortAsDescending === "True" ||
@@ -162,7 +160,6 @@ const updateTournament = async () => {
  */
 const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
     try {
-        // Convert the provided IDs to numbers.
         const tournamentIDInt = Number(tournamentID);
         const team1IDInt = Number(team1ID);
         const team2IDInt = Number(team2ID);
@@ -199,6 +196,8 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
  * @param {number|string|null} tournamentID - ID for the tournament.
  * @param {number|string|null} teamID - ID for a team. This will search for matches where the team is either team1 or team2.
  * @param {string|null} matchTime - The match time in a format acceptable by the database ("YYYY-MM-DD HH:MM:SS").
+ * @param {string|null} sortBy - Field to sort the results by.
+ * @param {string|boolean|null} sortAsDescending - If true, sorts the results by DESCENDING.
  * @returns {Promise<object|object[]|null>} Returns a single match object if matchID is provided, an array of match objects
  *                                          if searching by other criteria, or null if no match is found.
  * @throws {Error} Throws an error with status 400 if matchID is provided and is not a valid integer.
@@ -213,11 +212,10 @@ const searchMatches = async (
 ) => {
     try {
         // If matchID is provided, use it exclusively for the search.
-        if (matchID !== null) {
+        if (matchID !== null && matchID !== undefined) {
             // Convert the matchID to a number for validation.
             const id = Number(matchID);
             validateInteger(id, "matchID");
-            // Call the model function using only matchID.
             const match = await TournamentModel.searchMatches(
                 matchID,
                 null,
@@ -263,7 +261,6 @@ const searchMatches = async (
  */
 const updateMatchResult = async (matchID, winnerID, score1, score2) => {
     try {
-        // Convert parameters to numbers.
         const matchIDInt = Number(matchID);
         const winnerIDInt = Number(winnerID);
         const score1Int = Number(score1);

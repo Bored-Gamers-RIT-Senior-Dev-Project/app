@@ -48,6 +48,8 @@ const createTournament = async (
  * @param {string|null} endDate End date of the tournament in YYYY-MM-DD format. Returns tournaments ending on or before this date.
  * @param {string|null} status Status of the tournament (e.g., "Upcoming", "Active", etc.).
  * @param {string|null} location The location of the tournament, such as an address or university name.
+ *  * @param {string|null} sortBy - Field to sort the results by.
+ * @param {boolean} sortAsDescending - If true, sorts the results by DESCENDING. Defaults to ASCENDING.
  * @returns {Promise<object|null|object[]>} Returns a single tournament object if tournamentID is provided, an array of tournament objects
  *                                          matching the search criteria otherwise, or null if no tournaments are found.
  * @throws {Error} Throws an error if the database query fails.
@@ -136,13 +138,11 @@ const searchTournaments = async (
  */
 const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
     try {
-        // Execute the INSERT query to create a match record.
         const [result] = await db.query(
             `INSERT INTO Matches (tournamentID, team1ID, team2ID, matchTime)
              VALUES (?, ?, ?, ?)`,
             [tournamentID, team1ID, team2ID, matchTime]
         );
-        // Return an object representing the created match.
         return {
             id: result.insertId,
             tournamentID,
@@ -165,6 +165,8 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
  * @param {number|null} tournamentID - ID for the tournament.
  * @param {number|null} teamID - ID for a team. Searches for matches where this team is either team1 or team2.
  * @param {string|null} matchTime - The match time in a format acceptable by the database ("YYYY-MM-DD HH:MM:SS").
+ * @param {string|null} sortBy - Field to sort the results by.
+ * @param {boolean|null} sortAsDescending - If true, sorts the results by DESCENDING. Defaults to ASCENDING.
  * @returns {Promise<object|null|object[]>}
  *          If matchID is provided, returns a single match object or null if not found.
  *          Otherwise, returns an array of match objects matching the criteria, or null if no matches are found.
@@ -196,9 +198,9 @@ const searchMatches = async (
             }
             return rows[0];
         } else {
+            // If matchID is not set, build query using other search criteria
             let search = "SELECT * FROM Matches WHERE 1=1";
             const params = [];
-
             if (tournamentID !== null) {
                 search += " AND TournamentID = ?";
                 params.push(tournamentID);
