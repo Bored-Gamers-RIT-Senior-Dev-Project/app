@@ -53,14 +53,14 @@ const createTournament = async (
  * @throws {Error} Throws an error if the database query fails.
  */
 const searchTournaments = async (
-    tournamentID = null,
-    tournamentName = null,
-    startDate = null,
-    endDate = null,
-    status = null,
-    location = null,
-    sortBy = null,
-    sortAsDescending = false
+    tournamentID,
+    tournamentName,
+    startDate,
+    endDate,
+    status,
+    location,
+    sortBy,
+    sortAsDescending
 ) => {
     try {
         if (tournamentID !== null) {
@@ -171,12 +171,12 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
  * @throws {Error} Throws an error if multiple matches are found for a given matchID or if a database error occurs.
  */
 const searchMatches = async (
-    matchID = null,
-    tournamentID = null,
-    teamID = null,
-    matchTime = null,
-    sortBy = null,
-    sortAsDescending = false
+    matchID,
+    tournamentID,
+    teamID,
+    matchTime,
+    sortBy,
+    sortAsDescending
 ) => {
     try {
         // If a matchID is provided, perform a search based solely on matchID.

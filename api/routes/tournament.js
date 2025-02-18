@@ -38,14 +38,14 @@ router.get("/search", async (req, res, next) => {
     } = req.query;
     try {
         const tournament = await TournamentService.searchTournaments(
-            tournamentID || null,
-            tournamentName || null,
-            startDate || null,
-            endDate || null,
-            status || null,
-            location || null,
-            sortBy || null,
-            sortAsDescending || false
+            tournamentID,
+            tournamentName,
+            startDate,
+            endDate,
+            status,
+            location,
+            sortBy,
+            sortAsDescending
         );
         if (tournamentID && tournament === null) {
             return res.status(404).json({ error: "Tournament not found." });
@@ -91,12 +91,12 @@ router.get("/match/search", async (req, res, next) => {
     } = req.query;
     try {
         const matches = await TournamentService.searchMatches(
-            matchID || null,
-            tournamentID || null,
-            teamID || null,
-            matchTime || null,
-            sortBy || null,
-            sortAsDescending || false
+            matchID,
+            tournamentID,
+            teamID,
+            matchTime,
+            sortBy,
+            sortAsDescending
         );
         if (matchID && matches === null) {
             return res.status(404).json({ error: "Match not found." });
@@ -119,8 +119,8 @@ router.post("/match/setResult", async (req, res, next) => {
         const match = await TournamentService.updateMatchResult(
             matchID,
             winnerID,
-            score1 || null,
-            score2 || null
+            score1,
+            score2
         );
         res.status(201).json({
             message: "Match updated successfully",
