@@ -119,7 +119,7 @@ const About = () => {
         </Box>
       </Paper>
 
-      <Paper sx={{ padding: 3, borderRadius: "10px", backgroundColor: "rgba(255, 255, 255, 0.85)" }}>
+      <Paper sx={{ padding: 3, borderRadius: "10px"}}>
         <Typography variant="h5" sx={{ fontWeight: "bold", marginBottom: 2 }}>
           Player Roles
         </Typography>
