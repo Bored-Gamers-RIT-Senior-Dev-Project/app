@@ -78,6 +78,17 @@ const UserSettings = () => {
                     </RadioGroup>
                 </FormControl>
             </Paper>
+
+            {/* University Selection */}
+            <FormControl fullWidth sx={{ mt: 3 }}>
+                <FormLabel>University</FormLabel>
+                <Autocomplete
+                    options={universityList}
+                    value={selectedUniversity}
+                    onChange={(event, newValue) => setSelectedUniversity(newValue)}
+                    renderInput={(params) => <TextField {...params} label="Select your University" />}
+                />
+            </FormControl>
         </Paper>
     );
 };
