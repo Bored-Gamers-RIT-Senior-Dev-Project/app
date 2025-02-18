@@ -3,6 +3,7 @@ import { Google } from "@mui/icons-material";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useActionData, useNavigate } from "react-router";
+import { useAuth } from "../hooks/useAuth";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
 import { signInWithEmail, signInWithGoogle } from "../utils/firebase/auth";
@@ -21,6 +22,7 @@ const handleErrors = (error) => {
 const UserSignIn = () => {
     const [signInData, setSignInData] = useState({ email: "", password: "" });
     const actionData = useActionData();
+    const user = useAuth();
     const submit = usePostSubmit();
     const navigate = useNavigate();
 
@@ -32,26 +34,36 @@ const UserSignIn = () => {
         e.preventDefault();
         events.publish("spinner.open");
         try {
-            const user = await signInWithEmail(
+            /**
+             * const user = await signInWithEmail(
                 signInData.email,
                 signInData.password
             );
             const idToken = await user.getIdToken();
             submit({ idToken, method: "email" });
+             */
+            await signInWithEmail(signInData.email, signInData.password); //Authentication updates for preexisting users handled in AuthProvider.
         } catch (error) {
             handleErrors(error);
             events.publish("spinner.close");
         }
-        // events.publish("spinner.close");
     };
 
     const handleGoogleSignIn = async () => {
         events.publish("spinner.open");
         try {
             const user = await signInWithGoogle();
-            const idToken = await user.getIdToken();
-            const { displayName, photoURL, email } = user;
-            submit({ idToken, displayName, photoURL, email, method: "google" });
+            if (user.additionalUserInfo.isNewUser) {
+                const idToken = await user.getIdToken();
+                const { displayName, photoURL, email } = user;
+                submit({
+                    idToken,
+                    displayName,
+                    photoURL,
+                    email,
+                    method: "google",
+                });
+            }
         } catch (error) {
             //TODO: If the user is new and an error took place in the API, we need to handle that case and erase the user from Firebase.
             handleErrors(error);
@@ -70,6 +82,16 @@ const UserSignIn = () => {
             }
         }
     }, [actionData, navigate]);
+
+    //If the user is already signed in, redirect to home
+    // TODO: Redirect to previously viewed page, home if this is the user's first stop on the site
+    useEffect(() => {
+        events.publish("spinner.close");
+        if (user) {
+            navigate("/");
+        }
+    }, [user, navigate]);
+
     return (
         <Box
             sx={{
