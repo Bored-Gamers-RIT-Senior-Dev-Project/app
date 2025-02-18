@@ -83,7 +83,7 @@ const readUser = async (uid) => {
  * @param {String} username The username to check for duplicates.
  * @returns  {Promise<Array>} An array of usernames that start with the given string.
  */
-const sharedUserNames = async (username) => {
+const getSharedUsernames = async (username) => {
     try {
         //Select all usernames that start with the given username
         const [rows] = await db.query(
@@ -105,7 +105,7 @@ const sharedUserNames = async (username) => {
  */
 const generateUsername = async (username, sharedUsernames = null) => {
     // Get all usernames that start with the given username
-    if (!sharedUsernames) sharedUsernames = await sharedUserNames(username);
+    if (!sharedUsernames) sharedUsernames = await getSharedUsernames(username);
 
     // If the username is not taken, return it
     if (!sharedUsernames.includes(username)) {
@@ -135,7 +135,7 @@ const generateUsername = async (username, sharedUsernames = null) => {
  * @throws {Error} If the username is taken and strict is true.
  */
 const checkUsername = async (username, strict = false) => {
-    const sharedUsernames = await sharedUserNames(username);
+    const sharedUsernames = await getSharedUsernames(username);
     if (sharedUsernames.includes(username) && strict) {
         throw new Error("Username is taken");
     }
