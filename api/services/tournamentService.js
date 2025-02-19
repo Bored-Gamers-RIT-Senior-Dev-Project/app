@@ -34,7 +34,7 @@ const validateInteger = (value, fieldName) => {
  * This function validates the user role to ensure that only authorized users (with roleID 2 or 3).
  * @param {string} tournamentName - Name of the tournament.
  * @param {string} startDate - Start date of the tournament in YYYY-MM-DD format.
- * @param {string} endDate - End date of the tournament in YYYY-MM-DD format.
+ * @param {string} endDate - End date of the tournament in YYYY-MM-DD format. If not provided, defaults to endDate.
  * @param {string} location - The location of the tournament (likely an address or university name).
  * @param {string|number} userRoleID - The role ID of the user attempting to create the tournament.
  * @returns {Promise<object>} Returns a promise that resolves to the created tournament record.
@@ -43,7 +43,7 @@ const validateInteger = (value, fieldName) => {
 const createTournament = async (
     tournamentName,
     startDate,
-    endDate,
+    endDate = null,
     location,
     userRoleID
 ) => {
@@ -58,10 +58,16 @@ const createTournament = async (
             error.status = 401;
             throw error;
         }
+        // If no end date provided, assume the tournament only lasts a day.
+        if (endDate === null) {
+            finalEndDate = startDate;
+        } else {
+            finalEndDate = endDate;
+        }
         const tournament = await TournamentModel.createTournament(
             tournamentName,
             startDate,
-            endDate,
+            finalEndDate,
             "Upcoming",
             location
         );
@@ -78,8 +84,10 @@ const createTournament = async (
  * with a 400 status is thrown. If tournamentID is null, the function searches based on the other criteria
  * @param {number|string|null} tournamentID - Tournament ID. Solely used for search if value is provided.
  * @param {string|null} tournamentName - Name of the tournament.
- * @param {string|null} startDate - Start date in YYYY-MM-DD format.
- * @param {string|null} endDate - End date in YYYY-MM-DD format.
+ * @param {string|null} startsBefore - Date. Search for tournaments starting before this date (inclusive), formatted as YYYY-MM-DD.
+ * @param {string|null} startsAfter - Date. Search for tournaments starting after this date (inclusive), formatted as YYYY-MM-DD.
+ * @param {string|null} endsBefore - Date. Search for tournaments ending before this date (inclusive), formatted as YYYY-MM-DD.
+ * @param {string|null} endsAfter - Date. Search for tournaments ending after this date (inclusive), formatted as YYYY-MM-DD.
  * @param {string|null} status - Tournament status.
  * @param {string|null} location - Location of the tournament (address or university name).
  * @param {string|null} sortBy - Field to sort the results by.
@@ -92,8 +100,10 @@ const createTournament = async (
 const searchTournaments = async (
     tournamentID = null,
     tournamentName = null,
-    startDate = null,
-    endDate = null,
+    startsBefore = null,
+    startsAfter = null,
+    endsBefore = null,
+    endsAfter = null,
     status = null,
     location = null,
     sortBy = null,
@@ -106,6 +116,9 @@ const searchTournaments = async (
             validateInteger(id, "tournamentID");
             const tournament = await TournamentModel.searchTournaments(
                 tournamentID,
+                null,
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -127,8 +140,10 @@ const searchTournaments = async (
             const tournament = await TournamentModel.searchTournaments(
                 null,
                 safeDecode(tournamentName),
-                startDate,
-                endDate,
+                startsBefore,
+                startsAfter,
+                endsBefore,
+                endsAfter,
                 status,
                 safeDecode(location),
                 sortBy,
@@ -195,8 +210,8 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
  * @param {number|string|null} matchID - ID for the match. When provided, other criteria are ignored.
  * @param {number|string|null} tournamentID - ID for the tournament.
  * @param {number|string|null} teamID - ID for a team. This will search for matches where the team is either team1 or team2.
- * @param {string|null} before - Search for matches before this time in a format acceptable by the database ("YYYY-MM-DD HH:MM:SS").
- * @param {string|null} after - Search for matches after this time in a format acceptable by the database ("YYYY-MM-DD HH:MM:SS").
+ * @param {string|null} before - The latest date/time (inclusive) to search for matches, formatted as YYYY-MM-DD OR YYYY-MM-DD HH:mm:ss.
+ * @param {string|null} after - The earliest date/time (inclusive) to search for matches, formatted as YYYY-MM-DD YYYY-MM-DD HH:mm:ss.
  * @param {string|null} sortBy - Field to sort the results by.
  * @param {string|boolean|null} sortAsDescending - If true, sorts the results by DESCENDING.
  * @returns {Promise<object|object[]|null>} Returns a single match object if matchID is provided, an array of match objects

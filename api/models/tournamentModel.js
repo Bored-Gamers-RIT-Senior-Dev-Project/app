@@ -44,8 +44,10 @@ const createTournament = async (
  * startDate, endDate, status, location) to filter the tournaments.
  * @param {number|null} tournamentID ID for the tournament. If provided, only the tournament with this ID is returned.
  * @param {string|null} tournamentName Name of the tournament.
- * @param {string|null} startDate Start date of the tournament in YYYY-MM-DD format. Returns tournaments starting on or after this date.
- * @param {string|null} endDate End date of the tournament in YYYY-MM-DD format. Returns tournaments ending on or before this date.
+ * @param {string|null} startsBefore - Date. Search for tournaments starting before this date (inclusive), formatted as YYYY-MM-DD.
+ * @param {string|null} startsAfter - Date. Search for tournaments starting after this date (inclusive), formatted as YYYY-MM-DD.
+ * @param {string|null} endsBefore - Date. Search for tournaments ending before this date (inclusive), formatted as YYYY-MM-DD.
+ * @param {string|null} endsAfter - Date. Search for tournaments ending after this date (inclusive), formatted as YYYY-MM-DD.
  * @param {string|null} status Status of the tournament (e.g., "Upcoming", "Active", etc.).
  * @param {string|null} location The location of the tournament, such as an address or university name.
  *  * @param {string|null} sortBy - Field to sort the results by.
@@ -57,8 +59,10 @@ const createTournament = async (
 const searchTournaments = async (
     tournamentID,
     tournamentName,
-    startDate,
-    endDate,
+    startsBefore,
+    startsAfter,
+    endsBefore,
+    endsAfter,
     status,
     location,
     sortBy,
@@ -91,13 +95,21 @@ const searchTournaments = async (
                 search += " AND TournamentName = ?";
                 params.push(tournamentName);
             }
-            if (startDate !== null) {
-                search += " AND StartDate >= ?";
-                params.push(startDate);
+            if (startsBefore !== null) {
+                search += " AND StartDate <= ?";
+                params.push(startsBefore);
             }
-            if (endDate !== null) {
+            if (startsAfter !== null) {
+                search += " AND StartDate >= ?";
+                params.push(startsAfter);
+            }
+            if (endsBefore !== null) {
                 search += " AND EndDate <= ?";
-                params.push(endDate);
+                params.push(endsBefore);
+            }
+            if (endsAfter !== null) {
+                search += " AND EndDate >= ?";
+                params.push(endsAfter);
             }
             if (status !== null) {
                 search += " AND Status = ?";
@@ -213,11 +225,11 @@ const searchMatches = async (
                 params.push(teamID, teamID);
             }
             if (before !== null) {
-                search += " AND matchTime >= ?";
+                search += " AND matchTime <= ?";
                 params.push(before);
             }
             if (after !== null) {
-                search += " AND matchTime <= ?";
+                search += " AND matchTime >= ?";
                 params.push(after);
             }
             if (sortBy !== null) {
