@@ -67,6 +67,62 @@ router.get("/search", async (req, res, next) => {
     }
 });
 
+router.post("/update", async (req, res, next) => {
+    const {
+        tournamentID,
+        tournamentName,
+        startDate,
+        endDate,
+        status,
+        location,
+        userRoleID,
+    } = req.body;
+    if (!tournamentID || !userRoleID) {
+        return res.status(400).json({ message: "Invalid request format." });
+    }
+    try {
+        const tournament = await TournamentService.updateTournament(
+            tournamentID,
+            tournamentName,
+            startDate,
+            endDate,
+            null,
+            location,
+            userRoleID
+        );
+        res.status(201).json({
+            message: "Tournament updated successfully",
+            tournament,
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post("/cancel", async (req, res, next) => {
+    const { tournamentID, userRoleID } = req.body;
+    if (!tournamentID || !userRoleID) {
+        return res.status(400).json({ message: "Invalid request format." });
+    }
+    try {
+        const tournament = await TournamentService.updateTournament(
+            tournamentID,
+            null,
+            null,
+            null,
+            null,
+            null,
+            userRoleID
+        );
+        res.status(201).json({
+            message: "Tournament cancelled",
+            tournament,
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.get("/match/search", async (req, res, next) => {
     const {
         matchID,

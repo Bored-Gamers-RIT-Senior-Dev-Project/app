@@ -167,9 +167,40 @@ const searchTournaments = async (
 /**
  * Updates the tournament state in the database.
  */
-const updateTournament = async () => {
-    // TODO: Implement updating tournament state
-    throw new Error("Not implemented");
+const updateTournament = async (
+    tournamentID = null,
+    tournamentName = null,
+    startDate = null,
+    endDate = null,
+    status = null,
+    location = null,
+    userRoleID = null
+) => {
+    try {
+        const userRoleIDnum = Number(userRoleID);
+        validateInteger(userRoleIDnum, "userRoleID");
+        // Check if the user has an authorized role (2=SuperAdmin or 3=AdminEmployee).
+        if (userRoleIDnum !== 2 && userRoleIDnum !== 3) {
+            const error = new Error(
+                "Unauthorized. Invalid user role for updating tournament details."
+            );
+            error.status = 401;
+            throw error;
+        }
+        const tournamentIDnum = Number(tournamentID);
+        validateInteger(tournamentIDnum, "tournamentID");
+        const tournament = await TournamentModel.updateTournament(
+            tournamentID,
+            tournamentName,
+            startDate,
+            endDate,
+            status,
+            location
+        );
+        return tournament;
+    } catch (error) {
+        throw error;
+    }
 };
 
 /**
