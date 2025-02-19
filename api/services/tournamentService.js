@@ -31,33 +31,21 @@ const validateInteger = (value, fieldName) => {
 
 /**
  * Creates a new tournament in the database with the status of "Upcoming".
- * This function validates the user role to ensure that only authorized users (with roleID 2 or 3).
  * @param {string} tournamentName - Name of the tournament.
  * @param {string} startDate - Start date of the tournament in YYYY-MM-DD format.
  * @param {string} endDate - End date of the tournament in YYYY-MM-DD format. If not provided, defaults to endDate.
  * @param {string} location - The location of the tournament (likely an address or university name).
- * @param {string|number} userRoleID - The role ID of the user attempting to create the tournament.
  * @returns {Promise<object>} Returns a promise that resolves to the created tournament record.
- * @throws {Error} Throws an error with status 400 if userRoleID is not an integer, or with status 401 if the role is unauthorized.
+ * @throws {Error} Throws an error with status 401 if the user's role is unauthorized.
  */
 const createTournament = async (
     tournamentName,
     startDate,
     endDate = null,
-    location,
-    userRoleID
+    location
 ) => {
     try {
-        const userRoleIDnum = Number(userRoleID);
-        validateInteger(userRoleIDnum, "userRoleID");
-        // Check if the user has an authorized role (2=SuperAdmin or 3=AdminEmployee).
-        if (userRoleIDnum !== 2 && userRoleIDnum !== 3) {
-            const error = new Error(
-                "Unauthorized. Invalid userRoleID for tournament creation."
-            );
-            error.status = 401;
-            throw error;
-        }
+        // TODO: Validate user's role by their Firebase UID
         // If no end date provided, assume the tournament only lasts a day.
         if (endDate === null) {
             finalEndDate = startDate;
@@ -173,20 +161,9 @@ const updateTournament = async (
     startDate = null,
     endDate = null,
     status = null,
-    location = null,
-    userRoleID = null
+    location = null
 ) => {
     try {
-        const userRoleIDnum = Number(userRoleID);
-        validateInteger(userRoleIDnum, "userRoleID");
-        // Check if the user has an authorized role (2=SuperAdmin or 3=AdminEmployee).
-        if (userRoleIDnum !== 2 && userRoleIDnum !== 3) {
-            const error = new Error(
-                "Unauthorized. Invalid user role for updating tournament details."
-            );
-            error.status = 401;
-            throw error;
-        }
         const tournamentIDnum = Number(tournamentID);
         validateInteger(tournamentIDnum, "tournamentID");
         await TournamentModel.updateTournament(

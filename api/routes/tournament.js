@@ -3,9 +3,8 @@ const router = express.Router();
 const TournamentService = require("../services/tournamentService");
 
 router.post("/create", async (req, res, next) => {
-    const { tournamentName, startDate, endDate, location, userRoleID } =
-        req.body;
-    if (!tournamentName || !startDate || !endDate || !location || !userRoleID) {
+    const { tournamentName, startDate, endDate, location } = req.body;
+    if (!tournamentName || !startDate || !endDate || !location) {
         return res.status(400).json({ message: "Invalid request format." });
     }
     try {
@@ -13,8 +12,7 @@ router.post("/create", async (req, res, next) => {
             tournamentName,
             startDate,
             endDate,
-            location,
-            userRoleID
+            location
         );
         res.status(201).json({
             message: "Tournament created successfully",
@@ -68,15 +66,9 @@ router.get("/search", async (req, res, next) => {
 });
 
 router.post("/update", async (req, res, next) => {
-    const {
-        tournamentID,
-        tournamentName,
-        startDate,
-        endDate,
-        location,
-        userRoleID,
-    } = req.body;
-    if (!tournamentID || !userRoleID) {
+    const { tournamentID, tournamentName, startDate, endDate, location } =
+        req.body;
+    if (!tournamentID) {
         return res.status(400).json({ message: "Invalid request format." });
     }
     try {
@@ -86,8 +78,7 @@ router.post("/update", async (req, res, next) => {
             startDate,
             endDate,
             null,
-            location,
-            userRoleID
+            location
         );
         res.status(201).json({
             message: "Tournament updated successfully",
@@ -99,8 +90,8 @@ router.post("/update", async (req, res, next) => {
 });
 
 router.post("/cancel", async (req, res, next) => {
-    const { tournamentID, userRoleID } = req.body;
-    if (!tournamentID || !userRoleID) {
+    const { tournamentID } = req.body;
+    if (!tournamentID) {
         return res.status(400).json({ message: "Invalid request format." });
     }
     try {
@@ -110,8 +101,7 @@ router.post("/cancel", async (req, res, next) => {
             null,
             null,
             "Cancelled",
-            null,
-            userRoleID
+            null
         );
         res.status(201).json({
             message: "Tournament cancelled",
