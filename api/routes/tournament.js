@@ -109,7 +109,7 @@ router.post("/cancel", async (req, res, next) => {
             null,
             null,
             null,
-            null,
+            "Cancelled",
             null,
             userRoleID
         );
