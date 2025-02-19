@@ -29,6 +29,8 @@ router.get("/search", async (req, res, next) => {
     const {
         tournamentID,
         tournamentName,
+        startDate,
+        endDate,
         startsBefore,
         startsAfter,
         endsBefore,
@@ -42,6 +44,8 @@ router.get("/search", async (req, res, next) => {
         const tournament = await TournamentService.searchTournaments(
             tournamentID,
             tournamentName,
+            startDate,
+            endDate,
             startsBefore,
             startsAfter,
             endsBefore,

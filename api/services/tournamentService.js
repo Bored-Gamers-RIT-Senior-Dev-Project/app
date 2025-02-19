@@ -84,10 +84,12 @@ const createTournament = async (
  * with a 400 status is thrown. If tournamentID is null, the function searches based on the other criteria
  * @param {number|string|null} tournamentID - Tournament ID. Solely used for search if value is provided.
  * @param {string|null} tournamentName - Name of the tournament.
- * @param {string|null} startsBefore - Date. Search for tournaments starting before this date (inclusive), formatted as YYYY-MM-DD.
- * @param {string|null} startsAfter - Date. Search for tournaments starting after this date (inclusive), formatted as YYYY-MM-DD.
- * @param {string|null} endsBefore - Date. Search for tournaments ending before this date (inclusive), formatted as YYYY-MM-DD.
- * @param {string|null} endsAfter - Date. Search for tournaments ending after this date (inclusive), formatted as YYYY-MM-DD.
+ * @param {string|null} startDate Start date of the tournament in YYYY-MM-DD format. Returns tournaments starting on this date.
+ * @param {string|null} endDate End date of the tournament in YYYY-MM-DD format. Returns tournaments ending on this date.
+ * @param {string|null} startsBefore - Start date of the tournament in YYYY-MM-DD format. Returns tournaments starting on or before this date.
+ * @param {string|null} startsAfter - Start date of the tournament in YYYY-MM-DD format. Returns tournaments starting on or after this date.
+ * @param {string|null} endsBefore - End date of the tournament in YYYY-MM-DD format. Returns tournaments ending on or before this date.
+ * @param {string|null} endsAfter - End date of the tournament in YYYY-MM-DD format. Returns tournaments ending on or after this date.
  * @param {string|null} status - Tournament status.
  * @param {string|null} location - Location of the tournament (address or university name).
  * @param {string|null} sortBy - Field to sort the results by.
@@ -100,6 +102,8 @@ const createTournament = async (
 const searchTournaments = async (
     tournamentID = null,
     tournamentName = null,
+    startDate = null,
+    endDate = null,
     startsBefore = null,
     startsAfter = null,
     endsBefore = null,
@@ -124,6 +128,8 @@ const searchTournaments = async (
                 null,
                 null,
                 null,
+                null,
+                null,
                 null
             );
             return tournament;
@@ -140,6 +146,8 @@ const searchTournaments = async (
             const tournament = await TournamentModel.searchTournaments(
                 null,
                 safeDecode(tournamentName),
+                startDate,
+                endDate,
                 startsBefore,
                 startsAfter,
                 endsBefore,
@@ -229,12 +237,13 @@ const searchMatches = async (
 ) => {
     try {
         // If matchID is provided, use it exclusively for the search.
-        if (matchID !== null && matchID !== undefined) {
+        if (matchID !== null) {
             // Convert the matchID to a number for validation.
             const id = Number(matchID);
             validateInteger(id, "matchID");
             const match = await TournamentModel.searchMatches(
                 matchID,
+                null,
                 null,
                 null,
                 null,
