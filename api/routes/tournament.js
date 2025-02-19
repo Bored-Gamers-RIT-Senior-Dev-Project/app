@@ -67,27 +67,6 @@ router.get("/search", async (req, res, next) => {
     }
 });
 
-router.post("/match/create", async (req, res, next) => {
-    const { tournamentID, team1ID, team2ID, matchTime } = req.body;
-    if (!tournamentID || !team1ID || !team2ID || !matchTime) {
-        return res.status(400).json({ message: "Invalid request format." });
-    }
-    try {
-        const match = await TournamentService.createMatch(
-            tournamentID,
-            team1ID,
-            team2ID,
-            matchTime
-        );
-        res.status(201).json({
-            message: "Match created successfully",
-            match,
-        });
-    } catch (error) {
-        next(error);
-    }
-});
-
 router.get("/match/search", async (req, res, next) => {
     const {
         matchID,
