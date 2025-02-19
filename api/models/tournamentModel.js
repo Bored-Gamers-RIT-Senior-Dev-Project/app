@@ -151,6 +151,48 @@ const searchTournaments = async (
     }
 };
 
+const updateTournament = async (
+    tournamentID,
+    tournamentName,
+    startDate,
+    endDate,
+    status
+) => {
+    try {
+        if (tournamentName) {
+            const [result] = await db.query(
+                `UPDATE Tournaments SET TournamentName = ? WHERE TournamentID = ?`,
+                [tournamentName, tournamentID]
+            );
+        }
+        if (startDate) {
+            const [result] = await db.query(
+                `UPDATE Tournaments SET StartDate = ? WHERE TournamentID = ?`,
+                [startDate, tournamentID]
+            );
+        }
+        if (endDate) {
+            const [result] = await db.query(
+                `UPDATE Tournaments SET EndDate = ? WHERE TournamentID = ?`,
+                [endDate, tournamentID]
+            );
+        }
+        if (status) {
+            const [result] = await db.query(
+                `UPDATE Tournaments SET Status = ? WHERE TournamentID = ?`,
+                [Status, tournamentID]
+            );
+        }
+        let search = "SELECT * FROM Tournaments WHERE TournamentID = ?";
+        const params = [tournamentID];
+        const [rows] = await db.query(search, params);
+        return rows[0];
+    } catch (error) {
+        console.error("Error updating match result:", error);
+        throw error;
+    }
+};
+
 /**
  * Creates a match record for the tournament in the database.
  * @param {number} tournamentID - The ID for the tournament.
@@ -295,6 +337,7 @@ const updateMatchResult = async (matchID, winnerID, team1Score, team2Score) => {
 module.exports = {
     createTournament,
     searchTournaments,
+    updateTournament,
     createMatch,
     searchMatches,
     updateMatchResult,
