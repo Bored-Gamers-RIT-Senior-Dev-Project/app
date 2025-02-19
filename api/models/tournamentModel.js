@@ -52,11 +52,9 @@ const createTournament = async (
  * @param {string|null} endsAfter - End date of the tournament in YYYY-MM-DD format. Returns tournaments ending on or after this date.
  * @param {string|null} status Status of the tournament (e.g., "Upcoming", "Active", etc.).
  * @param {string|null} location The location of the tournament, such as an address or university name.
- *  * @param {string|null} sortBy - Field to sort the results by.
+ * @param {string|null} sortBy - Field to sort the results by.
  * @param {boolean} sortAsDescending - If true, sorts the results by DESCENDING. Defaults to ASCENDING.
- * @returns {Promise<object|null|object[]>} Returns a single tournament object if tournamentID is provided, an array of tournament objects
- *                                          matching the search criteria otherwise, or null if no tournaments are found.
- * @throws {Error} Throws an error if the database query fails.
+ * @throws {Error} Throws an error if the database update fails.
  */
 const searchTournaments = async (
     tournamentID,
@@ -159,37 +157,39 @@ const updateTournament = async (
     status
 ) => {
     try {
+        let updates = [];
+        let params = [];
+
         if (tournamentName) {
-            const [result] = await db.query(
-                `UPDATE Tournaments SET TournamentName = ? WHERE TournamentID = ?`,
-                [tournamentName, tournamentID]
-            );
+            updates.push("TournamentName = ?");
+            params.push(tournamentName);
         }
         if (startDate) {
-            const [result] = await db.query(
-                `UPDATE Tournaments SET StartDate = ? WHERE TournamentID = ?`,
-                [startDate, tournamentID]
-            );
+            updates.push("StartDate = ?");
+            params.push(startDate);
         }
         if (endDate) {
-            const [result] = await db.query(
-                `UPDATE Tournaments SET EndDate = ? WHERE TournamentID = ?`,
-                [endDate, tournamentID]
-            );
+            updates.push("EndDate = ?");
+            params.push(endDate);
         }
         if (status) {
-            const [result] = await db.query(
-                `UPDATE Tournaments SET Status = ? WHERE TournamentID = ?`,
-                [Status, tournamentID]
-            );
+            updates.push("Status = ?");
+            params.push(status);
         }
-        let search = "SELECT * FROM Tournaments WHERE TournamentID = ?";
-        const params = [tournamentID];
-        const [rows] = await db.query(search, params);
-        return rows[0];
+
+        if (updates.length === 0) {
+            throw new Error("No params provided for tournament update.");
+        }
+
+        params.push(tournamentID);
+
+        const updateQuery = `UPDATE Tournaments SET ${updates.join(
+            ", "
+        )} WHERE TournamentID = ?`;
+        await db.query(updateQuery, params);
     } catch (error) {
-        console.error("Error updating match result:", error);
-        throw error;
+        console.error("Error updating tournament:", error);
+        throw error.message;
     }
 };
 

@@ -73,7 +73,6 @@ router.post("/update", async (req, res, next) => {
         tournamentName,
         startDate,
         endDate,
-        status,
         location,
         userRoleID,
     } = req.body;

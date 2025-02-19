@@ -189,7 +189,7 @@ const updateTournament = async (
         }
         const tournamentIDnum = Number(tournamentID);
         validateInteger(tournamentIDnum, "tournamentID");
-        const tournament = await TournamentModel.updateTournament(
+        await TournamentModel.updateTournament(
             tournamentID,
             tournamentName,
             startDate,
@@ -197,6 +197,8 @@ const updateTournament = async (
             status,
             location
         );
+        // Return using existing SELECT in search to verify updated information
+        const tournament = searchTournaments(tournamentID);
         return tournament;
     } catch (error) {
         throw error;
