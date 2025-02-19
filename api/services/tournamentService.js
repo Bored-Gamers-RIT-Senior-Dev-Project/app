@@ -195,7 +195,8 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
  * @param {number|string|null} matchID - ID for the match. When provided, other criteria are ignored.
  * @param {number|string|null} tournamentID - ID for the tournament.
  * @param {number|string|null} teamID - ID for a team. This will search for matches where the team is either team1 or team2.
- * @param {string|null} matchTime - The match time in a format acceptable by the database ("YYYY-MM-DD HH:MM:SS").
+ * @param {string|null} before - Search for matches before this time in a format acceptable by the database ("YYYY-MM-DD HH:MM:SS").
+ * @param {string|null} after - Search for matches after this time in a format acceptable by the database ("YYYY-MM-DD HH:MM:SS").
  * @param {string|null} sortBy - Field to sort the results by.
  * @param {string|boolean|null} sortAsDescending - If true, sorts the results by DESCENDING.
  * @returns {Promise<object|object[]|null>} Returns a single match object if matchID is provided, an array of match objects
@@ -206,7 +207,8 @@ const searchMatches = async (
     matchID = null,
     tournamentID = null,
     teamID = null,
-    matchTime = null,
+    before = null,
+    after = null,
     sortBy = null,
     sortAsDescending = false
 ) => {
@@ -239,7 +241,8 @@ const searchMatches = async (
                 null,
                 tournamentID,
                 teamID,
-                matchTime,
+                before,
+                after,
                 sortBy,
                 sortAsDescending
             );

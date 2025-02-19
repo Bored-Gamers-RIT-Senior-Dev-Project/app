@@ -85,7 +85,8 @@ router.get("/match/search", async (req, res, next) => {
         matchID,
         tournamentID,
         teamID,
-        matchTime,
+        before,
+        after,
         sortBy,
         sortAsDescending,
     } = req.query;
@@ -94,7 +95,8 @@ router.get("/match/search", async (req, res, next) => {
             matchID,
             tournamentID,
             teamID,
-            matchTime,
+            before,
+            after,
             sortBy,
             sortAsDescending
         );

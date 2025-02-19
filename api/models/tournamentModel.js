@@ -164,7 +164,8 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
  * @param {number|null} matchID - ID for the match. When provided, all other criteria are ignored.
  * @param {number|null} tournamentID - ID for the tournament.
  * @param {number|null} teamID - ID for a team. Searches for matches where this team is either team1 or team2.
- * @param {string|null} matchTime - The match time in a format acceptable by the database ("YYYY-MM-DD HH:MM:SS").
+ * @param {string|null} before - Search for matches before this time in a format acceptable by the database ("YYYY-MM-DD HH:MM:SS").
+ * @param {string|null} after - Search for matches after this time in a format acceptable by the database ("YYYY-MM-DD HH:MM:SS").
  * @param {string|null} sortBy - Field to sort the results by.
  * @param {boolean|null} sortAsDescending - If true, sorts the results by DESCENDING. Defaults to ASCENDING.
  * @returns {Promise<object|null|object[]>}
@@ -176,11 +177,13 @@ const searchMatches = async (
     matchID,
     tournamentID,
     teamID,
-    matchTime,
+    before,
+    after,
     sortBy,
     sortAsDescending
 ) => {
     try {
+        console.log("Before: " + before + " and After: " + after);
         // If a matchID is provided, perform a search based solely on matchID.
         if (matchID !== null) {
             const [rows] = await db.query(
@@ -209,9 +212,13 @@ const searchMatches = async (
                 search += " AND (Team1ID = ? OR Team2ID = ?)";
                 params.push(teamID, teamID);
             }
-            if (matchTime !== null) {
-                search += " AND matchTime = ?";
-                params.push(matchTime);
+            if (before !== null) {
+                search += " AND matchTime >= ?";
+                params.push(before);
+            }
+            if (after !== null) {
+                search += " AND matchTime <= ?";
+                params.push(after);
             }
             if (sortBy !== null) {
                 search += " ORDER BY " + sortBy;
