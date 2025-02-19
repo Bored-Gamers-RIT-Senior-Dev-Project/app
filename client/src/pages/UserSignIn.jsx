@@ -14,7 +14,7 @@ const handleErrors = (error) => {
             console.error("Sign-in error:", error);
             events.publish(
                 "message",
-                ErrorData("An unexpected error occurred")
+                new ErrorData("An unexpected error occurred")
             );
     }
 };
@@ -66,7 +66,7 @@ const UserSignIn = () => {
             events.publish("spinner.close");
             events.publish(
                 "message",
-                MessageData(undefined, actionData.message)
+                new MessageData(undefined, actionData.message)
             );
             if (actionData.message === "Signin successful") {
                 navigate("/"); // Redirect to home on successful sign-in

@@ -36,7 +36,7 @@ const Search = () => {
                 onClick={() =>
                     events.publish(
                         "message",
-                        MessageData(
+                        new MessageData(
                             "Success!",
                             "Message sent!",
                             Severity.SUCCESS
@@ -52,7 +52,7 @@ const Search = () => {
                 onClick={() =>
                     events.publish(
                         "message",
-                        ErrorData("Oh, no!", Severity.ERROR, {
+                        new ErrorData("Oh, no!", Severity.ERROR, {
                             icon: <Error />,
                             autoHideDuration: 5000,
                         })
@@ -65,7 +65,10 @@ const Search = () => {
             </Button>
             <Button
                 onClick={() =>
-                    events.publish("message", MessageData(undefined, "Hooray!"))
+                    events.publish(
+                        "message",
+                        new MessageData(undefined, "Hooray!")
+                    )
                 }
                 variant="contained"
                 color="secondary"

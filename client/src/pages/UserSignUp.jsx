@@ -227,7 +227,7 @@ const UserSignUp = () => {
             events.publish("spinner.close");
             events.publish(
                 "message",
-                MessageData(undefined, actionData.message)
+                new MessageData(undefined, actionData.message)
             );
             if (actionData.message === "Welcome!") {
                 navigate("/"); // Redirect to home on successful sign-up
