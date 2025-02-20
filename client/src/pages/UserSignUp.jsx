@@ -227,6 +227,7 @@ const UserSignUp = () => {
     useEffect(() => {
         if (actionData) {
             events.publish("spinner.close");
+            setUser(actionData.user);
             events.publish(
                 "message",
                 new MessageData(undefined, actionData.message)
