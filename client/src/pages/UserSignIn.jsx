@@ -7,15 +7,16 @@ import { useAuth } from "../hooks/useAuth";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
 import { signInWithEmail, signInWithGoogle } from "../utils/firebase/auth";
+import { ErrorData, MessageData } from "../utils/messageData";
 
 const handleErrors = (error) => {
     switch (error.message) {
         default:
             console.error("Sign-in error:", error);
-            events.publish("message", {
-                message: "An unexpected error occurred",
-                severity: "error",
-            });
+            events.publish(
+                "message",
+                new ErrorData("An unexpected error occurred")
+            );
     }
 };
 
@@ -77,10 +78,10 @@ const UserSignIn = () => {
         if (actionData) {
             events.publish("spinner.close");
             setUser(actionData.user);
-            events.publish("message", { message: actionData.message });
-            if (actionData.message === "Signin successful") {
-                navigate("/"); // Redirect to home on successful sign-in
-            }
+            events.publish(
+                "message",
+                new MessageData(undefined, actionData.message)
+            );
         }
     }, [actionData, navigate, setUser]);
 
