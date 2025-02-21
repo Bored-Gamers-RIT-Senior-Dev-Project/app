@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const { makeObjectCamelCase } = require("../utils");
 
 /**
  * Creates a user in the database.
@@ -36,16 +37,10 @@ const createUser = async (
                 roleId,
             ]
         );
-        return {
-            id: result.insertId,
-            firebaseUID,
-            email,
-            firstName,
-            lastName,
-            username,
-            profileImageUrl,
-            roleId,
-        };
+        if (result[0].affectedRows === 0) {
+            throw new Error("User not created.");
+        }
+        return await readUser(firebaseUID);
     } catch (error) {
         console.error("Error creating user:", error.message);
         throw error;
@@ -62,16 +57,18 @@ const readUser = async (uid) => {
     try {
         const [rows] = await db.query(
             `
-            SELECT * 
-            FROM Users
-            WHERE FirebaseUID = ?
+        SELECT user.*, uni.UniversityName, team.TeamName
+            FROM users AS user
+            LEFT JOIN universities AS uni ON user.UniversityID = uni.UniversityId
+            LEFT JOIN teams AS team ON user.TeamID = team.TeamId
+            WHERE user.FirebaseUID = ?;
         `,
             [uid]
         );
         if (rows.length === 0) {
             return null;
         }
-        return rows[0];
+        return makeObjectCamelCase(rows[0]);
     } catch (error) {
         console.error("Error fetching user:", error.message);
         throw error;
