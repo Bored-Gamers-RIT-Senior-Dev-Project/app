@@ -1,4 +1,6 @@
+const createHttpError = require("http-errors");
 const db = require("../config/db");
+const { makeObjectCamelCase } = require("../utils");
 
 /**
  * Creates a user in the database.
@@ -36,16 +38,10 @@ const createUser = async (
                 roleId,
             ]
         );
-        return {
-            id: result.insertId,
-            firebaseUID,
-            email,
-            firstName,
-            lastName,
-            username,
-            profileImageUrl,
-            roleId,
-        };
+        if (result[0].affectedRows === 0) {
+            throw new Error("User not created.");
+        }
+        return await readUser(firebaseUID);
     } catch (error) {
         console.error("Error creating user:", error.message);
         throw error;
@@ -62,20 +58,68 @@ const readUser = async (uid) => {
     try {
         const [rows] = await db.query(
             `
-            SELECT * 
-            FROM Users
-            WHERE FirebaseUID = ?
+        SELECT user.*, uni.UniversityName, team.TeamName
+            FROM users AS user
+            LEFT JOIN universities AS uni ON user.UniversityID = uni.UniversityId
+            LEFT JOIN teams AS team ON user.TeamID = team.TeamId
+            WHERE user.FirebaseUID = ?;
         `,
             [uid]
         );
         if (rows.length === 0) {
             return null;
         }
-        return rows[0];
+        return makeObjectCamelCase(rows[0]);
     } catch (error) {
         console.error("Error fetching user:", error.message);
         throw error;
     }
+};
+
+const VALID_KEYS = [
+    "USERID",
+    "FIRSTNAME",
+    "LASTNAME",
+    "USERNAME",
+    "EMAIL",
+    "FIREBASEUID",
+    "PROFILEIMAGEURL",
+    "BIO",
+    "CREATEDAT",
+    "PAID",
+    "TEAMID",
+    "ROLEID",
+    "UNIVERSITYID",
+    "ISVALIDATED",
+    "UNIVERSITYNAME",
+    "TEAMNAME",
+];
+const updateUser = async (firebaseUid, body) => {
+    if (body.username) body.username = await generateUsername(body.username);
+    const updates = [];
+    for (const key of Object.keys(body)) {
+        if (VALID_KEYS.includes(key.toUpperCase())) {
+            updates.push(`${key} = ?`);
+        } else {
+            console.error("Error fulfilling update request:", body);
+            console.error("Invalid key:", key);
+            throw createHttpError(400, "Invalid attempt to update user.");
+        }
+    }
+    const keys = Object.keys(body)
+        .map((key) => `${key} = ?`)
+        .join(", ");
+
+    const [rows] = await db.query(
+        `UPDATE Users SET ${keys} WHERE FirebaseUID = ?`,
+        [...Object.values(body), firebaseUid]
+    );
+
+    if (rows.affectedRows === 0) {
+        throw new Error("User not updated.");
+    }
+
+    return await readUser(firebaseUid);
 };
 
 /**
@@ -114,7 +158,7 @@ const generateUsername = async (username, sharedUsernames = null) => {
 
     // Otherwise, append a number to the username until we find a unique one
     let i = 1;
-    while (sharedUsernames.contains(`${username}-${i}`)) {
+    while (sharedUsernames.includes(`${username}-${i}`)) {
         i++;
         if (i > 100)
             console.error(
@@ -142,4 +186,4 @@ const checkUsername = async (username, strict = false) => {
     return await generateUsername(username, sharedUsernames);
 };
 
-module.exports = { createUser, readUser, checkUsername };
+module.exports = { createUser, readUser, updateUser, checkUsername };

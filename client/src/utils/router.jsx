@@ -1,11 +1,17 @@
 import { createBrowserRouter } from "react-router";
 import App from "../App";
-
-import { Home, NotFound, Search, UserSignIn, UserSignUp, UserSettings } from "../pages";
-
-import { Home, NotFound, Search, UserSignIn, UserSignUp,University, Rules, Schedule} from "../pages";
-
-import { handleSignIn, handleSignUp, sendTest } from "./api";
+import {
+    Home,
+    NotFound,
+    Rules,
+    Schedule,
+    Search,
+    University,
+    UserSignIn,
+    UserSignUp,
+} from "../pages";
+import { UserPreferences } from "../pages/UserPreferences.DEMO";
+import { handleSignIn, handleSignUp, sendTest, updateUser } from "./api";
 import { events } from "./events";
 
 //Make an action out of an api call
@@ -18,8 +24,6 @@ const makeAction =
         if (spinner) events.publish("spinner.close");
         return response;
     };
-
-
 const router = createBrowserRouter([
     {
         path: "/",
@@ -45,68 +49,36 @@ const router = createBrowserRouter([
                 action: makeAction(sendTest),
             },
             {
+                path: "/university/:universityId",
+                element: <University />,
+            },
+            {
                 path: "/about",
                 element: "TODO: About Page",
+            },
+            {
+            {
+                path: "/settings",
+                element: <UserSettings />,
+            },
+                path: "/rules",
+                element: <Rules />,
+            },
+            {
+                path: "/schedule",
+                element: <Schedule />,
+            },
+            {
+                path: "/user_preferences",
+                element: <UserPreferences />,
+                action: makeAction(updateUser),
             },
             {
                 path: "*",
                 element: <NotFound />,
             },
-            {
-                path: "/settings",
-                element: <UserSettings />,
-            },
         ],
     },
 ]);
-
-    const router = createBrowserRouter([
-      {
-          path: "/",
-          element: <App />,
-          children: [
-              {
-                  path: "/",
-                  element: <Home />,
-              },
-              {
-                  path: "/signin",
-                  element: <UserSignIn />,
-                  action: makeAction(handleSignIn),
-              },
-              {
-                  path: "/signup",
-                  element: <UserSignUp />,
-                  action: makeAction(handleSignUp),
-              },
-              {
-                  path: "/search",
-                  element: <Search />,
-                  action: makeAction(sendTest),
-              },
-              {
-                  path: "/university/:universityId",
-                  element: <University/>,
-              },
-              {
-                  path: "/about",
-                  element: "TODO: About Page",
-              },
-              {
-                  path:"/rules",
-                  element:<Rules />,
-              },
-              {
-                  path: "/Schedule",
-                  element: <Schedule />,
-              },
-              {
-                  path: "*",
-                  element: <NotFound />,
-              },
-          ],
-      },
-  ]);
-
 
 export { router };

@@ -15,6 +15,7 @@ import { useActionData, useNavigate } from "react-router";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
 import { signUpWithEmail } from "../utils/firebase/auth";
+import { ErrorData, MessageData, Severity } from "../utils/messageData";
 
 // From https://zxcvbn-ts.github.io/zxcvbn/guide/framework-examples/#react:
 import { zxcvbnAsync, zxcvbnOptions } from "@zxcvbn-ts/core";
@@ -24,26 +25,7 @@ import { zxcvbnAsync, zxcvbnOptions } from "@zxcvbn-ts/core";
 import * as zxcvbnCommonPackage from "@zxcvbn-ts/language-common";
 import * as zxcvbnEnPackage from "@zxcvbn-ts/language-en";
 import { translations } from "@zxcvbn-ts/language-en";
-
-/**
- * @class ErrorData a convenience for representing the data needed for an error
- */
-class ErrorData {
-    /**
-     * Create a new ErrorData
-     * @param {string} message The user-facing message for this error
-     * @param {string} [severity] The severity, or "error" if not specified.
-     * Should be one of "info", "error", "warning", or "success", if provided
-     */
-    constructor(message, severity = "error") {
-        this.message = message;
-        const allowedErrors = ["info", "error", "warning", "success"];
-        if (!allowedErrors.includes(severity)) {
-            console.warn(`ErrorData: Unexpected severity ${severity}`);
-        }
-        this.severity = severity;
-    }
-}
+import { useAuth } from "../hooks/useAuth";
 
 /**
  * Handle a sign up error from Firebase
@@ -184,6 +166,7 @@ PasswordStrength.propTypes = {
 };
 
 const UserSignUp = () => {
+    const { user, setUser } = useAuth();
     const [signUpData, setSignUpData] = useState({
         email: "",
         username: "",
@@ -213,10 +196,10 @@ const UserSignUp = () => {
 
         if (signUpData.password !== signUpData.repeatPassword) {
             //TODO: Make the form validate this automatically, rather than on submit.
-            events.publish("Message", {
-                message: "Passwords do not match",
-                severity: "warning",
-            });
+            events.publish(
+                "Message",
+                new ErrorData("Passwords do not match", Severity.WARNING)
+            );
             events.publish("spinner.close");
             return;
         }
@@ -244,12 +227,19 @@ const UserSignUp = () => {
     useEffect(() => {
         if (actionData) {
             events.publish("spinner.close");
-            events.publish("message", { message: actionData.message });
-            if (actionData.message === "Welcome!") {
-                navigate("/"); // Redirect to home on successful sign-up
-            }
+            events.publish(
+                "message",
+                new MessageData(undefined, actionData.message)
+            );
+            setUser(actionData.user);
         }
-    }, [actionData, navigate]);
+    }, [actionData, navigate, setUser]);
+
+    useEffect(() => {
+        if (user) {
+            navigate("/");
+        }
+    }, [user, navigate]);
 
     return (
         <Paper elevation={6} sx={{ p: 4, maxWidth: 600 }}>
