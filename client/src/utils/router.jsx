@@ -1,17 +1,18 @@
 import { createBrowserRouter } from "react-router";
 import App from "../App";
 import {
-    About,
     Home,
     NotFound,
     Rules,
     Schedule,
     Search,
     University,
+    About,
     UserSignIn,
     UserSignUp,
 } from "../pages";
-import { handleSignIn, handleSignUp, sendTest } from "./api";
+import { UserPreferences } from "../pages/UserPreferences.DEMO";
+import { handleSignIn, handleSignUp, sendTest, updateUser } from "./api";
 import { events } from "./events";
 
 //Make an action out of an api call
@@ -64,6 +65,11 @@ const router = createBrowserRouter([
             {
                 path: "/schedule",
                 element: <Schedule />,
+            },
+            {
+                path: "/user_preferences",
+                element: <UserPreferences />,
+                action: makeAction(updateUser),
             },
             {
                 path: "*",
