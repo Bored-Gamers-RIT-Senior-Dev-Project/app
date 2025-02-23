@@ -70,6 +70,43 @@ const Search = () => {
                 </SearchIconWrapper>
                 <StyledInputBase placeholder="Search…" inputProps={{ "aria-label": "search" }} />
             </SearchBar>
+
+        
+        <Paper variant="outlined" sx={{ mt: 2, mb: 2, padding: 2 }}>
+                <FormLabel>Advanced Search</FormLabel>
+                <Autocomplete 
+                    sx={{ mt: 2 }}
+                    options={universityList}
+                    value={selectedUniversity}
+                    onChange={(e, newValue) => setSelectedUniversity(newValue)}
+                    renderInput={(params) => <TextField {...params} label="Select your University" />}
+                />
+                <Autocomplete 
+                    sx={{ mt: 2 }}
+                    options={cityList}
+                    value={selectedCity}
+                    onChange={(e, newValue) => setSelectedCity(newValue)}
+                    renderInput={(params) => <TextField {...params} label="Select your City" />}
+                />
+                <Box sx={{ mt: 2 }}>
+                    <FormControl fullWidth>
+                        <InputLabel>Sort by:</InputLabel>
+                        <Select value={sorting} onChange={(e) => setSorting(e.target.value)}>
+                            <MenuItem value="popularity">Popularity</MenuItem>
+                            <MenuItem value="recent_activity">Recent Activity</MenuItem>
+                            <MenuItem value="win_rate">Win Rate</MenuItem>
+                            <MenuItem value="rank">Rank</MenuItem>
+                            <MenuItem value="members">Number of Members</MenuItem>
+                            <MenuItem value="date_created">Date Created (Newest First)</MenuItem>
+                            <MenuItem value="alphabetical">Alphabetical Order (A-Z)</MenuItem>
+                            <MenuItem value="upcoming_matches">Upcoming Matches</MenuItem>
+                            <MenuItem value="availability">Team Availability</MenuItem>
+                            <MenuItem value="game_mode">Game Mode Specialization</MenuItem>
+                            <MenuItem value="region">Region/Location</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Box>
+            </Paper>
         </Paper>
     );
 };
