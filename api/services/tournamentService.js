@@ -205,6 +205,75 @@ const updateTournament = async (
     }
 };
 
+const addTournamentFacilitator = async (tournamentID, userID) => {
+    try {
+        const tournamentIDnum = Number(tournamentID);
+        validateInteger(tournamentIDnum, "tournamentID");
+        const userIDnum = Number(userID);
+        validateInteger(userIDnum, "userID");
+        const existingFacilitator =
+            await TournamentModel.searchTournamentFacilitators(
+                tournamentIDnum,
+                userIDnum
+            );
+        if (existingFacilitator && existingFacilitator.length > 0) {
+            throw new Error("Facilitator already exists for this tournament.");
+        }
+        await TournamentModel.addTournamentFacilitator(
+            tournamentIDnum,
+            userIDnum
+        );
+    } catch (error) {
+        throw error;
+    }
+};
+
+const removeTournamentFacilitator = async (tournamentID, userID) => {
+    try {
+        const tournamentIDnum = Number(tournamentID);
+        validateInteger(tournamentIDnum, "tournamentID");
+        const userIDnum = Number(userID);
+        validateInteger(userIDnum, "userID");
+        const existingFacilitator =
+            await TournamentModel.searchTournamentFacilitators(
+                tournamentIDnum,
+                userIDnum
+            );
+        if (!existingFacilitator || existingFacilitator.length === 0) {
+            throw new Error("Facilitator not found in this tournament.");
+        }
+        await TournamentModel.removeTournamentFacilitator(
+            tournamentIDnum,
+            userIDnum
+        );
+    } catch (error) {
+        throw error;
+    }
+};
+
+const searchTournamentFacilitators = async (
+    tournamentID,
+    userID,
+    name,
+    email,
+    universityID
+) => {
+    try {
+        console.log("Performing search on service layer");
+        const tournament = await TournamentModel.searchTournamentFacilitators(
+            tournamentID,
+            userID,
+            name,
+            email,
+            universityID
+        );
+        console.log("Returning search result on service layer");
+        return tournament;
+    } catch (error) {
+        throw error;
+    }
+};
+
 /**
  * Creates a match for the tournament in the database.
  * @param {number|string} tournamentID - The tournament ID.
@@ -345,6 +414,9 @@ module.exports = {
     createTournament,
     searchTournaments,
     updateTournament,
+    addTournamentFacilitator,
+    removeTournamentFacilitator,
+    searchTournamentFacilitators,
     createMatch,
     searchMatches,
     updateMatchResult,

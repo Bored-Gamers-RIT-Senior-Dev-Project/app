@@ -71,7 +71,7 @@ const searchTournaments = async (
     sortAsDescending
 ) => {
     try {
-        if (tournamentID !== null) {
+        if (tournamentID) {
             const [rows] = await db.query(
                 `
                 SELECT * 
@@ -93,46 +93,46 @@ const searchTournaments = async (
             const params = [];
 
             // Only add a search parameter if the parameter is not null
-            if (tournamentName !== null) {
+            if (tournamentName) {
                 search += " AND TournamentName = ?";
                 params.push(tournamentName);
             }
-            if (startDate !== null) {
+            if (startDate) {
                 search += " AND StartDate = ?";
                 params.push(startDate);
             }
-            if (endDate !== null) {
+            if (endDate) {
                 search += " AND EndDate = ?";
                 params.push(endDate);
             }
-            if (startsBefore !== null) {
+            if (startsBefore) {
                 search += " AND StartDate <= ?";
                 params.push(startsBefore);
             }
-            if (startsAfter !== null) {
+            if (startsAfter) {
                 search += " AND StartDate >= ?";
                 params.push(startsAfter);
             }
-            if (endsBefore !== null) {
+            if (endsBefore) {
                 search += " AND EndDate <= ?";
                 params.push(endsBefore);
             }
-            if (endsAfter !== null) {
+            if (endsAfter) {
                 search += " AND EndDate >= ?";
                 params.push(endsAfter);
             }
-            if (status !== null) {
+            if (status) {
                 search += " AND Status = ?";
                 params.push(status);
             }
-            if (location !== null) {
+            if (location) {
                 search += " AND Location = ?";
                 params.push(location);
             }
-            if (sortBy !== null) {
+            if (sortBy) {
                 search += " ORDER BY " + sortBy;
             }
-            if (sortBy !== null && sortAsDescending) {
+            if (sortBy && sortAsDescending) {
                 search += " DESC";
             }
             console.log("Tournament Search Query: " + search + params);
@@ -145,6 +145,75 @@ const searchTournaments = async (
         }
     } catch (error) {
         console.error("Error searching for tournament:", error.message);
+        throw error;
+    }
+};
+
+const addTournamentFacilitator = async (tournamentID, userID) => {
+    try {
+        const [result] = await db.query(
+            `INSERT INTO TournamentFacilitators (TournamentID, UserID)
+             VALUES (?, ?)`,
+            [tournamentID, userID]
+        );
+    } catch (error) {
+        console.error("Error assigning tournament facilitator:", error);
+        throw error;
+    }
+};
+
+const removeTournamentFacilitator = async (tournamentID, userID) => {
+    try {
+        await db.query(
+            `DELETE FROM TournamentFacilitators WHERE TournamentID = ? AND UserID = ?`,
+            [tournamentID, userID]
+        );
+    } catch (error) {
+        console.error("Error removing tournament facilitator:", error);
+        throw error;
+    }
+};
+
+const searchTournamentFacilitators = async (
+    tournamentID,
+    userID,
+    name,
+    email,
+    universityID
+) => {
+    try {
+        console.log("Setting params");
+        let search =
+            "SELECT Users.UserID, CONCAT(Users.FirstName, ' ', Users.LastName) AS FullName, Email, ProfileImageURL FROM TournamentFacilitators JOIN Users ON TournamentFacilitators.UserID = Users.UserID WHERE 1=1";
+        const params = [];
+
+        // Only add a search parameter if the parameter is not null
+        if (tournamentID) {
+            search += " AND TournamentID = ?";
+            params.push(tournamentID);
+        }
+        if (userID) {
+            search += " AND Users.UserID = ?";
+            params.push(userID);
+        }
+        if (name) {
+            search +=
+                " AND CONCAT(Users.FirstName, ' ', Users.LastName) LIKE ?";
+            params.push(`%${name}%`);
+        }
+        if (email) {
+            search += " AND Email LIKE ?";
+            params.push(`%${email}%`);
+        }
+        if (universityID) {
+            search += " AND UniversityID = ?";
+            params.push(universityID);
+        }
+        console.log("Tournament Search Query: " + search + params);
+        const [rows] = await db.query(search, params);
+        return rows;
+    } catch (error) {
+        console.error("Error searching for facilitator(s):", error.message);
         throw error;
     }
 };
@@ -251,7 +320,7 @@ const searchMatches = async (
     try {
         console.log("Before: " + before + " and After: " + after);
         // If a matchID is provided, perform a search based solely on matchID.
-        if (matchID !== null) {
+        if (matchID) {
             const [rows] = await db.query(
                 `
                 SELECT * 
@@ -270,26 +339,26 @@ const searchMatches = async (
             // If matchID is not set, build query using other search criteria
             let search = "SELECT * FROM Matches WHERE 1=1";
             const params = [];
-            if (tournamentID !== null) {
+            if (tournamentID) {
                 search += " AND TournamentID = ?";
                 params.push(tournamentID);
             }
-            if (teamID !== null) {
+            if (teamID) {
                 search += " AND (Team1ID = ? OR Team2ID = ?)";
                 params.push(teamID, teamID);
             }
-            if (before !== null) {
+            if (before) {
                 search += " AND matchTime <= ?";
                 params.push(before);
             }
-            if (after !== null) {
+            if (after) {
                 search += " AND matchTime >= ?";
                 params.push(after);
             }
-            if (sortBy !== null) {
+            if (sortBy) {
                 search += " ORDER BY " + sortBy;
             }
-            if (sortBy !== null && sortAsDescending) {
+            if (sortBy && sortAsDescending) {
                 search += " DESC";
             }
             const [rows] = await db.query(search, params);
@@ -338,6 +407,9 @@ module.exports = {
     createTournament,
     searchTournaments,
     updateTournament,
+    addTournamentFacilitator,
+    removeTournamentFacilitator,
+    searchTournamentFacilitators,
     createMatch,
     searchMatches,
     updateMatchResult,

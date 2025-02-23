@@ -122,6 +122,84 @@ router.post("/cancel", async (req, res, next) => {
     }
 });
 
+router.post("/addFacilitator", async (req, res, next) => {
+    const { tournamentID, userID } = req.body;
+    if (!tournamentID || !userID) {
+        return res.status(400).json({ message: "Invalid request format." });
+    }
+    try {
+        const facilitators = await TournamentService.addTournamentFacilitator(
+            tournamentID,
+            userID
+        );
+        res.status(201).json({
+            message: "Facilitator added successfully",
+            facilitators,
+        });
+    } catch (error) {
+        if (
+            error.message === "Facilitator already exists for this tournament."
+        ) {
+            return res.status(409).json({ error: error.message });
+        }
+        res.status(500).json({ error: "An unexpected error occurred." });
+    }
+});
+
+router.post("/removeFacilitator", async (req, res) => {
+    const { tournamentID, userID } = req.body;
+    if (!tournamentID || !userID) {
+        return res.status(400).json({ message: "Invalid request format." });
+    }
+    try {
+        const facilitators =
+            await TournamentService.removeTournamentFacilitator(
+                tournamentID,
+                userID
+            );
+        res.status(201).json({
+            message: "Facilitator removed successfully",
+            facilitators,
+        });
+    } catch (error) {
+        if (error.message === "Facilitator not found in this tournament.") {
+            return res.status(200).json({ error: error.message });
+        }
+        res.status(500).json({ error: "An unexpected error occurred." });
+    }
+});
+
+router.get("/listFacilitators", async (req, res, next) => {
+    const { tournamentID } = req.query;
+    if (!tournamentID) {
+        return res.status(400).json({ message: "Invalid request format." });
+    }
+    try {
+        const facilitators =
+            await TournamentService.searchTournamentFacilitators(tournamentID);
+        res.status(200).json({ facilitators });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get("/searchFacilitators", async (req, res, next) => {
+    const { tournamentID, userID, name, email, universityID } = req.query;
+    try {
+        const facilitators =
+            await TournamentService.searchTournamentFacilitators(
+                tournamentID,
+                userID,
+                name,
+                email,
+                universityID
+            );
+        res.status(200).json({ facilitators });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.get("/match/search", async (req, res, next) => {
     const {
         matchID,
