@@ -26,6 +26,7 @@ const validateInteger = (value, fieldName) => {
         error.status = 400;
         throw error;
     }
+    return value;
 };
 
 /* End Helper Functions */
@@ -49,7 +50,7 @@ const createTournament = async (
     userRoleID
 ) => {
     try {
-        const userRoleID = validateInteger(userRoleID, "userRoleID");
+        userRoleID = validateInteger(userRoleID, "userRoleID");
         // Check if the user has an authorized role (2=SuperAdmin or 3=AdminEmployee).
         if (userRoleID !== 2 && userRoleID !== 3) {
             const error = new Error(
@@ -116,7 +117,7 @@ const searchTournaments = async (
     try {
         // If tournamentID is provided, use it exclusively for the search.
         if (tournamentID !== null) {
-            const tournamentID = validateInteger(tournamentID, "tournamentID");
+            tournamentID = validateInteger(tournamentID, "tournamentID");
             const tournament = await TournamentModel.searchTournaments(
                 tournamentID,
                 null,
@@ -176,7 +177,7 @@ const updateTournament = async (
     userRoleID = null
 ) => {
     try {
-        const userRoleID = validateInteger(userRoleID, "userRoleID");
+        userRoleID = validateInteger(userRoleID, "userRoleID");
         // Check if the user has an authorized role (2=SuperAdmin or 3=AdminEmployee).
         if (userRoleID !== 2 && userRoleID !== 3) {
             const error = new Error(
@@ -204,8 +205,8 @@ const updateTournament = async (
 
 const addTournamentFacilitator = async (tournamentID, userID) => {
     try {
-        const tournamentID = validateInteger(tournamentID, "tournamentID");
-        const userID = validateInteger(userID, "userID");
+        tournamentID = validateInteger(tournamentID, "tournamentID");
+        userID = validateInteger(userID, "userID");
         const existingFacilitator =
             await TournamentModel.searchTournamentFacilitators(
                 tournamentID,
@@ -222,8 +223,8 @@ const addTournamentFacilitator = async (tournamentID, userID) => {
 
 const removeTournamentFacilitator = async (tournamentID, userID) => {
     try {
-        const tournamentID = validateInteger(tournamentID, "tournamentID");
-        const userID = validateInteger(userID, "userID");
+        tournamentID = validateInteger(tournamentID, "tournamentID");
+        userID = validateInteger(userID, "userID");
         const existingFacilitator =
             await TournamentModel.searchTournamentFacilitators(
                 tournamentID,
@@ -272,9 +273,9 @@ const searchTournamentFacilitators = async (
  */
 const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
     try {
-        const tournamentID = validateInteger(tournamentID, "tournamentID");
-        const team1ID = validateInteger(team1ID, "team1ID");
-        const team2ID = validateInteger(team2ID, "team2ID");
+        tournamentID = validateInteger(tournamentID, "tournamentID");
+        team1ID = validateInteger(team1ID, "team1ID");
+        team2ID = validateInteger(team2ID, "team2ID");
         // Convert matchTime from an ISO 8601 string to MySQL DATETIME format ("YYYY-MM-DD HH:MM:SS").
         const formattedMatchTime = new Date(matchTime)
             .toISOString() // Converts to "2025-02-17T00:00:00.000Z"
@@ -325,8 +326,8 @@ const searchMatches = async (
         // If matchID is provided, use it exclusively for the search.
         if (matchID !== null) {
             // Convert the matchID to a number for validation.
-            const matchID = validateInteger(matchID, "matchID");
-            const match = await TournamentModel.searchMatches(
+            matchID = validateInteger(matchID, "matchID");
+            match = await TournamentModel.searchMatches(
                 matchID,
                 null,
                 null,
@@ -373,11 +374,11 @@ const searchMatches = async (
  */
 const updateMatchResult = async (matchID, winnerID, score1, score2) => {
     try {
-        const matchID = validateInteger(matchID, "matchID");
-        const winnerID = validateInteger(winnerID, "winnerID");
-        const score1 = validateInteger(score1, "score1");
-        const score2 = validateInteger(score2, "score2");
-        const match = await TournamentModel.updateMatchResult(
+        matchID = validateInteger(matchID, "matchID");
+        winnerID = validateInteger(winnerID, "winnerID");
+        score1 = validateInteger(score1, "score1");
+        score2 = validateInteger(score2, "score2");
+        match = await TournamentModel.updateMatchResult(
             matchID,
             winnerID,
             score1,
