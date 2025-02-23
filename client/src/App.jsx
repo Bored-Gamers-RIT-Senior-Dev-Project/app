@@ -19,8 +19,8 @@ import { Spinner } from "./components/Spinner";
 
 function App() {
     const desktop = useMediaQuery((theme) => theme.breakpoints.up("lg"));
-    //MobileDrawer state handles if the drawer is open/closed.  Default to open when on desktop.
-    const [mobileDrawer, setMobileDrawer] = useState(desktop);
+    //drawer state handles if the drawer is open/closed.  Default to open when on desktop.
+    const [drawer, setDrawer] = useState(desktop);
 
     return (
         <Box
@@ -52,7 +52,7 @@ function App() {
                 >
                     <IconButton
                         color="inherit"
-                        onClick={() => setMobileDrawer(!mobileDrawer)}
+                        onClick={() => setDrawer(!drawer)}
                         size="large"
                         edge="start"
                         sx={{ position: "absolute", left: { lg: 25, xs: 15 } }}
@@ -67,11 +67,7 @@ function App() {
                     <AccountIcon desktop={desktop} />
                 </Toolbar>
             </AppBar>
-            <NavDrawer
-                open={mobileDrawer}
-                onClose={() => setMobileDrawer(false)}
-                desktop={desktop}
-            />
+            <NavDrawer open={drawer} setOpen={setDrawer} desktop={desktop} />
             <Box component="main" sx={{ padding: 2 }}>
                 {/* Empty Toolbar ensures content is not hidden by the AppBar */}
                 <Toolbar />

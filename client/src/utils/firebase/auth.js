@@ -1,7 +1,9 @@
 import {
     createUserWithEmailAndPassword,
+    getAdditionalUserInfo,
     getAuth,
     GoogleAuthProvider,
+    onAuthStateChanged,
     signInWithEmailAndPassword,
     signInWithPopup,
 } from "firebase/auth";
@@ -18,7 +20,8 @@ authProvider.addScope("profile");
 //Sign-in functions
 const signInWithGoogle = async () => {
     const result = await signInWithPopup(auth, authProvider);
-    return result.user;
+    const additionalUserInfo = getAdditionalUserInfo(result);
+    return { ...result, additionalUserInfo };
 };
 const signInWithEmail = async (email, password) => {
     const result = await signInWithEmailAndPassword(auth, email, password);
@@ -31,9 +34,16 @@ const signUpWithEmail = async (email, password) => {
     return result.user;
 };
 
+const observeAuthState = (callback) => onAuthStateChanged(auth, callback);
+
+//TODO: .then() a snackbar confirming log-out was successful.
+const signOut = () => auth.signOut();
+
 export {
+    observeAuthState,
     // googleAuthProvider as authProvider,
     signInWithEmail,
     signInWithGoogle,
+    signOut,
     signUpWithEmail,
 };

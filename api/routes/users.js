@@ -6,7 +6,7 @@ const createError = require("http-errors");
 router.post("/get", async (req, res, next) => {
     const { token } = req.body;
     try {
-        const user = UserService.getUser(token);
+        const user = await UserService.getUser(token);
         return res.status(200).json(user);
     } catch (error) {
         next(error);
@@ -56,7 +56,7 @@ router.post("/signup", async (req, res, next) => {
         return res.status(400).json({ message: "Invalid request format." });
     }
     try {
-        const result = await UserService.signUp(
+        const user = await UserService.signUp(
             idToken,
             email,
             username,
@@ -65,7 +65,19 @@ router.post("/signup", async (req, res, next) => {
         );
         res.status(201).json({
             message: "Welcome!",
-            user: result,
+            user,
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post("/update", async (req, res, next) => {
+    const { idToken, ...body } = req.body;
+    try {
+        const user = await UserService.updateUser(idToken, body);
+        res.status(200).json({
+            message: "User updated",
         });
     } catch (error) {
         next(error);
