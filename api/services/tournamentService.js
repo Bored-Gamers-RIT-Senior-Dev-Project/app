@@ -20,6 +20,7 @@ const safeDecode = (value) => {
  * @throws {Error} Throws an error with status 400 if the value is not an integer.
  */
 const validateInteger = (value, fieldName) => {
+    value = Number(value);
     if (!Number.isInteger(value)) {
         const error = new Error(`Invalid ${fieldName}. Value must be integer.`);
         error.status = 400;
@@ -48,10 +49,9 @@ const createTournament = async (
     userRoleID
 ) => {
     try {
-        const userRoleIDnum = Number(userRoleID);
-        validateInteger(userRoleIDnum, "userRoleID");
+        const userRoleID = validateInteger(userRoleID, "userRoleID");
         // Check if the user has an authorized role (2=SuperAdmin or 3=AdminEmployee).
-        if (userRoleIDnum !== 2 && userRoleIDnum !== 3) {
+        if (userRoleID !== 2 && userRoleID !== 3) {
             const error = new Error(
                 "Unauthorized. Invalid userRoleID for tournament creation."
             );
@@ -116,8 +116,7 @@ const searchTournaments = async (
     try {
         // If tournamentID is provided, use it exclusively for the search.
         if (tournamentID !== null) {
-            const id = Number(tournamentID);
-            validateInteger(id, "tournamentID");
+            const tournamentID = validateInteger(tournamentID, "tournamentID");
             const tournament = await TournamentModel.searchTournaments(
                 tournamentID,
                 null,
@@ -177,18 +176,16 @@ const updateTournament = async (
     userRoleID = null
 ) => {
     try {
-        const userRoleIDnum = Number(userRoleID);
-        validateInteger(userRoleIDnum, "userRoleID");
+        const userRoleID = validateInteger(userRoleID, "userRoleID");
         // Check if the user has an authorized role (2=SuperAdmin or 3=AdminEmployee).
-        if (userRoleIDnum !== 2 && userRoleIDnum !== 3) {
+        if (userRoleID !== 2 && userRoleID !== 3) {
             const error = new Error(
                 "Unauthorized. Invalid user role for updating tournament details."
             );
             error.status = 401;
             throw error;
         }
-        const tournamentIDnum = Number(tournamentID);
-        validateInteger(tournamentIDnum, "tournamentID");
+        const tournamentID = validateInteger(tournamentID, "tournamentID");
         await TournamentModel.updateTournament(
             tournamentID,
             tournamentName,
@@ -207,22 +204,17 @@ const updateTournament = async (
 
 const addTournamentFacilitator = async (tournamentID, userID) => {
     try {
-        const tournamentIDnum = Number(tournamentID);
-        validateInteger(tournamentIDnum, "tournamentID");
-        const userIDnum = Number(userID);
-        validateInteger(userIDnum, "userID");
+        const tournamentID = validateInteger(tournamentID, "tournamentID");
+        const userID = validateInteger(userID, "userID");
         const existingFacilitator =
             await TournamentModel.searchTournamentFacilitators(
-                tournamentIDnum,
-                userIDnum
+                tournamentID,
+                userID
             );
         if (existingFacilitator && existingFacilitator.length > 0) {
             throw new Error("Facilitator already exists for this tournament.");
         }
-        await TournamentModel.addTournamentFacilitator(
-            tournamentIDnum,
-            userIDnum
-        );
+        await TournamentModel.addTournamentFacilitator(tournamentID, userID);
     } catch (error) {
         throw error;
     }
@@ -230,22 +222,17 @@ const addTournamentFacilitator = async (tournamentID, userID) => {
 
 const removeTournamentFacilitator = async (tournamentID, userID) => {
     try {
-        const tournamentIDnum = Number(tournamentID);
-        validateInteger(tournamentIDnum, "tournamentID");
-        const userIDnum = Number(userID);
-        validateInteger(userIDnum, "userID");
+        const tournamentID = validateInteger(tournamentID, "tournamentID");
+        const userID = validateInteger(userID, "userID");
         const existingFacilitator =
             await TournamentModel.searchTournamentFacilitators(
-                tournamentIDnum,
-                userIDnum
+                tournamentID,
+                userID
             );
         if (!existingFacilitator || existingFacilitator.length === 0) {
             throw new Error("Facilitator not found in this tournament.");
         }
-        await TournamentModel.removeTournamentFacilitator(
-            tournamentIDnum,
-            userIDnum
-        );
+        await TournamentModel.removeTournamentFacilitator(tournamentID, userID);
     } catch (error) {
         throw error;
     }
@@ -285,12 +272,9 @@ const searchTournamentFacilitators = async (
  */
 const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
     try {
-        const tournamentIDInt = Number(tournamentID);
-        const team1IDInt = Number(team1ID);
-        const team2IDInt = Number(team2ID);
-        validateInteger(tournamentIDInt, "tournamentID");
-        validateInteger(team1IDInt, "team1ID");
-        validateInteger(team2IDInt, "team2ID");
+        const tournamentID = validateInteger(tournamentID, "tournamentID");
+        const team1ID = validateInteger(team1ID, "team1ID");
+        const team2ID = validateInteger(team2ID, "team2ID");
         // Convert matchTime from an ISO 8601 string to MySQL DATETIME format ("YYYY-MM-DD HH:MM:SS").
         const formattedMatchTime = new Date(matchTime)
             .toISOString() // Converts to "2025-02-17T00:00:00.000Z"
@@ -341,8 +325,7 @@ const searchMatches = async (
         // If matchID is provided, use it exclusively for the search.
         if (matchID !== null) {
             // Convert the matchID to a number for validation.
-            const id = Number(matchID);
-            validateInteger(id, "matchID");
+            const matchID = validateInteger(matchID, "matchID");
             const match = await TournamentModel.searchMatches(
                 matchID,
                 null,
@@ -390,19 +373,15 @@ const searchMatches = async (
  */
 const updateMatchResult = async (matchID, winnerID, score1, score2) => {
     try {
-        const matchIDInt = Number(matchID);
-        const winnerIDInt = Number(winnerID);
-        const score1Int = Number(score1);
-        const score2Int = Number(score2);
-        validateInteger(matchIDInt, "matchID");
-        validateInteger(winnerIDInt, "winnerID");
-        validateInteger(score1Int, "score1");
-        validateInteger(score2Int, "score2");
+        const matchID = validateInteger(matchID, "matchID");
+        const winnerID = validateInteger(winnerID, "winnerID");
+        const score1 = validateInteger(score1, "score1");
+        const score2 = validateInteger(score2, "score2");
         const match = await TournamentModel.updateMatchResult(
-            matchIDInt,
-            winnerIDInt,
-            score1Int,
-            score2Int
+            matchID,
+            winnerID,
+            score1,
+            score2
         );
         return match;
     } catch (error) {
