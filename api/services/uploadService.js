@@ -1,4 +1,5 @@
 const sharp = require("sharp");
+const { createHash } = require("node:crypto");
 
 // The maximum length of the longest side of a user-uploaded image, in pixels:
 const MAX_LONGEST_SIDE = 1000;
@@ -14,15 +15,25 @@ const encodeImage = async (image) => {
         return await sharp(image)
             .resize(MAX_LONGEST_SIDE, MAX_LONGEST_SIDE, {
                 fit: "inside",
-                withoutEnlargement: true
+                withoutEnlargement: true,
             })
             .webp()
-            .toBuffer()
-
+            .toBuffer();
     } catch (e) {
         console.warn(e);
         return null;
     }
-}
+};
 
-module.exports = { encodeImage };
+/**
+ * Hash a buffer with sha1
+ * @param {Buffer} buffer
+ * @returns {string} sha1 of the buffer, base64url encoded
+ */
+const hash = (buffer) => {
+    const hash = createHash("sha1");
+    hash.update(buffer);
+    return hash.digest("base64url");
+};
+
+module.exports = { encodeImage, hash };
