@@ -24,6 +24,7 @@ const makeAction =
         if (spinner) events.publish("spinner.close");
         return response;
     };
+
 const router = createBrowserRouter([
     {
         path: "/",
@@ -57,10 +58,6 @@ const router = createBrowserRouter([
                 element: "TODO: About Page",
             },
             {
-            {
-                path: "/settings",
-                element: <UserSettings />,
-            },
                 path: "/rules",
                 element: <Rules />,
             },

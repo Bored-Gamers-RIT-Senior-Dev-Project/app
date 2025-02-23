@@ -20,7 +20,6 @@ const buildNavLinks = (user) => {
             links: [
                 { key: "homepage", text: "Home", path: "/" },
                 { key: "schedule", text: "Schedule", path: "/schedule" },
-                { key: "settings", text: "UserSettings", path: "/settings" },
                 {
                     key: "search",
                     text: "Search Teams & Schools",
@@ -29,7 +28,6 @@ const buildNavLinks = (user) => {
                 { key: "about", text: 'About "A New World"', path: "/about" },
                 { key: "rules", text: "Rules", path: "/rules" },
                 { key: "faq", text: "FAQ", path: "/faq" },
-              
             ],
         },
     ];
