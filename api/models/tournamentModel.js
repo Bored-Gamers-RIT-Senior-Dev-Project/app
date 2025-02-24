@@ -216,7 +216,7 @@ const updateTournamentParticipant = async (
         }
 
         if (updates.length === 0) {
-            throw new Error("No params provided for tournament update.");
+            throw new Error("No params provided for participant update.");
         }
 
         params.push(tournamentID);
