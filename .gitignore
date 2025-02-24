@@ -154,4 +154,4 @@ node_modules/
 .com.apple.timemachine.donotpresent
 
 # The directory where user images are stored
-user_images/
+api/user-images/*

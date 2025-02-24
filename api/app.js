@@ -15,6 +15,9 @@ const university = require("./routes/university");
 const teams = require("./routes/teams");
 const createError = require("http-errors");
 
+const uploadService = require("./services/uploadService");
+uploadService.test();
+
 //Initialize Express
 const express = require("express");
 const app = express();
@@ -32,6 +35,8 @@ app.use("/api", index);
 app.use("/api/users", users);
 app.use("/api/university", university);
 app.use("/api/teams", teams);
+app.use("/api", test);
+app.use("/user-images", express.static(__dirname + "/user-images"));
 
 //404 any routes not defined above
 app.use((_req, _res, next) => {

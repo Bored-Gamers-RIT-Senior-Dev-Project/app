@@ -5,7 +5,7 @@ const fs = require("node:fs/promises");
 // The maximum length of the longest side of a user-uploaded image, in pixels:
 const MAX_LONGEST_SIDE = 1000;
 // The directory to where images are stored
-const USER_IMAGE_DIRECTORY = __dirname + "../../user-images";
+const USER_IMAGE_DIRECTORY = __dirname + "/../user-images/";
 /**
  * Encode image as WEBP, discarding any metadata
  * Also, resize image so that it is at most 1000px on it's longest side
@@ -61,5 +61,16 @@ const saveImage = async (name, image) => {
     return path;
 };
 
+const test = async () => { // TODO: Delete me, also, real unit testing
+    const jpeg = await fs.readFile(__dirname + "/test.jpg");
+    const webp = await encodeImage(jpeg)
+    const h = hash(webp);
+    saveImage(`${h}.webp`, webp);
 
-module.exports = { encodeImage, hash, saveImage };
+    const worstCase = await fs.readFile(__dirname + "/worst_case.png");
+    const worstCaseWebp = await encodeImage(worstCase)
+    const worstCaseHash = hash(worstCaseWebp);
+    saveImage(`${worstCaseHash}.webp`, worstCase);
+}
+
+module.exports = { encodeImage, hash, saveImage, test };
