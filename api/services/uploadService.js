@@ -39,16 +39,16 @@ const hash = (buffer) => {
     return hash.digest("base64url");
 };
 
-
 /**
  * Save an image to the disk
  * @param {string} name the name of the image
  * @param {Buffer} image a buffer containing the image data
- * @return {string} The path to the file saved
  */
 const saveImage = async (name, image) => {
     if (image.byteLength > 1e6) {
-        console.warn(`saveImage: Image ${name} is very large! ${image.byteLength} bytes!`);
+        console.warn(
+            `saveImage: Image ${name} is very large! ${image.byteLength} bytes!`
+        );
     }
     await fs.mkdir(USER_IMAGE_DIRECTORY, {
         recursive: true,
@@ -58,19 +58,19 @@ const saveImage = async (name, image) => {
     await fs.writeFile(path, image, {
         mode: 0o644,
     });
-    return path;
 };
 
-const test = async () => { // TODO: Delete me, also, real unit testing
+const test = async () => {
+    // TODO: Delete me, also, real unit testing
     const jpeg = await fs.readFile(__dirname + "/test.jpg");
-    const webp = await encodeImage(jpeg)
+    const webp = await encodeImage(jpeg);
     const h = hash(webp);
     saveImage(`${h}.webp`, webp);
 
     const worstCase = await fs.readFile(__dirname + "/worst_case.png");
-    const worstCaseWebp = await encodeImage(worstCase)
+    const worstCaseWebp = await encodeImage(worstCase);
     const worstCaseHash = hash(worstCaseWebp);
     saveImage(`${worstCaseHash}.webp`, worstCase);
-}
+};
 
 module.exports = { encodeImage, hash, saveImage, test };
