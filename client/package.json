@@ -18,7 +18,7 @@
         "axios": "^1.7.9",
         "firebase": "^11.3.0",
 
-        "@mui/icons-material": "^6.4.4",
+        "@mui/icons-material": "^6.4.5",
         "@mui/material": "^6.4.5",
         "@zxcvbn-ts/core": "^3.0.4",
         "@zxcvbn-ts/language-common": "^3.0.4",
