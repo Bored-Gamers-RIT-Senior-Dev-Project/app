@@ -149,6 +149,89 @@ const searchTournaments = async (
     }
 };
 
+const addTournamentParticipants = async (tournamentID, teamID) => {
+    try {
+        await db.query(
+            `INSERT INTO TournamentParticipants (TournamentID, TeamID) VALUES (?, ?)`,
+            [tournamentID, teamID]
+        );
+    } catch (error) {
+        console.error("Error adding team to tournament:", error);
+        throw error;
+    }
+};
+
+const removeTournamentParticipants = async (tournamentID, teamID) => {
+    try {
+        await db.query(
+            `DELETE FROM TournamentParticipants WHERE TournamentID = ? AND TeamID = ?`,
+            [tournamentID, teamID]
+        );
+    } catch (error) {
+        console.error("Error removing team from tournament:", error);
+        throw error;
+    }
+};
+
+const updateTournamentParticipant = async (
+    tournamentID,
+    teamID,
+    round,
+    byes,
+    status,
+    bracketSide,
+    nextMatchID
+) => {
+    try {
+        let updates = [];
+        let params = [];
+
+        if (tournamentID) {
+            updates.push("TournamentID = ?");
+            params.push(tournamentID);
+        }
+        if (teamID) {
+            updates.push("TeamID = ?");
+            params.push(teamID);
+        }
+        if (round) {
+            updates.push("Round = ?");
+            params.push(round);
+        }
+        if (byes) {
+            updates.push("Status = ?");
+            params.push(status);
+        }
+        if (status) {
+            updates.push("Status = ?");
+            params.push(status);
+        }
+        if (bracketSide) {
+            updates.push("BracketSide = ?");
+            params.push(bracketSide);
+        }
+        if (nextMatchID) {
+            updates.push("NextMatchID = ?");
+            params.push(nextMatchID);
+        }
+
+        if (updates.length === 0) {
+            throw new Error("No params provided for tournament update.");
+        }
+
+        params.push(tournamentID);
+        params.push(teamID);
+
+        const updateQuery = `UPDATE TournamentParticipants SET ${updates.join(
+            ", "
+        )} WHERE TournamentID = ? AND TeamID = ?`;
+        await db.query(updateQuery, params);
+    } catch (error) {
+        console.error("Error updating participant:", error);
+        throw error.message;
+    }
+};
+
 const addTournamentFacilitator = async (tournamentID, userID) => {
     try {
         const [result] = await db.query(
@@ -407,6 +490,9 @@ module.exports = {
     createTournament,
     searchTournaments,
     updateTournamentDetails,
+    addTournamentParticipants,
+    removeTournamentParticipants,
+    updateTournamentParticipant,
     addTournamentFacilitator,
     removeTournamentFacilitator,
     searchTournamentFacilitators,
