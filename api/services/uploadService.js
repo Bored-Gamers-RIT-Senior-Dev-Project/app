@@ -1,11 +1,11 @@
 const sharp = require("sharp");
 const { createHash } = require("node:crypto");
-const fs = require("node:fs/promises")
+const fs = require("node:fs/promises");
 
 // The maximum length of the longest side of a user-uploaded image, in pixels:
 const MAX_LONGEST_SIDE = 1000;
 // The directory to where images are stored
-const USER_IMAGE_DIRECTORY = __dirname + "../user-images"
+const USER_IMAGE_DIRECTORY = __dirname + "../../user-images";
 /**
  * Encode image as WEBP, discarding any metadata
  * Also, resize image so that it is at most 1000px on it's longest side
@@ -39,12 +39,27 @@ const hash = (buffer) => {
     return hash.digest("base64url");
 };
 
-module.exports = { encodeImage, hash };
 
 /**
  * Save an image to the disk
  * @param {string} name the name of the image
  * @param {Buffer} image a buffer containing the image data
+ * @return {string} The path to the file saved
  */
 const saveImage = async (name, image) => {
-}
+    if (image.byteLength > 1e6) {
+        console.warn(`saveImage: Image ${name} is very large! ${image.byteLength} bytes!`);
+    }
+    await fs.mkdir(USER_IMAGE_DIRECTORY, {
+        recursive: true,
+        mode: 0o755,
+    });
+    const path = USER_IMAGE_DIRECTORY + name;
+    await fs.writeFile(path, image, {
+        mode: 0o644,
+    });
+    return path;
+};
+
+
+module.exports = { encodeImage, hash, saveImage };
