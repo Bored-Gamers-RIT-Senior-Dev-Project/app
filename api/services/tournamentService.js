@@ -156,7 +156,7 @@ const searchTournaments = async (
 /**
  * Updates the tournament state in the database.
  */
-const updateTournament = async (
+const updateTournamentDetails = async (
     tournamentID = null,
     tournamentName = null,
     startDate = null,
@@ -373,7 +373,7 @@ const updateMatchResult = async (matchID, winnerID, score1, score2) => {
 module.exports = {
     createTournament,
     searchTournaments,
-    updateTournament,
+    updateTournamentDetails,
     addTournamentFacilitator,
     removeTournamentFacilitator,
     searchTournamentFacilitators,

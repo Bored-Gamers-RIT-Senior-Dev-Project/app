@@ -218,7 +218,7 @@ const searchTournamentFacilitators = async (
     }
 };
 
-const updateTournament = async (
+const updateTournamentDetails = async (
     tournamentID,
     tournamentName,
     startDate,
@@ -406,7 +406,7 @@ const updateMatchResult = async (matchID, winnerID, team1Score, team2Score) => {
 module.exports = {
     createTournament,
     searchTournaments,
-    updateTournament,
+    updateTournamentDetails,
     addTournamentFacilitator,
     removeTournamentFacilitator,
     searchTournamentFacilitators,

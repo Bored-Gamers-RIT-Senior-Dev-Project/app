@@ -65,7 +65,7 @@ router.get("/search", async (req, res, next) => {
     }
 });
 
-router.post("/update", async (req, res, next) => {
+router.post("/updateDetails", async (req, res, next) => {
     const { tournamentID, tournamentName, startDate, endDate, location } =
         req.body;
     if (!tournamentID) {
