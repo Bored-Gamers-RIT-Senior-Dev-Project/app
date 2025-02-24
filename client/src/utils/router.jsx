@@ -7,6 +7,7 @@ import {
     Schedule,
     Search,
     University,
+    UserSettings,
     UserSignIn,
     UserSignUp,
 } from "../pages";
@@ -57,10 +58,10 @@ const router = createBrowserRouter([
                 element: "TODO: About Page",
             },
             {
-            {
                 path: "/settings",
                 element: <UserSettings />,
             },
+            {
                 path: "/rules",
                 element: <Rules />,
             },
