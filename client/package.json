@@ -29,7 +29,7 @@
         "postal": "^2.0.6",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
-        "react-router": "^7.1.5"
+        "react-router": "^7.2.0"
     },
     "devDependencies": {
         "@eslint/js": "^9.20.0",
