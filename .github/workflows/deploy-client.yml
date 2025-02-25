@@ -1,6 +1,11 @@
 name: Build and Deploy Client to Staging Host
 
 on:
+    # Trigger on push to the main branch
+    #  push:
+    #    branches:
+    #      - main
+
     workflow_dispatch:
         inputs:
             branch:
