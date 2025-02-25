@@ -183,6 +183,81 @@ const updateTournamentDetails = async (
     }
 };
 
+const addTournamentParticipant = async (tournamentID, teamID) => {
+    try {
+        tournamentID = validateInteger(tournamentID, "tournamentID");
+        teamID = validateInteger(teamID, "teamID");
+        const existingParticipant =
+            await TournamentModel.searchTournamentParticipants(
+                tournamentID,
+                teamID
+            );
+        if (existingParticipant && existingParticipant.length > 0) {
+            throw new Error("Team is already registered for this tournament.");
+        }
+        await TournamentModel.addTournamentParticipant(tournamentID, teamID);
+    } catch (error) {
+        throw error;
+    }
+};
+
+const removeTournamentParticipant = async (tournamentID, teamID) => {
+    try {
+        tournamentID = validateInteger(tournamentID, "tournamentID");
+        teamID = validateInteger(teamID, "teamID");
+        const existingParticipant =
+            await TournamentModel.searchTournamentParticipants(
+                tournamentID,
+                teamID
+            );
+        if (!existingParticipant || existingParticipant.length === 0) {
+            throw new Error("Participant not found in this tournament.");
+        }
+        await TournamentModel.removeTournamentParticipant(tournamentID, teamID);
+    } catch (error) {
+        throw error;
+    }
+};
+
+const searchTournamentParticipants = async (
+    tournamentID,
+    teamID,
+    round,
+    byes,
+    status,
+    bracketSide,
+    nextMatchID,
+    universityID,
+    teamName,
+    teamLeaderID,
+    isApproved,
+    universityName,
+    sortBy,
+    sortAsDescending
+) => {
+    try {
+        const tournament = await TournamentModel.searchTournamentParticipants(
+            tournamentID,
+            teamID,
+            round,
+            byes,
+            status,
+            bracketSide,
+            nextMatchID,
+            universityID,
+            teamName,
+            teamLeaderID,
+            isApproved,
+            universityName,
+            sortBy,
+            sortAsDescending
+        );
+        return tournament;
+    } catch (error) {
+        throw error;
+    }
+};
+
 const addTournamentFacilitator = async (tournamentID, userID) => {
     try {
         tournamentID = validateInteger(tournamentID, "tournamentID");
@@ -374,6 +449,8 @@ module.exports = {
     createTournament,
     searchTournaments,
     updateTournamentDetails,
+    addTournamentParticipant,
+    removeTournamentParticipant,
     addTournamentFacilitator,
     removeTournamentFacilitator,
     searchTournamentFacilitators,

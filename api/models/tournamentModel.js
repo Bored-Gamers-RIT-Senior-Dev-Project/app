@@ -232,6 +232,125 @@ const updateTournamentParticipant = async (
     }
 };
 
+const searchTournamentParticipants = async (
+    tournamentID,
+    teamID,
+    teamName,
+    teamLeaderID,
+    teamLeaderName,
+    round,
+    byes,
+    status,
+    bracketSide,
+    nextMatchID,
+    universityID,
+    universityName,
+    isApproved,
+    sortBy,
+    sortAsDescending
+) => {
+    try {
+        let searchQuery = `
+        SELECT 
+            TournamentParticipants.TeamID,
+            TournamentParticipants.Round AS TeamRound,
+            TournamentParticipants.Byes AS TeamByeCount,
+            TournamentParticipants.Status AS ParticipantStatus,
+            TournamentParticipants.BracketSide AS TeamBracketSide,
+            TournamentParticipants.NextMatchID AS TeamNextMatchID,
+            TournamentParticipants.BracketOrder AS TeamBracketOrder,
+            TournamentParticipants.TournamentID,
+            Tournaments.TournamentName,
+            Tournaments.Status AS TournamentStatus,
+            Teams.TeamName,
+            Teams.ProfileImageURL AS TeamProfileImageURL,
+            Teams.TeamLeaderID,
+            Teams.IsApproved AS TeamApprovalStatus,
+            Teams.CreatedAt AS TeamCreatedAt,
+            CONCAT(Users.FirstName, ' ', Users.LastName) AS TeamLeaderFullName,
+            Universities.UniversityName,
+            Universities.LogoURL AS UniversityLogoURL
+            FROM TournamentParticipants
+            JOIN Tournaments ON TournamentParticipants.TournamentID = Tournaments.TournamentID
+            JOIN Teams ON TournamentParticipants.TeamID = Teams.TeamID
+            JOIN Universities ON Teams.UniversityID = Universities.UniversityID
+            JOIN Users ON Teams.TeamLeaderID = Users.UserID
+        WHERE 1=1
+      `;
+        const params = [];
+
+        if (tournamentID) {
+            searchQuery += " AND TournamentParticipants.TournamentID = ?";
+            params.push(tournamentID);
+        }
+        if (teamID) {
+            searchQuery += " AND TournamentParticipants.TeamID = ?";
+            params.push(teamID);
+        }
+        if (teamLeaderName) {
+            searchQuery += " AND Users.";
+        }
+        // Check for round, ensuring zero is allowed
+        if (round) {
+            searchQuery += " AND TournamentParticipants.Round = ?";
+            params.push(round);
+        }
+        // Check for byes similarly
+        if (byes) {
+            searchQuery += " AND TournamentParticipants.Byes = ?";
+            params.push(byes);
+        }
+        if (status) {
+            searchQuery += " AND TournamentParticipants.Status = ?";
+            params.push(status);
+        }
+        if (bracketSide) {
+            searchQuery += " AND TournamentParticipants.BracketSide = ?";
+            params.push(bracketSide);
+        }
+        if (nextMatchID) {
+            searchQuery += " AND TournamentParticipants.NextMatchID = ?";
+            params.push(nextMatchID);
+        }
+        if (universityID) {
+            searchQuery += " AND Teams.UniversityID = ?";
+            params.push(universityID);
+        }
+        if (teamName) {
+            searchQuery += " AND Teams.TeamName LIKE ?";
+            params.push(`%${teamName}%`);
+        }
+        if (teamLeaderID) {
+            searchQuery += " AND Teams.TeamLeaderID = ?";
+            params.push(teamLeaderID);
+        }
+        if (isApproved) {
+            searchQuery += " AND Teams.IsApproved = ?";
+            params.push(isApproved);
+        }
+        if (universityName) {
+            searchQuery += " AND Users.UniversityName LIKE ?";
+            params.push(`%${universityName}%`);
+        }
+        if (sortBy) {
+            search += " ORDER BY " + sortBy;
+        }
+        if (sortBy && sortAsDescending) {
+            search += " DESC";
+        }
+
+        console.log("Tournament Search Query:", searchQuery, params);
+        const [rows] = await db.query(searchQuery, params);
+        return rows;
+    } catch (error) {
+        console.error(
+            "Error searching for tournament participants:",
+            error.message
+        );
+        throw error;
+    }
+};
+
 const addTournamentFacilitator = async (tournamentID, userID) => {
     try {
         const [result] = await db.query(
@@ -493,6 +612,7 @@ module.exports = {
     addTournamentParticipants,
     removeTournamentParticipants,
     updateTournamentParticipant,
+    searchTournamentParticipants,
     addTournamentFacilitator,
     removeTournamentFacilitator,
     searchTournamentFacilitators,
