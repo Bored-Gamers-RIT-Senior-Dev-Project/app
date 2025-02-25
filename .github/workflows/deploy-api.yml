@@ -1,25 +1,62 @@
 name: Build and Deploy API to Staging Host
 
 on:
-#  # Trigger on push to the main branch
-#  push:
-#    branches:
-#      - main
+    # Trigger on push to the main branch
+    #  push:
+    #    branches:
+    #      - main
 
-  # Allows manual execution from any branch
-  workflow_dispatch:
-    inputs:
-      branch:
-        description: "Branch to deploy"  # User chooses the branch to deploy
-        required: false
-        default: "main"  # Default branch if no input is provided
+    # Allows manual execution from any branch
+    workflow_dispatch:
+        inputs:
+            branch:
+                description: "Branch to deploy" # User chooses the branch to deploy
+                required: false
+                default: "main" # Default branch if no input is provided
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+    build-and-deploy:
+        runs-on: self-hosted
 
-    steps:
-      - uses: actions/checkout@v4
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.inputs.branch || github.ref_name }}
 
-      - name: Placeholder
-        run: echo This is a placeholder workflow
+            - name: Build Docker Image
+              run: |
+                  docker buildx build --network=host -t bg-api ./api
+
+            - name: Save and Transfer Docker Image to Server
+              run: |
+                  docker save bg-api -o bg-api.tar
+                  ssh-keyscan -t ed25519 ${{ secrets.SSH_STAGING_HOST }} >> ~/.ssh/known_hosts
+                  scp bg-api.tar ${{ secrets.SSH_USER }}@${{ secrets.SSH_STAGING_HOST }}:/tmp/bg-api.tar
+
+            - name: Deploy Application via SSH
+              run: |
+                  ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_STAGING_HOST }} << 'EOF'
+                    CONTAINER_NAME=bg-api_app
+                    IMAGE_TAR=/tmp/bg-api.tar
+                    echo "Container Name: $CONTAINER_NAME"
+                    echo "Image .tar Name: $IMAGE_TAR"
+
+                    # Load the Docker image
+                    echo "Loading $IMAGE_TAR"
+                    docker load -i "$IMAGE_TAR"
+
+                    # Stop and remove old container if it exists
+                    echo "Stopping running containers..."
+                    docker stop "$CONTAINER_NAME" || true
+                    echo "Removing previous containers..."
+                    docker rm "$CONTAINER_NAME" || true
+
+                    # Run the new container on port 5173
+                    echo "Running container: $CONTAINER_NAME"
+                    docker run -d --name "$CONTAINER_NAME" -p 3000:3000 bg-api
+
+                    # Clean up image tar file
+                    echo "Cleaning up image file..."
+                    rm -f "$IMAGE_TAR"
+                  EOF
