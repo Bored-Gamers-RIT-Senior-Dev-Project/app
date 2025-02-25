@@ -112,6 +112,126 @@ router.post("/cancel", async (req, res, next) => {
     }
 });
 
+router.post("/addTeam", async (req, res, next) => {
+    const { tournamentID, teamID } = req.body;
+    if (!tournamentID || !teamID) {
+        return res.status(400).json({ message: "Invalid request format." });
+    }
+    try {
+        const teams = await TournamentService.addTournamentParticipant(
+            tournamentID,
+            teamID
+        );
+        res.status(201).json({
+            message: "Team added to tournament successfully",
+            teams,
+        });
+    } catch (error) {
+        if (error.message === "Team already exists for this tournament.") {
+            return res.status(409).json({ error: error.message });
+        }
+        res.status(500).json({ error: "An unexpected error occurred." });
+    }
+});
+
+router.post("/removeTeam", async (req, res) => {
+    const { tournamentID, teamID } = req.body;
+    if (!tournamentID || !teamID) {
+        return res.status(400).json({ message: "Invalid request format." });
+    }
+    try {
+        const teams = await TournamentService.removeTournamentParticipant(
+            tournamentID,
+            teamID
+        );
+        res.status(201).json({
+            message: "Team removed from tournament successfully",
+            teams,
+        });
+    } catch (error) {
+        if (error.message === "Team not found in this tournament.") {
+            return res.status(200).json({ error: error.message });
+        }
+        res.status(500).json({ error: "An unexpected error occurred." });
+    }
+});
+
+router.post("/disqualifyTeam", async (req, res) => {
+    const { tournamentID, teamID } = req.body;
+    if (!tournamentID || !teamID) {
+        return res.status(400).json({ message: "Invalid request format." });
+    }
+    try {
+        const teams = await TournamentService.updateTournamentParticipant(
+            tournamentID,
+            teamID,
+            null,
+            null,
+            "disqualified",
+            null,
+            null
+        );
+        res.status(201).json({
+            message: "Team disqualified from tournament successfully",
+            teams,
+        });
+    } catch (error) {
+        if (error.message === "Team not found in this tournament.") {
+            return res.status(200).json({ error: error.message });
+        }
+        res.status(500).json({ error: "An unexpected error occurred." });
+    }
+});
+
+router.get("/searchParticipants", async (req, res, next) => {
+    const {
+        tournamentID,
+        teamID,
+        round,
+        byes,
+        status,
+        bracketSide,
+        nextMatchID,
+        universityID,
+        teamName,
+        teamLeaderID,
+        isApproved,
+        universityName,
+        sortBy,
+        sortAsDescending,
+    } = req.query;
+    try {
+        const participant =
+            await TournamentService.searchTournamentParticipants(
+                tournamentID,
+                teamID,
+                round,
+                byes,
+                status,
+                bracketSide,
+                nextMatchID,
+                universityID,
+                teamName,
+                teamLeaderID,
+                isApproved,
+                universityName,
+                sortBy,
+                sortAsDescending
+            );
+        if (teamID && tournamentID && participant === null) {
+            return res
+                .status(404)
+                .json({ error: "Participant not found in tournament." });
+        }
+        if (!tournamentID && !teamID && participant === null) {
+            return res.status(200).json([]);
+        }
+        return res.status(200).json(participant);
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.post("/addFacilitator", async (req, res, next) => {
     const { tournamentID, userID } = req.body;
     if (!tournamentID || !userID) {

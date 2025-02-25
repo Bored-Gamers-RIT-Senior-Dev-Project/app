@@ -258,6 +258,31 @@ const searchTournamentParticipants = async (
     }
 };
 
+const updateTournamentParticipant = async (
+    tournamentID,
+    teamID,
+    round,
+    byes,
+    status,
+    bracketSide,
+    nextMatchID
+) => {
+    try {
+        const participant = await TournamentModel.searchTournamentParticipants(
+            tournamentID,
+            teamID,
+            round,
+            byes,
+            status,
+            bracketSide,
+            nextMatchID
+        );
+        return participant;
+    } catch (error) {
+        throw error;
+    }
+};
+
 const addTournamentFacilitator = async (tournamentID, userID) => {
     try {
         tournamentID = validateInteger(tournamentID, "tournamentID");
@@ -452,6 +477,7 @@ module.exports = {
     addTournamentParticipant,
     removeTournamentParticipant,
     searchTournamentParticipants,
+    updateTournamentParticipant,
     addTournamentFacilitator,
     removeTournamentFacilitator,
     searchTournamentFacilitators,
