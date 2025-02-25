@@ -451,6 +451,7 @@ module.exports = {
     updateTournamentDetails,
     addTournamentParticipant,
     removeTournamentParticipant,
+    searchTournamentParticipants,
     addTournamentFacilitator,
     removeTournamentFacilitator,
     searchTournamentFacilitators,
