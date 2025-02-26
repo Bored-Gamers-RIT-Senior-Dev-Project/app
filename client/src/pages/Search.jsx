@@ -1,9 +1,10 @@
 import { useState } from "react";
 
-import SearchIcon from "@mui/icons-material/Search";
+import { Error, Search as SearchIcon } from "@mui/icons-material";
 import {
     Autocomplete,
     Box,
+    Button,
     FormControl,
     FormLabel,
     InputLabel,
@@ -15,6 +16,7 @@ import {
 } from "@mui/material";
 import InputBase from "@mui/material/InputBase";
 import { alpha, styled } from "@mui/material/styles";
+import { usePostSubmit } from "../hooks/usePostSubmit";
 
 const universityList = [
     "Rochester Institute of Technology",
@@ -63,6 +65,8 @@ const Search = () => {
     const [selectedUniversity, setSelectedUniversity] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
     const [sorting, setSorting] = useState("");
+    const [searchBar, setSearchBar] = useState("");
+    const submit = usePostSubmit();
 
     return (
         <>
