@@ -1,12 +1,14 @@
 import { useState } from "react";
 
-import { Error, Search as SearchIcon } from "@mui/icons-material";
+import { Search as SearchIcon } from "@mui/icons-material";
+
 import {
     Autocomplete,
     Box,
     Button,
     FormControl,
     FormLabel,
+    InputAdornment,
     InputLabel,
     MenuItem,
     Paper,
@@ -75,13 +77,21 @@ const Search = () => {
                     Search
                 </Typography>
 
-                <SearchBar>
-                    <SearchIconWrapper>
+                <TextField
+                    label="Search"
+                    variant="filled"
+                    name="search"
+                    slotProps={{
+                        input: {
+                            startAdornment: (
+                                <InputAdornment position="start">
                         <SearchIcon />
-                    </SearchIconWrapper>
-                    <StyledInputBase
-                        placeholder="Search…"
-                        inputProps={{ "aria-label": "search" }}
+                                </InputAdornment>
+                            ),
+                        },
+                    }}
+                    value={searchBar}
+                    onChange={(_e, value) => setSearchBar(value)}
                     />
                 </SearchBar>
             </Paper>
