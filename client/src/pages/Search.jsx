@@ -1,11 +1,13 @@
 import { Search as SearchIcon } from "@mui/icons-material";
 import { useState } from "react";
 
+import { Search as SearchIcon } from "@mui/icons-material";
+
 import {
     Box,
     Button,
     FormControl,
-    Grid2 as Grid,
+    FormLabel,
     InputAdornment,
     InputLabel,
     Paper,
@@ -91,106 +93,80 @@ const Search = () => {
                 <Typography variant="h4" textAlign="center" sx={{ pb: 3 }}>
                     Search
                 </Typography>
-                <Grid
-                    container
-                    spacing={1}
-                    component="form"
-                    onKeyDown={(e) =>
-                        e.key === "Enter" ? handleSearch() : null
-                    }
-                    onSubmit={(e) => {
-                        e.preventDefault();
+
+                <TextField
+                    label="Search"
+                    variant="filled"
+                    name="search"
+                    slotProps={{
+                        input: {
+                            startAdornment: (
+                                <InputAdornment position="start">
+                        <SearchIcon />
+                                </InputAdornment>
+                            ),
+                        },
                     }}
-                >
-                    <Grid size={{ xs: 12, md: 9 }}>
-                        <TextField
-                            label="Search"
-                            variant="outlined"
-                            color="primary"
-                            name="search"
-                            slotProps={{
-                                input: {
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <SearchIcon />
-                                        </InputAdornment>
-                                    ),
-                                },
-                            }}
-                            value={searchBar}
-                            onChange={(e) => setSearchBar(e.target.value)}
-                            sx={{ width: "100%" }}
-                        />
-                    </Grid>
-                    <Grid size={{ xs: 6, md: 3 }}>
-                        <FormControl fullWidth>
-                            <InputLabel htmlFor="sortBy" id="sortByLabel">
-                                Sort By
-                            </InputLabel>
-                            <DynamicSelect
-                                fullWidth
-                                id="sortBy"
-                                labelId="sortByLabel"
-                                label="Sort By"
-                                variant="outlined"
-                                value={sorting}
-                                onChange={({ target }) =>
-                                    setSorting(target.value)
-                                }
-                                options={{
-                                    alphabetical: "Alphabetical",
-                                    universityName: "University Name",
-                                }}
-                                onKeyDown={(e) => console.log(e)}
-                            />
-                        </FormControl>
-                    </Grid>
-                    <Grid size={2}>
-                        <Button variant="contained" onClick={handleSearch}>
-                            Search
-                        </Button>
-                    </Grid>
-                </Grid>
-                {/* <Accordion>
-                    <AccordionSummary expandIcon={<ExpandMore />}>
-                        Advanced Search
-                    </AccordionSummary>
-                    <AccordionDetails>
-                        <Grid container spacing={1}>
-                            <Grid size={{ xs: 12, md: 6 }}>
-                                <Autocomplete
-                                    options={universityList}
-                                    value={selectedUniversity}
-                                    onChange={(e, newValue) =>
-                                        setSelectedUniversity(newValue)
-                                    }
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            label="University Name"
-                                        />
-                                    )}
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12, md: 6 }}>
-                                <Autocomplete
-                                    options={cityList}
-                                    value={selectedCity}
-                                    onChange={(e, newValue) =>
-                                        setSelectedCity(newValue)
-                                    }
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            label="Home City"
-                                        />
-                                    )}
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12, md: 6 }}></Grid>
-                        </Grid>
-                    </AccordionDetails>
-                </Accordion> */}
+                    value={searchBar}
+                    onChange={(_e, value) => setSearchBar(value)}
+                    />
+                </SearchBar>
+            </Paper>
+            <Paper variant="outlined" sx={{ mt: 2, mb: 2, padding: 2 }}>
+                <FormLabel>Advanced Search</FormLabel>
+                <Autocomplete
+                    sx={{ mt: 2 }}
+                    options={universityList}
+                    value={selectedUniversity}
+                    onChange={(e, newValue) => setSelectedUniversity(newValue)}
+                    renderInput={(params) => (
+                        <TextField {...params} label="Select your University" />
+                    )}
+                />
+                <Autocomplete
+                    sx={{ mt: 2 }}
+                    options={cityList}
+                    value={selectedCity}
+                    onChange={(e, newValue) => setSelectedCity(newValue)}
+                    renderInput={(params) => (
+                        <TextField {...params} label="Select your City" />
+                    )}
+                />
+                <Box sx={{ mt: 2 }}>
+                    <FormControl fullWidth>
+                        <InputLabel>Sort by:</InputLabel>
+                        <Select
+                            value={sorting}
+                            onChange={(e) => setSorting(e.target.value)}
+                        >
+                            <MenuItem value="popularity">Popularity</MenuItem>
+                            <MenuItem value="recent_activity">
+                                Recent Activity
+                            </MenuItem>
+                            <MenuItem value="win_rate">Win Rate</MenuItem>
+                            <MenuItem value="rank">Rank</MenuItem>
+                            <MenuItem value="members">
+                                Number of Members
+                            </MenuItem>
+                            <MenuItem value="date_created">
+                                Date Created (Newest First)
+                            </MenuItem>
+                            <MenuItem value="alphabetical">
+                                Alphabetical Order (A-Z)
+                            </MenuItem>
+                            <MenuItem value="upcoming_matches">
+                                Upcoming Matches
+                            </MenuItem>
+                            <MenuItem value="availability">
+                                Team Availability
+                            </MenuItem>
+                            <MenuItem value="game_mode">
+                                Game Mode Specialization
+                            </MenuItem>
+                            <MenuItem value="region">Region/Location</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Box>
             </Paper>
             {results.length === 0 ? (
                 <Paper>
