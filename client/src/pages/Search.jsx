@@ -1,5 +1,5 @@
 import { Search as SearchIcon } from "@mui/icons-material";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import {
     Box,
@@ -12,50 +12,56 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-
-import { useActionData, useLoaderData, useNavigate } from "react-router";
-import { DynamicSelect } from "../components/DynamicSelect";
-import { InfoElement } from "../components/InfoElement";
+import InputBase from "@mui/material/InputBase";
+import { alpha, styled } from "@mui/material/styles";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 
+const universityList = [
+    "Rochester Institute of Technology",
+    "Harvard University",
+    "MIT",
+    "Stanford University",
+];
+
+const cityList = [
+    "Rochester",
+    "New York City",
+    "Los Angeles",
+    "Chicago",
+    "Houston",
+    "Phoenix",
+];
+
+const SearchBar = styled("div")(({ theme }) => ({
+    position: "relative",
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.black, 0.15),
+    "&:hover": { backgroundColor: alpha(theme.palette.common.black, 0.25) },
+    margin: "0 auto",
+    width: "100%",
+}));
+
+const SearchIconWrapper = styled("div")(({ theme }) => ({
+    padding: theme.spacing(1),
+    position: "absolute",
+    pointerEvents: "none",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+    color: "inherit",
+    width: "100%",
+    padding: theme.spacing(1, 1, 1, 5),
+}));
+
 const Search = () => {
-    // const [selectedUniversity, setSelectedUniversity] = useState(null);
-    // const [selectedCity, setSelectedCity] = useState(null);
-
-    const submit = usePostSubmit();
-    const actionData = useActionData();
-    const loaderData = useLoaderData();
-    const navigate = useNavigate();
-
-    const [sorting, setSorting] = useState("alphabetical");
+    const [selectedUniversity, setSelectedUniversity] = useState(null);
+    const [selectedCity, setSelectedCity] = useState(null);
+    const [sorting, setSorting] = useState("");
     const [searchBar, setSearchBar] = useState("");
-
-    const handleSearch = () => {
-        submit({ value: searchBar });
-    };
-
-    const results = useMemo(() => {
-        const data = actionData ?? loaderData;
-        switch (sorting) {
-            case "alphabetical":
-                return data.result.sort((a, b) => {
-                    const valueA =
-                        a.type === "University" ? a.universityName : a.teamName;
-                    const valueB =
-                        b.type === "University" ? b.universityName : b.teamName;
-                    if (valueA > valueB) return 1;
-                    if (valueB > valueA) return -1;
-                    return 0;
-                });
-            case "universityName":
-                return data.result.sort((a, b) => {
-                    if (a.universityName > b.universityName) return 2;
-                    if (b.universityName > a.universityName) return -2;
-                    if (b.type === "University") return 1;
-                    return -1;
-                });
-        }
-    }, [actionData, loaderData, sorting]);
+    const submit = usePostSubmit();
 
     return (
         <Box
