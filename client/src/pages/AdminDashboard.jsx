@@ -1,0 +1,135 @@
+import React, { useState, useCallback } from "react";
+import {
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Typography,
+    TextField,
+    InputAdornment,
+    MenuItem,
+    Select,
+    FormControl,
+    InputLabel,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+
+const adminItems = [
+    {
+        title: "Team Page Edited",
+        details: "Team Name: The Best",
+        submitted: "2025-02-10",
+        lastUpdated: "2025-02-15",
+        status: "New",
+        buttonText: "REVIEW CHANGES",
+    },
+    {
+        title: "Reported User",
+        details: "User Name: badGuy123",
+        submitted: "2025-02-12",
+        lastUpdated: "2025-02-14",
+        status: "New",
+        buttonText: "REVIEW REPORT",
+    },
+    {
+        title: "Support Ticket",
+        details: "Subject: Can't find my friend!",
+        submitted: "2025-02-15",
+        lastUpdated: "2025-02-16",
+        status: "In Review",
+        buttonText: "REVIEW TICKET",
+    },
+];
+
+const AdminItemCard = ({ title, details, submitted, lastUpdated, status, buttonText }) => (
+    <Card sx={{ mb: 2, p: 2, backgroundColor: "#f0f0f0", boxShadow: 2, borderRadius: "12px" }}>
+        <CardContent sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <Box>
+                <Typography variant="h6" fontWeight="bold">
+                    {title}
+                </Typography>
+                <Typography variant="body1">{details}</Typography>
+                <Typography variant="body2">Submitted: {submitted}</Typography>
+            </Box>
+            <Box textAlign="right">
+                <Typography variant="body2" color="textSecondary">
+                    Last Updated: {lastUpdated}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                    Status: {status}
+                </Typography>
+                <Button variant="contained" sx={{ mt: 1, borderRadius: "8px" }}>
+                    {buttonText}
+                </Button>
+            </Box>
+        </CardContent>
+    </Card>
+);
+
+const AdminDashboard = () => {
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
+    const [search, setSearch] = useState("");
+    const [ticketType, setTicketType] = useState("All");
+
+    const handleSearchChange = useCallback((e) => setSearch(e.target.value), []);
+    const handleTicketTypeChange = useCallback((e) => setTicketType(e.target.value), []);
+
+    return (
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <Box p={3} sx={{ maxWidth: "900px", margin: "auto" }}>
+                <Typography variant="h4" gutterBottom textAlign="center">
+                    Admin Dashboard
+                </Typography>
+
+                <Box
+                    display="flex"
+                    gap={2}
+                    mb={3}
+                    sx={{
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        backgroundColor: "rgba(255, 255, 255, 0.8)",
+                        padding: "10px",
+                        borderRadius: "8px",
+                        flexWrap: "nowrap",
+                    }}
+                >
+                    <DatePicker label="Start Date" value={startDate} onChange={setStartDate} />
+                    <DatePicker label="End Date" value={endDate} onChange={setEndDate} />
+                    <FormControl sx={{ minWidth: 160 }}>
+                        <InputLabel>Ticket Type</InputLabel>
+                        <Select value={ticketType} onChange={handleTicketTypeChange}>
+                            <MenuItem value="All">All Types</MenuItem>
+                            <MenuItem value="Team Page">Team Page</MenuItem>
+                            <MenuItem value="Reported User">Report User</MenuItem>
+                            <MenuItem value="Support Ticket">Support Ticket</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <TextField
+                        label="Search"
+                        value={search}
+                        onChange={handleSearchChange}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchIcon />
+                                </InputAdornment>
+                            ),
+                        }}
+                        sx={{ width: 200 }}
+                    />
+                </Box>
+
+                {adminItems.map((item, index) => (
+                    <AdminItemCard key={index} {...item} />
+                ))}
+            </Box>
+        </LocalizationProvider>
+    );
+};
+
+export { AdminDashboard };

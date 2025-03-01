@@ -10,6 +10,8 @@ import {
     UserSettings,
     UserSignIn,
     UserSignUp,
+    ReportView,
+    AdminDashboard
 } from "../pages";
 import { UserPreferences } from "../pages/UserPreferences.DEMO";
 import { handleSignIn, handleSignUp, sendTest, updateUser } from "./api";
@@ -68,6 +70,14 @@ const router = createBrowserRouter([
             {
                 path: "/schedule",
                 element: <Schedule />,
+            },
+            {
+                path: "/admin/reports",
+                element: <ReportView />,
+            },
+            {
+                path:"/admin",
+                element: <AdminDashboard />,
             },
             {
                 path: "/user_preferences",

@@ -7,6 +7,8 @@ import { University } from "./University";
 import { UserSettings } from "./UserSettings";
 import { UserSignIn } from "./UserSignIn";
 import { UserSignUp } from "./UserSignUp";
+import { ReportView } from "./ReportView";
+import { AdminDashboard } from "./AdminDashboard";
 export {
     Home,
     NotFound,
@@ -17,4 +19,6 @@ export {
     UserSettings,
     UserSignIn,
     UserSignUp,
+    ReportView,
+    AdminDashboard,
 };
