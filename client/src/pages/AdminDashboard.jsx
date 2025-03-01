@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo} from "react";
 import {
     Box,
     Button,
@@ -16,6 +16,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
 
 const adminItems = [
     {
@@ -42,6 +43,15 @@ const adminItems = [
         status: "In Review",
         buttonText: "REVIEW TICKET",
     },
+    {
+        title: "Support Ticket",
+        details: "Subject: Can't find my friend!",
+        submitted: "2025-02-18",
+        lastUpdated: "2025-02-16",
+        status: "In Review",
+        buttonText: "REVIEW TICKET",
+    },
+
 ];
 
 const AdminItemCard = ({ title, details, submitted, lastUpdated, status, buttonText }) => (
@@ -77,6 +87,22 @@ const AdminDashboard = () => {
 
     const handleSearchChange = useCallback((e) => setSearch(e.target.value), []);
     const handleTicketTypeChange = useCallback((e) => setTicketType(e.target.value), []);
+
+    //Filtering logic
+    const filteredItems = useMemo(() => {
+        return adminItems.filter((item) => {
+            const submittedDate = dayjs(item.submitted);
+            const isWithinDateRange =
+                (!startDate || submittedDate.isAfter(startDate)|| submittedDate.isSame(startDate)) && (!endDate || submittedDate.isBefore(endDate) || submittedDate.isSame(endDate));
+
+            const matchesSearch =
+            item.title.toLowerCase().includes(search.toLowerCase()) || item.details.toLowerCase().includes(search.toLowerCase());
+
+            const matchesType = ticketType === "All" || item.title.includes(ticketType);
+            return isWithinDateRange && matchesSearch && matchesType;
+        });
+    }, [search, ticketType, startDate, endDate]);
+
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -123,10 +149,14 @@ const AdminDashboard = () => {
                         sx={{ width: 200 }}
                     />
                 </Box>
+                {filteredItems.length > 0 ? (
+                    filteredItems.map((item, index) => <AdminItemCard key={index} {...item} />)           
+                ) : (
+                    <Typography textAlign="center" color="textSecondary">
+                        No matching tickets found.
 
-                {adminItems.map((item, index) => (
-                    <AdminItemCard key={index} {...item} />
-                ))}
+                    </Typography>
+                )}
             </Box>
         </LocalizationProvider>
     );
