@@ -18,6 +18,8 @@
         "@zxcvbn-ts/core": "^3.0.4",
         "@zxcvbn-ts/language-common": "^3.0.4",
         "@zxcvbn-ts/language-en": "^3.0.2",
+        "ag-grid-community": "^32.3.3",
+        "ag-grid-react": "^32.3.3",
         "axios": "^1.7.9",
         "dayjs": "^1.11.13",
         "firebase": "^11.3.1",

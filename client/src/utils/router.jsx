@@ -11,7 +11,8 @@ import {
     UserSignIn,
     UserSignUp,
     ReportView,
-    AdminDashboard
+    AdminDashboard,
+    UserManager
 } from "../pages";
 import { UserPreferences } from "../pages/UserPreferences.DEMO";
 import { handleSignIn, handleSignUp, sendTest, updateUser } from "./api";
@@ -78,6 +79,10 @@ const router = createBrowserRouter([
             {
                 path:"/admin",
                 element: <AdminDashboard />,
+            },
+            {
+                path:"/admin/users",
+                element: <UserManager />,
             },
             {
                 path: "/user_preferences",

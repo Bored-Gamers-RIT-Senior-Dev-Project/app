@@ -9,6 +9,7 @@ import { UserSignIn } from "./UserSignIn";
 import { UserSignUp } from "./UserSignUp";
 import { ReportView } from "./ReportView";
 import { AdminDashboard } from "./AdminDashboard";
+import { UserManager } from "./UserManager";
 export {
     Home,
     NotFound,
@@ -21,4 +22,5 @@ export {
     UserSignUp,
     ReportView,
     AdminDashboard,
+    UserManager,
 };
