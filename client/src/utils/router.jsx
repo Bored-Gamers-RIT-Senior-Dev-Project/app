@@ -1,6 +1,7 @@
 import { createBrowserRouter, redirect } from "react-router";
 import App from "../App";
 import {
+    About,
     Home,
     NotFound,
     Rules,
@@ -8,7 +9,6 @@ import {
     Search,
     TeamsPage,
     University,
-    About,
     UserSettings,
     UserSignIn,
     UserSignUp,
