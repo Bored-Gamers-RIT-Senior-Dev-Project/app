@@ -1,5 +1,20 @@
 const db = require("../config/db");
 
+const getUniversity = async (id) => {
+    const query = await db.query(
+        `SELECT *
+        FROM UNIVERSITIES
+        WHERE UniversityId = ?`,
+        [id]
+    );
+
+    if (query[0].length == 0) {
+        return null;
+    }
+
+    return query[0][0];
+};
+
 /**
  * Searches universities based on the search term.
  *
@@ -17,7 +32,7 @@ const searchUniversities = async (universityName, partial = true) => {
             Description,
             WebsiteURL,
             'University' AS Type
-        FROM universities
+        FROM Universities
         WHERE 
             UniversityName LIKE ?`;
 
@@ -27,18 +42,4 @@ const searchUniversities = async (universityName, partial = true) => {
     return query[0];
 };
 
-const getUniversityById = async (universityId) => {
-    let sql = `SELECT *
-        FROM Universities
-        WHERE UniversityId = ?`;
-
-    const query = await db.query(sql, [universityId]);
-
-    if (query[0].length < 1) {
-        return null;
-    }
-
-    return query[0][0];
-};
-
-module.exports = { searchUniversities, getUniversityById };
+module.exports = { searchUniversities };
