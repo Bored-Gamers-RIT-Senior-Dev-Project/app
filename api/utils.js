@@ -1,4 +1,4 @@
-import camelCase from "lodash/camelCase";
+const camelCase = require("lodash/camelCase");
 const makeObjectCamelCase = (object) => {
     if (!object) return null;
 
