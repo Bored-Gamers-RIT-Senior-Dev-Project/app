@@ -13,3 +13,5 @@ router.get("/:universityId", async (req, res, next) => {
         next(e);
     }
 });
+
+module.exports = router;
