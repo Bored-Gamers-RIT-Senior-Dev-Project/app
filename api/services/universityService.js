@@ -3,34 +3,28 @@ const db = require("../config/db");
 /**
  * Searches universities based on the search term.
  *
- * @param {string} teamName - The search term for the team name.
- * @param {string} universityName - The name of the university to search for, optional.
+ * @param {string} universityName - The search term for the university name.
  * @param {boolean} partial - If the search should include partial matches
  * @returns {Promise<Array>} - A promise that resolves to an array of search results.
  */
-const searchUniversities = async (
-    teamName,
-    universityName = null,
-    partial = true
-) => {
+const searchUniversities = async (universityName, partial = true) => {
     //TODO: Create universityModel and move sql logic there.
-    const sql = `
+    let sql = `
         SELECT 
-            t.TeamID AS ID, 
-            t.TeamName AS Name, 
-            'Team' AS Type,
-            u.UniversityName AS AssociatedUniversity
-        FROM Team t
-        JOIN University u ON t.UniversityID = u.UniversityID
+            UniversityId,
+            UniversityName, 
+            Location,
+            LogoURL,
+            Description,
+            WebsiteURL,
+            'University' AS Type
+        FROM Universities
         WHERE 
-            t.TeamName ILIKE ?`;
-    const fieldPacket = [partial ? `%${teamName}%` : teamName];
-    if (universityName) {
-        sql += ` OR u.UniversityName ILIKE ?`;
-        fieldPacket.push(partial ? `%${universityName}%` : universityName);
-    }
+            UniversityName LIKE ?`;
 
-    const query = await db.query(sql, fieldPacket);
+    const query = await db.query(sql, [
+        partial ? `%${universityName}%` : universityName,
+    ]);
     return query[0];
 };
 
