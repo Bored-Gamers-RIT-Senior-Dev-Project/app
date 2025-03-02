@@ -4,7 +4,7 @@ import {
     Button,
     Card,
     CardContent,
-    Grid,
+    Grid2 as Grid,
     MenuItem,
     Paper,
     Select,
@@ -200,9 +200,13 @@ const University = () => {
                             }}
                         >
                             <CardContent>
-                                <Grid container alignItems="center" spacing={2}>
+                                <Grid
+                                    container
+                                    sx={{ alignItems: "center" }}
+                                    spacing={2}
+                                >
                                     {/* Team Name & University */}
-                                    <Grid item xs={5}>
+                                    <Grid xs={5}>
                                         <Typography
                                             variant="h6"
                                             sx={{ fontWeight: "bold" }}
@@ -218,7 +222,7 @@ const University = () => {
                                     </Grid>
 
                                     {/* Win/Loss Stats */}
-                                    <Grid item xs={4} textAlign="center">
+                                    <Grid xs={4} textAlign="center">
                                         <Typography
                                             sx={{
                                                 fontSize: "1.1em",
@@ -230,7 +234,7 @@ const University = () => {
                                     </Grid>
 
                                     {/* Dropdown Menu for Remove */}
-                                    <Grid item xs={3} textAlign="right">
+                                    <Grid xs={3} textAlign="right">
                                         <Select
                                             defaultValue=""
                                             onChange={(e) => {
