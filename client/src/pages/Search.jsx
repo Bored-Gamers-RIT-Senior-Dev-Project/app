@@ -41,8 +41,8 @@ const Search = () => {
             sx={{
                 display: "flex",
                 flexDirection: "column",
-                maxWidth: "800px",
-                width: "100%",
+                width: "800px",
+                maxWidth: "95%",
             }}
         >
             <Paper component="div" sx={{ padding: { xs: 1, md: 3 } }}>
