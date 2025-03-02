@@ -9,7 +9,7 @@ const cors = require("cors");
 
 // Require Routes
 const users = require("./routes/users");
-const test = require("./routes/test");
+const index = require("./routes");
 const createError = require("http-errors");
 
 //Initialize Express
@@ -25,7 +25,7 @@ app.use(cors()); // Enable CORS
 
 // Routes
 app.use("/api/users", users);
-app.use("/api", test);
+app.use("/api", index);
 
 //404 any routes not defined above
 app.use((_req, _res, next) => {
