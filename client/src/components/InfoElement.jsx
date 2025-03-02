@@ -2,7 +2,13 @@ import { ButtonBase, Grid2 as Grid, Paper, Typography } from "@mui/material";
 import PropTypes from "../utils/propTypes";
 import { ImageHolder } from "./ImageHolder";
 
-const InfoElement = ({ imageUrl, title, subtitle, onClick }) => {
+const InfoElement = ({
+    imageUrl,
+    title,
+    subtitle = "",
+    text = "",
+    onClick,
+}) => {
     return (
         <ButtonBase sx={{ width: "100%" }} onClick={onClick}>
             <Paper sx={{ display: "flex", width: "100%" }}>
@@ -41,6 +47,11 @@ const InfoElement = ({ imageUrl, title, subtitle, onClick }) => {
                             {subtitle}
                         </Typography>
                     </Grid>
+                    <Grid size={12}>
+                        <Typography variant="p" sx={{ textAlign: "left" }}>
+                            {text}
+                        </Typography>
+                    </Grid>
                 </Grid>
             </Paper>
         </ButtonBase>
@@ -51,7 +62,8 @@ const InfoElement = ({ imageUrl, title, subtitle, onClick }) => {
 InfoElement.propTypes = {
     imageUrl: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
-    subtitle: PropTypes.string.isRequired,
+    subtitle: PropTypes.string,
+    text: PropTypes.string,
     onClick: PropTypes.func,
 };
 
