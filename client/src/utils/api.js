@@ -42,8 +42,17 @@ const updateUser = async (params) => {
     return data;
 };
 
+/****************
+ * UNIVERSITY
+ ****************/
+const getUniversityInfo = async (universityId) => {
+    let { data } = await axios.get(url(`university/${universityId}`));
+    return data;
+};
+
 export {
     getTest,
+    getUniversityInfo,
     getUserData,
     handleSignIn,
     handleSignUp,
