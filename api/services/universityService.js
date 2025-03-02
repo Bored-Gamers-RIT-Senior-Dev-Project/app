@@ -11,7 +11,7 @@ const searchUniversities = async (universityName, partial = true) => {
     //TODO: Create universityModel and move sql logic there.
     let sql = `
         SELECT 
-            UniversityId,
+            UniversityId AS Id,
             UniversityName, 
             Location,
             LogoURL,
