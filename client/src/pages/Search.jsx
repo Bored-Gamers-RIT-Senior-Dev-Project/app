@@ -16,14 +16,14 @@ import {
     Typography,
 } from "@mui/material";
 
-import { useActionData, useLoaderData } from "react-router";
+import { useActionData, useLoaderData, useNavigate } from "react-router";
 import { DynamicSelect } from "../components/DynamicSelect";
 import { ImageHolder } from "../components/ImageHolder";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 
 const SearchElement = ({ imageUrl, title, subtitle, onClick }) => {
     return (
-        <ButtonBase sx={{ width: "100%" }}>
+        <ButtonBase sx={{ width: "100%" }} onClick={onClick}>
             <Paper sx={{ display: "flex", width: "100%" }}>
                 <ImageHolder
                     src={imageUrl}
@@ -81,6 +81,7 @@ const Search = () => {
     const submit = usePostSubmit();
     const actionData = useActionData();
     const loaderData = useLoaderData();
+    const navigate = useNavigate();
 
     const [sorting, setSorting] = useState("alphabetical");
     const [searchBar, setSearchBar] = useState("");
@@ -130,12 +131,11 @@ const Search = () => {
             <Paper
                 component="div"
                 sx={(theme) => {
-                    console.log(theme);
                     return {
                         padding: { xs: 1, md: 3 },
                         position: "sticky",
-                        top: "3em",
-                        zIndex: theme.zIndex.appBar + 5,
+                        top: "4em",
+                        zIndex: theme.zIndex.appBar,
                     };
                 }}
             >
@@ -245,7 +245,9 @@ const Search = () => {
             </Paper>
             {results.length === 0 ? (
                 <Paper>
-                    <Typography variant="h3">No Results Found</Typography>
+                    <Typography variant="h4" sx={{ textAlign: "center" }}>
+                        No Results Found
+                    </Typography>
                 </Paper>
             ) : (
                 results.map((result) =>
@@ -254,6 +256,7 @@ const Search = () => {
                             imageUrl={result.logoUrl}
                             title={result.universityName}
                             subtitle={result.location}
+                            onClick={() => navigate(`/university/${result.id}`)}
                             key={"University" + result.id}
                         />
                     ) : (
