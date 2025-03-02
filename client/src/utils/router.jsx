@@ -12,7 +12,7 @@ import {
     UserSignUp,
 } from "../pages";
 import { UserPreferences } from "../pages/UserPreferences.DEMO";
-import { handleSignIn, handleSignUp, sendTest, updateUser } from "./api";
+import { handleSignIn, handleSignUp, search, updateUser } from "./api";
 import { events } from "./events";
 
 //Make an action out of an api call
@@ -47,7 +47,7 @@ const router = createBrowserRouter([
             {
                 path: "/search",
                 element: <Search />,
-                action: makeAction(sendTest),
+                action: makeAction(search),
             },
             {
                 path: "/university/:universityId",

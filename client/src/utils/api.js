@@ -11,6 +11,14 @@ const sendTest = async (params) => {
 };
 const getTest = async () => axios.get(url("users"));
 
+/****************
+ * SEARCH
+ ****************/
+const search = async (params) => {
+    let { data } = await axios.post(url("search"), params);
+    return data;
+};
+
 /******************
  * AUTHENTICATION *
  ******************/
@@ -39,6 +47,7 @@ export {
     getUserData,
     handleSignIn,
     handleSignUp,
+    search,
     sendTest,
     updateUser,
 };
