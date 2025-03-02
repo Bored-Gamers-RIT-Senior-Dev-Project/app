@@ -20,7 +20,7 @@ router.post("/search", async (req, res, next) => {
 
     try {
         const universitySearch = universityService.searchUniversities(value);
-        const teamSearch = teamService.searchTeams(value, value);
+        const teamSearch = teamService.searchTeams(value);
 
         const [universities, teams] = await Promise.all([
             universitySearch,
