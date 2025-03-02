@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, redirect } from "react-router";
 import App from "../App";
 import {
     Home,
@@ -14,7 +14,13 @@ import {
     UserSignUp,
 } from "../pages";
 import { UserPreferences } from "../pages/UserPreferences.DEMO";
-import { handleSignIn, handleSignUp, search, updateUser } from "./api";
+import {
+    getUniversityInfo,
+    handleSignIn,
+    handleSignUp,
+    search,
+    updateUser,
+} from "./api";
 import { events } from "./events";
 
 //Make an action out of an api call
@@ -59,6 +65,14 @@ const router = createBrowserRouter([
             {
                 path: "/university/:universityId",
                 element: <University />,
+                loader: async ({ params }) => {
+                    const { universityId } = params;
+                    console.log(parseInt(universityId));
+                    if (isNaN(parseInt(universityId))) {
+                        return redirect("/404");
+                    }
+                    return await getUniversityInfo(universityId);
+                },
             },
             {
                 path: "/about",
@@ -82,8 +96,12 @@ const router = createBrowserRouter([
                 action: makeAction(updateUser),
             },
             {
-                path: "*",
+                path: "404",
                 element: <NotFound />,
+            },
+            {
+                path: "*",
+                loader: () => redirect("/404"),
             },
         ],
     },
