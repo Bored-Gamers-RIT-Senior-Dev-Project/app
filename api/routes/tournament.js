@@ -310,6 +310,82 @@ router.get("/searchFacilitators", async (req, res, next) => {
     }
 });
 
+router.get("/getBracket", async (req, res, next) => {
+    const { tournamentID } = req.query;
+    try {
+        const participants =
+            await TournamentService.searchTournamentParticipants(tournamentID);
+        const numTeams = participants.length;
+
+        if (numTeams === 0) {
+            return res
+                .status(404)
+                .json({ error: "No teams found in the tournament" });
+        }
+
+        const totalRounds = Math.ceil(Math.log2(numTeams));
+
+        const leftBracket = await TournamentService.searchMatches(
+            null,
+            tournamentID,
+            "left",
+            null,
+            null,
+            null,
+            "participant1.BracketOrder",
+            null
+        );
+        const rightBracket = await TournamentService.searchMatches(
+            null,
+            tournamentID,
+            "right",
+            null,
+            null,
+            null,
+            "participant1.BracketOrder",
+            null
+        );
+
+        if (!leftBracket.length && !rightBracket.length) {
+            return res.status(404).json({ error: "Please start tournament" });
+        }
+
+        const formatBracket = (matches) => {
+            const rounds = Array.from({ length: totalRounds }, (_, i) => ({
+                title: `Round ${i + 1}`,
+                seeds: [],
+            }));
+
+            matches.forEach((match) => {
+                console.log(match);
+                const roundIndex = match.round - 1;
+                if (roundIndex >= 0 && roundIndex < totalRounds) {
+                    rounds[roundIndex].seeds.push({
+                        id: match.matchID,
+                        date: new Date(match.MatchTime).toDateString(),
+                        teams: [
+                            { name: match.Team1Name || "TBD" },
+                            { name: match.Team2Name || "TBD" },
+                        ],
+                    });
+                }
+            });
+
+            return rounds.filter((round) => round.seeds.length > 0); // Remove empty rounds
+        };
+
+        // Step 5: Format both brackets
+        const formattedLeftBracket = formatBracket(leftBracket);
+        const formattedRightBracket = formatBracket(rightBracket);
+
+        return res
+            .status(200)
+            .json([...formattedLeftBracket, ...formattedRightBracket]);
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.get("/match/search", async (req, res, next) => {
     const {
         matchID,

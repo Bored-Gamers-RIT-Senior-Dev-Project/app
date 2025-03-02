@@ -394,13 +394,14 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
  * @throws {Error} Throws an error with status 400 if matchID is provided and is not a valid integer.
  */
 const searchMatches = async (
-    matchID = null,
-    tournamentID = null,
-    teamID = null,
-    before = null,
-    after = null,
-    sortBy = null,
-    sortAsDescending = false
+    matchID,
+    tournamentID,
+    bracketSide,
+    teamID,
+    before,
+    after,
+    sortBy,
+    sortAsDescending
 ) => {
     try {
         // If matchID is provided, use it exclusively for the search.
@@ -409,6 +410,7 @@ const searchMatches = async (
             matchID = validateInteger(matchID, "matchID");
             match = await TournamentModel.searchMatches(
                 matchID,
+                null,
                 null,
                 null,
                 null,
@@ -430,6 +432,7 @@ const searchMatches = async (
             const match = await TournamentModel.searchMatches(
                 null,
                 tournamentID,
+                bracketSide,
                 teamID,
                 before,
                 after,

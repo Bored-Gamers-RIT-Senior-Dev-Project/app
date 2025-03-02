@@ -19,7 +19,7 @@ const createTournament = async (
 ) => {
     try {
         const [result] = await db.query(
-            `INSERT INTO Tournaments (TournamentName, StartDate, EndDate, Status, Location)
+            `INSERT INTO tournaments (TournamentName, StartDate, EndDate, Status, Location)
              VALUES (?, ?, ?, ?, ?)`,
             [tournamentName, startDate, endDate, status, location]
         );
@@ -56,7 +56,7 @@ const createTournament = async (
  * @param {boolean} sortAsDescending - If true, sorts the results by DESCENDING. Defaults to ASCENDING.
  * @throws {Error} Throws an error if the database update fails.
  */
-const searchTournaments = async (
+const searchtournaments = async (
     tournamentID,
     tournamentName,
     startDate,
@@ -75,7 +75,7 @@ const searchTournaments = async (
             const [rows] = await db.query(
                 `
                 SELECT * 
-                FROM Tournaments
+                FROM tournaments
                 WHERE TournamentID = ?
             `,
                 [tournamentID]
@@ -88,8 +88,8 @@ const searchTournaments = async (
             return rows[0];
         } else {
             let search =
-                //Remove the time from query output: "SELECT TournamentID, TournamentName, DATE(StartDate) AS StartDate, DATE(EndDate) AS EndDate, Status, Location FROM Tournaments WHERE 1=1";
-                "SELECT * FROM Tournaments WHERE 1=1";
+                //Remove the time from query output: "SELECT TournamentID, TournamentName, DATE(StartDate) AS StartDate, DATE(EndDate) AS EndDate, Status, Location FROM tournaments WHERE 1=1";
+                "SELECT * FROM tournaments WHERE 1=1";
             const params = [];
 
             // Only add a search parameter if the parameter is not null
@@ -149,10 +149,10 @@ const searchTournaments = async (
     }
 };
 
-const addTournamentParticipants = async (tournamentID, teamID) => {
+const addtournament_participants = async (tournamentID, teamID) => {
     try {
         await db.query(
-            `INSERT INTO TournamentParticipants (TournamentID, TeamID) VALUES (?, ?)`,
+            `INSERT INTO tournament_participants (TournamentID, TeamID) VALUES (?, ?)`,
             [tournamentID, teamID]
         );
     } catch (error) {
@@ -161,10 +161,10 @@ const addTournamentParticipants = async (tournamentID, teamID) => {
     }
 };
 
-const removeTournamentParticipants = async (tournamentID, teamID) => {
+const removetournament_participants = async (tournamentID, teamID) => {
     try {
         await db.query(
-            `DELETE FROM TournamentParticipants WHERE TournamentID = ? AND TeamID = ?`,
+            `DELETE FROM tournament_participants WHERE TournamentID = ? AND TeamID = ?`,
             [tournamentID, teamID]
         );
     } catch (error) {
@@ -222,7 +222,7 @@ const updateTournamentParticipant = async (
         params.push(tournamentID);
         params.push(teamID);
 
-        const updateQuery = `UPDATE TournamentParticipants SET ${updates.join(
+        const updateQuery = `UPDATE tournament_participants SET ${updates.join(
             ", "
         )} WHERE TournamentID = ? AND TeamID = ?`;
         await db.query(updateQuery, params);
@@ -252,84 +252,84 @@ const searchTournamentParticipants = async (
     try {
         let searchQuery = `
         SELECT 
-            TournamentParticipants.TeamID,
-            TournamentParticipants.Round AS TeamRound,
-            TournamentParticipants.Byes AS TeamByeCount,
-            TournamentParticipants.Status AS ParticipantStatus,
-            TournamentParticipants.BracketSide AS TeamBracketSide,
-            TournamentParticipants.NextMatchID AS TeamNextMatchID,
-            TournamentParticipants.BracketOrder AS TeamBracketOrder,
-            TournamentParticipants.TournamentID,
-            Tournaments.TournamentName,
-            Tournaments.Status AS TournamentStatus,
-            Teams.TeamName,
-            Teams.ProfileImageURL AS TeamProfileImageURL,
-            Teams.TeamLeaderID,
-            Teams.IsApproved AS TeamApprovalStatus,
-            Teams.CreatedAt AS TeamCreatedAt,
-            CONCAT(Users.FirstName, ' ', Users.LastName) AS TeamLeaderFullName,
-            Universities.UniversityName,
-            Universities.LogoURL AS UniversityLogoURL
-            FROM TournamentParticipants
-            JOIN Tournaments ON TournamentParticipants.TournamentID = Tournaments.TournamentID
-            JOIN Teams ON TournamentParticipants.TeamID = Teams.TeamID
-            JOIN Universities ON Teams.UniversityID = Universities.UniversityID
-            JOIN Users ON Teams.TeamLeaderID = Users.UserID
+            tournament_participants.TeamID,
+            tournament_participants.Round AS TeamRound,
+            tournament_participants.Byes AS TeamByeCount,
+            tournament_participants.Status AS ParticipantStatus,
+            tournament_participants.BracketSide AS TeamBracketSide,
+            tournament_participants.NextMatchID AS TeamNextMatchID,
+            tournament_participants.BracketOrder AS TeamBracketOrder,
+            tournament_participants.TournamentID,
+            tournaments.TournamentName,
+            tournaments.Status AS TournamentStatus,
+            teams.TeamName,
+            teams.ProfileImageURL AS TeamProfileImageURL,
+            teams.TeamLeaderID,
+            teams.IsApproved AS TeamApprovalStatus,
+            teams.CreatedAt AS TeamCreatedAt,
+            CONCAT(users.FirstName, ' ', users.LastName) AS TeamLeaderFullName,
+            universities.UniversityName,
+            universities.LogoURL AS UniversityLogoURL
+            FROM tournament_participants
+            JOIN tournaments ON tournament_participants.TournamentID = tournaments.TournamentID
+            JOIN teams ON tournament_participants.TeamID = teams.TeamID
+            JOIN universities ON teams.UniversityID = universities.UniversityID
+            JOIN users ON teams.TeamLeaderID = users.UserID
         WHERE 1=1
       `;
         const params = [];
 
         if (tournamentID) {
-            searchQuery += " AND TournamentParticipants.TournamentID = ?";
+            searchQuery += " AND tournament_participants.TournamentID = ?";
             params.push(tournamentID);
         }
         if (teamID) {
-            searchQuery += " AND TournamentParticipants.TeamID = ?";
+            searchQuery += " AND tournament_participants.TeamID = ?";
             params.push(teamID);
         }
         if (teamLeaderName) {
-            searchQuery += " AND Users.";
+            searchQuery += " AND users.";
         }
         // Check for round, ensuring zero is allowed
         if (round) {
-            searchQuery += " AND TournamentParticipants.Round = ?";
+            searchQuery += " AND tournament_participants.Round = ?";
             params.push(round);
         }
         // Check for byes similarly
         if (byes) {
-            searchQuery += " AND TournamentParticipants.Byes = ?";
+            searchQuery += " AND tournament_participants.Byes = ?";
             params.push(byes);
         }
         if (status) {
-            searchQuery += " AND TournamentParticipants.Status = ?";
+            searchQuery += " AND tournament_participants.Status = ?";
             params.push(status);
         }
         if (bracketSide) {
-            searchQuery += " AND TournamentParticipants.BracketSide = ?";
+            searchQuery += " AND tournament_participants.BracketSide = ?";
             params.push(bracketSide);
         }
         if (nextMatchID) {
-            searchQuery += " AND TournamentParticipants.NextMatchID = ?";
+            searchQuery += " AND tournament_participants.NextMatchID = ?";
             params.push(nextMatchID);
         }
         if (universityID) {
-            searchQuery += " AND Teams.UniversityID = ?";
+            searchQuery += " AND teams.UniversityID = ?";
             params.push(universityID);
         }
         if (teamName) {
-            searchQuery += " AND Teams.TeamName LIKE ?";
+            searchQuery += " AND teams.TeamName LIKE ?";
             params.push(`%${teamName}%`);
         }
         if (teamLeaderID) {
-            searchQuery += " AND Teams.TeamLeaderID = ?";
+            searchQuery += " AND teams.TeamLeaderID = ?";
             params.push(teamLeaderID);
         }
         if (isApproved) {
-            searchQuery += " AND Teams.IsApproved = ?";
+            searchQuery += " AND teams.IsApproved = ?";
             params.push(isApproved);
         }
         if (universityName) {
-            searchQuery += " AND Users.UniversityName LIKE ?";
+            searchQuery += " AND users.UniversityName LIKE ?";
             params.push(`%${universityName}%`);
         }
         if (sortBy) {
@@ -386,7 +386,7 @@ const searchTournamentFacilitators = async (
     try {
         console.log("Setting params");
         let search =
-            "SELECT Users.UserID, CONCAT(Users.FirstName, ' ', Users.LastName) AS FullName, Email, ProfileImageURL FROM TournamentFacilitators JOIN Users ON TournamentFacilitators.UserID = Users.UserID WHERE 1=1";
+            "SELECT users.UserID, CONCAT(users.FirstName, ' ', users.LastName) AS FullName, Email, ProfileImageURL FROM TournamentFacilitators JOIN users ON TournamentFacilitators.UserID = users.UserID WHERE 1=1";
         const params = [];
 
         // Only add a search parameter if the parameter is not null
@@ -395,12 +395,12 @@ const searchTournamentFacilitators = async (
             params.push(tournamentID);
         }
         if (userID) {
-            search += " AND Users.UserID = ?";
+            search += " AND users.UserID = ?";
             params.push(userID);
         }
         if (name) {
             search +=
-                " AND CONCAT(Users.FirstName, ' ', Users.LastName) LIKE ?";
+                " AND CONCAT(users.FirstName, ' ', users.LastName) LIKE ?";
             params.push(`%${name}%`);
         }
         if (email) {
@@ -454,7 +454,7 @@ const updateTournamentDetails = async (
 
         params.push(tournamentID);
 
-        const updateQuery = `UPDATE Tournaments SET ${updates.join(
+        const updateQuery = `UPDATE tournaments SET ${updates.join(
             ", "
         )} WHERE TournamentID = ?`;
         await db.query(updateQuery, params);
@@ -476,7 +476,7 @@ const updateTournamentDetails = async (
 const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
     try {
         const [result] = await db.query(
-            `INSERT INTO Matches (tournamentID, team1ID, team2ID, matchTime)
+            `INSERT INTO matches (tournamentID, team1ID, team2ID, matchTime)
              VALUES (?, ?, ?, ?)`,
             [tournamentID, team1ID, team2ID, matchTime]
         );
@@ -496,7 +496,7 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
 /**
  * Searches tournament matches from the database.
  *
- * This function retrieves match records from the Matches table based on the provided criteria.
+ * This function retrieves match records from the matches table based on the provided criteria.
  * If a matchID is provided (not null), it returns a single match record (or null if not found).
  * @param {number|null} matchID - ID for the match. When provided, all other criteria are ignored.
  * @param {number|null} tournamentID - ID for the tournament.
@@ -513,6 +513,7 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
 const searchMatches = async (
     matchID,
     tournamentID,
+    bracketSide,
     teamID,
     before,
     after,
@@ -520,13 +521,11 @@ const searchMatches = async (
     sortAsDescending
 ) => {
     try {
-        console.log("Before: " + before + " and After: " + after);
-        // If a matchID is provided, perform a search based solely on matchID.
         if (matchID) {
             const [rows] = await db.query(
                 `
                 SELECT * 
-                FROM Matches
+                FROM matches
                 WHERE MatchID = ?
                 `,
                 [matchID]
@@ -539,10 +538,36 @@ const searchMatches = async (
             return rows[0];
         } else {
             // If matchID is not set, build query using other search criteria
-            let search = "SELECT * FROM Matches WHERE 1=1";
+            let search = `
+            SELECT
+                matches.TournamentID,
+                matches.MatchTime,
+                matches.Team1ID,
+                team1.TeamName,
+                matches.Score1,
+                matches.Team2ID,
+                team2.TeamName,
+                matches.Score2,
+                CASE 
+                    WHEN matches.WinnerID IS NOT NULL THEN participant1.Round
+                    ELSE 
+                        CASE 
+                            WHEN matches.WinnerID = matches.Team1ID THEN participant2.Round
+                            ELSE participant1.Round
+                        END
+                END AS MatchRound
+                FROM matches
+                JOIN teams team1 ON matches.Team1ID = team1.TeamID
+                JOIN teams team2 ON matches.Team2ID = team2.TeamID
+                JOIN tournament_participants participant1
+                    ON matches.TournamentID = participant1.TournamentID AND matches.Team1ID = participant1.TeamID
+                JOIN tournament_participants participant2
+                    ON matches.TournamentID = participant2.TournamentID AND matches.Team1ID = participant2.TeamID
+            WHERE 1=1
+            `;
             const params = [];
             if (tournamentID) {
-                search += " AND TournamentID = ?";
+                search += " AND matches.TournamentID = ?";
                 params.push(tournamentID);
             }
             if (teamID) {
@@ -550,12 +575,16 @@ const searchMatches = async (
                 params.push(teamID, teamID);
             }
             if (before) {
-                search += " AND matchTime <= ?";
+                search += " AND matches.MatchTime <= ?";
                 params.push(before);
             }
             if (after) {
-                search += " AND matchTime >= ?";
+                search += " AND matches.MatchTime>= ?";
                 params.push(after);
+            }
+            if (bracketSide) {
+                search += " AND participant1.BracketSide = ?";
+                params.push(bracketSide);
             }
             if (sortBy) {
                 search += " ORDER BY " + sortBy;
@@ -589,7 +618,7 @@ const updateMatchResult = async (matchID, winnerID, team1Score, team2Score) => {
     try {
         // Execute the UPDATE query to update the match results.
         const [result] = await db.query(
-            `UPDATE Matches SET Score1 = ?, Score2 = ?, WinnerID = ? WHERE MatchID = ?;`,
+            `UPDATE matches SET Score1 = ?, Score2 = ?, WinnerID = ? WHERE MatchID = ?;`,
             [team1Score, team2Score, winnerID, matchID]
         );
         // Return an object representing the updated match.
@@ -607,10 +636,10 @@ const updateMatchResult = async (matchID, winnerID, team1Score, team2Score) => {
 
 module.exports = {
     createTournament,
-    searchTournaments,
+    searchtournaments,
     updateTournamentDetails,
-    addTournamentParticipants,
-    removeTournamentParticipants,
+    addtournament_participants,
+    removetournament_participants,
     updateTournamentParticipant,
     searchTournamentParticipants,
     addTournamentFacilitator,
