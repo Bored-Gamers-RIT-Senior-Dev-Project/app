@@ -27,9 +27,13 @@ router.post("/search", async (req, res, next) => {
             teamSearch,
         ]);
 
+        const result = [];
+        result.push(...universities);
+        result.push(...teams);
+
         return res.json({
-            universities: makeObjectCamelCase(universities),
-            teams: makeObjectCamelCase(teams),
+            count: result.length,
+            result: makeObjectCamelCase(result),
         });
     } catch (e) {
         console.error("Search Error: ", e.message);
