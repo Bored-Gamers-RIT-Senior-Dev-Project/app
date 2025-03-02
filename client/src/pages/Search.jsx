@@ -99,9 +99,10 @@ const Search = () => {
                 });
             case "universityName":
                 return data.result.sort((a, b) => {
-                    if (a.universityName > b.universityName) return 1;
-                    if (b.universityName > a.universityName) return -1;
-                    return 0;
+                    if (a.universityName > b.universityName) return 2;
+                    if (b.universityName > a.universityName) return -2;
+                    if (b.type === "University") return 1;
+                    return -1;
                 });
         }
     }, [actionData, loaderData, sorting]);
