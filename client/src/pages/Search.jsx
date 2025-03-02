@@ -1,9 +1,8 @@
 import { Search as SearchIcon } from "@mui/icons-material";
-import { useMemo, useState } from "react";
 
 import {
-    Box,
     Button,
+    ButtonBase,
     FormControl,
     Grid2 as Grid,
     InputAdornment,
@@ -13,19 +12,64 @@ import {
     Typography,
 } from "@mui/material";
 
-import { useActionData, useLoaderData, useNavigate } from "react-router";
 import { DynamicSelect } from "../components/DynamicSelect";
-import { InfoElement } from "../components/InfoElement";
 import { usePostSubmit } from "../hooks/usePostSubmit";
+
+const UniversityElement = ({ university }) => {
+    return (
+        <Paper sx={{ display: "flex" }}>
+            <ImageHolder
+                src={university.logoUrl}
+                sx={{
+                    width: "8rem",
+                    height: "8rem",
+                    objectFit: "cover",
+                    borderRadius: "2rem",
+                }}
+            />
+            <Typography type="h3">{university.universityName}</Typography>
+        </Paper>
+    );
+};
+
+UniversityElement.propTypes = {
+    university: PropTypes.shape({
+        logoUrl: PropTypes.string.isRequired,
+        universityName: PropTypes.string.isRequired,
+    }).isRequired,
+};
+
+const TeamElement = ({ team }) => {
+    return (
+        <ButtonBase sx={{ width: "100%" }}>
+            <Paper sx={{ display: "flex", width: "100%" }}>
+                <ImageHolder
+                    src={team.profileImageUrl}
+                    sx={{
+                        width: "8rem",
+                        height: "8rem",
+                        objectFit: "cover",
+                        borderRadius: "2rem",
+                    }}
+                />
+                <Typography type="h3">{team.teamName}</Typography>
+            </Paper>
+        </ButtonBase>
+    );
+};
+
+TeamElement.propTypes = {
+    team: PropTypes.shape({
+        profileImageUrl: PropTypes.string.isRequired,
+        teamName: PropTypes.string.isRequired,
+    }).isRequired,
+};
 
 const Search = () => {
     // const [selectedUniversity, setSelectedUniversity] = useState(null);
     // const [selectedCity, setSelectedCity] = useState(null);
 
     const submit = usePostSubmit();
-    const actionData = useActionData();
-    const loaderData = useLoaderData();
-    const navigate = useNavigate();
 
     const [sorting, setSorting] = useState("alphabetical");
     const [searchBar, setSearchBar] = useState("");
@@ -34,31 +78,9 @@ const Search = () => {
         submit({ value: searchBar });
     };
 
-    const results = useMemo(() => {
-        const data = actionData ?? loaderData;
-        switch (sorting) {
-            case "alphabetical":
-                return data.result.sort((a, b) => {
-                    const valueA =
-                        a.type === "University" ? a.universityName : a.teamName;
-                    const valueB =
-                        b.type === "University" ? b.universityName : b.teamName;
-                    if (valueA > valueB) return 1;
-                    if (valueB > valueA) return -1;
-                    return 0;
-                });
-            case "universityName":
-                return data.result.sort((a, b) => {
-                    if (a.universityName > b.universityName) return 2;
-                    if (b.universityName > a.universityName) return -2;
-                    if (b.type === "University") return 1;
-                    return -1;
-                });
-        }
-    }, [actionData, loaderData, sorting]);
-
     return (
-        <Box
+        <Grid
+            container
             sx={{
                 width: {
                     xs: "90vw",
@@ -71,17 +93,7 @@ const Search = () => {
             }}
             spacing={1}
         >
-            <Paper
-                component="div"
-                sx={(theme) => {
-                    return {
-                        padding: { xs: 1, md: 3 },
-                        position: "sticky",
-                        top: "4em",
-                        zIndex: theme.zIndex.appBar,
-                    };
-                }}
-            >
+            <Paper component="div" sx={{ padding: { xs: 1, md: 3 } }}>
                 <Typography variant="h4" textAlign="center" sx={{ pb: 3 }}>
                     Search
                 </Typography>
@@ -92,9 +104,6 @@ const Search = () => {
                     onKeyDown={(e) =>
                         e.key === "Enter" ? handleSearch() : null
                     }
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                    }}
                 >
                     <Grid size={{ xs: 12, md: 9 }}>
                         <TextField
@@ -186,32 +195,6 @@ const Search = () => {
                     </AccordionDetails>
                 </Accordion> */}
             </Paper>
-            {results.length === 0 ? (
-                <Paper>
-                    <Typography variant="h4" sx={{ textAlign: "center" }}>
-                        No Results Found
-                    </Typography>
-                </Paper>
-            ) : (
-                results.map((result) =>
-                    result.type === "University" ? (
-                        <InfoElement
-                            imageUrl={result.logoUrl}
-                            title={result.universityName}
-                            subtitle={result.location}
-                            onClick={() => navigate(`/university/${result.id}`)}
-                            key={"University" + result.id}
-                        />
-                    ) : (
-                        <InfoElement
-                            imageUrl={result.profileImageUrl}
-                            title={result.teamName}
-                            subtitle={result.universityName}
-                            key={"Team" + result.id}
-                        />
-                    )
-                )
-            )}
         </Box>
     );
 };
