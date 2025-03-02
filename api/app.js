@@ -8,8 +8,9 @@ const logger = require("morgan");
 const cors = require("cors");
 
 // Require Routes
-const users = require("./routes/users");
 const index = require("./routes");
+const users = require("./routes/users");
+const university = require("./routes/university");
 const createError = require("http-errors");
 
 //Initialize Express
@@ -24,8 +25,9 @@ app.use(cookieParser());
 app.use(cors()); // Enable CORS
 
 // Routes
-app.use("/api/users", users);
 app.use("/api", index);
+app.use("/api/users", users);
+app.use("/api/university", university);
 
 //404 any routes not defined above
 app.use((_req, _res, next) => {
