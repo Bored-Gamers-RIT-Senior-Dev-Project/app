@@ -18,7 +18,7 @@ const searchTeams = async (
     //TODO create teamModel and move SQL interactions there
     let sql = `
         SELECT 
-            t.TeamID, 
+            t.TeamID AS Id, 
             t.TeamName,
             t.ProfileImageURL,
             t.Description,
