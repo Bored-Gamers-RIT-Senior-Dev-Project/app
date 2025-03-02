@@ -1,5 +1,5 @@
 const db = require("../config/db");
-
+const universityModel = require("../models/universityModel");
 /**
  * Searches universities based on the search term.
  *
@@ -7,25 +7,12 @@ const db = require("../config/db");
  * @param {boolean} partial - If the search should include partial matches
  * @returns {Promise<Array>} - A promise that resolves to an array of search results.
  */
-const searchUniversities = async (universityName, partial = true) => {
-    //TODO: Create universityModel and move sql logic there.
-    let sql = `
-        SELECT 
-            UniversityId AS Id,
-            UniversityName, 
-            Location,
-            LogoURL,
-            Description,
-            WebsiteURL,
-            'University' AS Type
-        FROM Universities
-        WHERE 
-            UniversityName LIKE ?`;
-
-    const query = await db.query(sql, [
-        partial ? `%${universityName}%` : universityName,
-    ]);
-    return query[0];
+const searchUniversities = async (universityName) => {
+    const searchResult = await universityModel.searchUniversities(
+        universityModel,
+        true
+    );
+    return searchResult;
 };
 
 module.exports = { searchUniversities };
