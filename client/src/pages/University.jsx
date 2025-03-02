@@ -14,37 +14,35 @@ import {
     Typography,
 } from "@mui/material";
 import { useState } from "react";
+import { useLoaderData } from "react-router";
 
 const University = () => {
-    const [universityName, setUniversityName] = useState("University Name");
-    const [summary, setSummary] = useState(
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ullamcorper adipiscing curae quisque vehicula eleifend lectus."
-    );
+    const university = useLoaderData();
+    const [universityData, setUniversityData] = useState(university);
     const [selectedTab, setSelectedTab] = useState(0);
-    const [teams, setTeams] = useState([
-        { id: 1, name: "Team 1", wins: 0, losses: 0 },
-        { id: 2, name: "Team 2", wins: 0, losses: 1 },
-        { id: 3, name: "Team 3", wins: 1, losses: 2 },
-    ]);
 
     // Save university name (future API call)
     const handleSaveUniversityName = () => {
-        console.log("Saved:", universityName);
+        console.log("Saved:", universityData);
     };
 
     // Handle removing a team
     const handleRemoveTeam = (id) => {
-        setTeams(teams.filter((team) => team.id !== id));
+        setUniversityData((current) => ({
+            ...current,
+            teams: current.teams.filter((team) => team.id !== id),
+        }));
+    };
+
+    const handleFormChange = (key, value) => {
+        setUniversityData((current) => ({ ...current, [key]: value }));
     };
 
     return (
-        <Box
+        <Card
             sx={{
-                maxWidth: "750px",
-                margin: "auto",
+                width: { sm: "95vw", md: "800px" },
                 padding: 4,
-                background: "rgba(255, 255, 255, 0.9)",
-                borderRadius: "12px",
                 boxShadow: 3,
             }}
         >
@@ -58,8 +56,10 @@ const University = () => {
                 }}
             >
                 <TextField
-                    value={universityName}
-                    onChange={(e) => setUniversityName(e.target.value)}
+                    value={universityData.universityName}
+                    onChange={(e) =>
+                        handleFormChange("universityName", e.target.value)
+                    }
                     variant="outlined"
                     sx={{
                         backgroundColor: "white",
@@ -158,8 +158,10 @@ const University = () => {
                 fullWidth
                 multiline
                 rows={4}
-                value={summary}
-                onChange={(e) => setSummary(e.target.value)}
+                value={universityData.description}
+                onChange={(e) =>
+                    handleFormChange("description", e.target.value)
+                }
                 label="University Summary"
                 variant="outlined"
                 sx={{
@@ -188,7 +190,7 @@ const University = () => {
             {/* Team List (if Teams tab is selected) */}
             {selectedTab === 0 && (
                 <Box sx={{ marginTop: 3 }}>
-                    {teams.map((team) => (
+                    {universityData.teams.map((team) => (
                         <Card
                             key={team.id}
                             sx={{
@@ -211,13 +213,13 @@ const University = () => {
                                             variant="h6"
                                             sx={{ fontWeight: "bold" }}
                                         >
-                                            {team.name}
+                                            {team.teamName}
                                         </Typography>
                                         <Typography
                                             variant="body2"
                                             sx={{ color: "#666" }}
                                         >
-                                            Rochester Institute of Technology
+                                            {team.universityName}
                                         </Typography>
                                     </Grid>
 
@@ -229,7 +231,8 @@ const University = () => {
                                                 fontWeight: "bold",
                                             }}
                                         >
-                                            {team.wins}W | {team.losses}L
+                                            {team.wins ?? 0}W |{" "}
+                                            {team.losses ?? 0}L
                                         </Typography>
                                     </Grid>
 
@@ -279,7 +282,7 @@ const University = () => {
                     </Typography>
                 </Box>
             )}
-        </Box>
+        </Card>
     );
 };
 
