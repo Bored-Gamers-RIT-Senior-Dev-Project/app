@@ -1,31 +1,16 @@
 const universityModel = require("../models/universityModel");
-const teamModel = require("../models/teamModel");
-const createHttpError = require("http-errors");
 /**
  * Searches universities based on the search term.
  *
  * @param {string} universityName - The search term for the university name.
  * @returns {Promise<Array>} - A promise that resolves to an array of search results.
  */
-const searchUniversities = async (universityName, partial = true) => {
-    //TODO: Create universityModel and move sql logic there.
-    let sql = `
-        SELECT 
-            UniversityId AS Id,
-            UniversityName, 
-            Location,
-            LogoURL,
-            Description,
-            WebsiteURL,
-            'University' AS Type
-        FROM Universities
-        WHERE 
-            UniversityName LIKE ?`;
-
-    const query = await db.query(sql, [
-        partial ? `%${universityName}%` : universityName,
-    ]);
-    return query[0];
+const searchUniversities = async (universityName) => {
+    const searchResult = await universityModel.searchUniversities(
+        universityModel,
+        true
+    );
+    return searchResult;
 };
 
 const getUniversityInfo = async (universityId) => {
