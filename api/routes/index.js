@@ -15,15 +15,12 @@ router.post("/test", async (req, res) => {
 });
 
 router.post("/search", async (req, res, next) => {
-    let { searchTerm } = req.body;
-    searchTerm = searchTerm ? searchTerm : "";
+    let { value } = req.body;
+    value = value ? value : "";
 
     try {
-        const universitySearch = universityService.searchUniversities(
-            searchTerm,
-            searchTerm
-        );
-        const teamSearch = teamService.searchTeams(searchTerm);
+        const universitySearch = universityService.searchUniversities(value);
+        const teamSearch = teamService.searchTeams(value, value);
 
         const [universities, teams] = await Promise.all([
             universitySearch,
