@@ -1,4 +1,6 @@
 const universityModel = require("../models/universityModel");
+const teamModel = require("../models/teamModel");
+const createHttpError = require("http-errors");
 /**
  * Searches universities based on the search term.
  *
@@ -12,4 +14,18 @@ const searchUniversities = async (universityName) => {
     return searchResult;
 };
 
-module.exports = { searchUniversities };
+const getUniversityInfo = async (universityId) => {
+    const universityQuery = universityModel.getUniversityById(universityId);
+    const teamQuery = teamModel.getTeamsByUniversityId(universityId);
+
+    const [universityInfo, teams] = await Promise.all([
+        universityQuery,
+        teamQuery,
+    ]);
+
+    if (!universityInfo) throw createHttpError(404);
+
+    return { ...universityInfo, teams };
+};
+
+module.exports = { searchUniversities, getUniversityInfo };

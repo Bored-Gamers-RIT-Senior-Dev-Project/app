@@ -1,20 +1,5 @@
 const db = require("../config/db");
 
-const getUniversity = async (id) => {
-    const query = await db.query(
-        `SELECT *
-        FROM UNIVERSITIES
-        WHERE UniversityId = ?`,
-        [id]
-    );
-
-    if (query[0].length == 0) {
-        return null;
-    }
-
-    return query[0][0];
-};
-
 /**
  * Searches universities based on the search term.
  *
