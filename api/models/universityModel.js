@@ -42,4 +42,18 @@ const searchUniversities = async (universityName, partial = true) => {
     return query[0];
 };
 
-module.exports = { searchUniversities };
+const getUniversityById = async (universityId) => {
+    let sql = `SELECT *
+        FROM Universities
+        WHERE UniversityId = ?`;
+
+    const query = await db.query(sql, [universityId]);
+
+    if (query[0].length < 1) {
+        return null;
+    }
+
+    return query[0][0];
+};
+
+module.exports = { searchUniversities, getUniversityById };
