@@ -9,30 +9,8 @@ const teamModel = require("../models/teamModel");
  */
 const searchTeams = async (teamName, universityName = null) => {
     //TODO create teamModel and move SQL interactions there
-    let sql = `
-        SELECT 
-            t.TeamID AS Id, 
-            t.TeamName,
-            t.ProfileImageURL,
-            t.Description,
-            u.UniversityName,
-            'Team' AS Type
-        FROM Teams t
-        JOIN Universities u ON t.UniversityID = u.UniversityID
-        WHERE 
-            (t.TeamName LIKE ?`;
-    const fieldPacket = [partial ? `%${teamName}%` : teamName];
-    if (universityName) {
-        fieldPacket.push(partial ? `%${universityName}%` : universityName);
-        sql += ` OR u.UniversityName LIKE ?)`;
-    } else sql += ")";
-    if (approvedOnly) {
-        sql += " AND t.IsApproved = true";
-    }
-
-    const teamQuery = await db.query(sql, fieldPacket);
-
-    return teamQuery[0];
+    const results = await teamModel.searchTeams(teamName, universityName);
+    return results;
 };
 
 module.exports = { searchTeams };
