@@ -42,4 +42,16 @@ const searchTeams = async (
     return teamQuery[0];
 };
 
-module.exports = { searchTeams };
+const getTeamsByUniversityId = async (universityId, approvedOnly = true) => {
+    let sql = `SELECT *
+        FROM Teams
+        WHERE
+            UniversityId = ?`;
+    if (approvedOnly) sql += "\n AND IsApproved = true";
+
+    const query = await db.query(sql, [universityId]);
+
+    return query[0];
+};
+
+module.exports = { searchTeams, getTeamsByUniversityId };
