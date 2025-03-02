@@ -1,31 +1,37 @@
-const universityModel = require("../models/universityModel");
-const teamModel = require("../models/teamModel");
-const createHttpError = require("http-errors");
+const db = require("../config/db");
+
 /**
  * Searches universities based on the search term.
  *
- * @param {string} universityName - The search term for the university name.
+ * @param {string} teamName - The search term for the team name.
+ * @param {string} universityName - The name of the university to search for, optional.
+ * @param {boolean} partial - If the search should include partial matches
  * @returns {Promise<Array>} - A promise that resolves to an array of search results.
  */
-const searchUniversities = async (universityName) => {
-    const searchResult = await universityModel.searchUniversities(
-        universityName
-    );
-    return searchResult;
+const searchUniversities = async (
+    teamName,
+    universityName = null,
+    partial = true
+) => {
+    //TODO: Create universityModel and move sql logic there.
+    const sql = `
+        SELECT 
+            t.TeamID AS ID, 
+            t.TeamName AS Name, 
+            'Team' AS Type,
+            u.UniversityName AS AssociatedUniversity
+        FROM Team t
+        JOIN University u ON t.UniversityID = u.UniversityID
+        WHERE 
+            t.TeamName ILIKE ?`;
+    const fieldPacket = [partial ? `%${teamName}%` : teamName];
+    if (universityName) {
+        sql += ` OR u.UniversityName ILIKE ?`;
+        fieldPacket.push(partial ? `%${universityName}%` : universityName);
+    }
+
+    const query = await db.query(sql, fieldPacket);
+    return query[0];
 };
 
-const getUniversityInfo = async (universityId) => {
-    const universityQuery = universityModel.getUniversityById(universityId);
-    const teamQuery = teamModel.getTeamsByUniversityId(universityId);
-
-    const [universityInfo, teams] = await Promise.all([
-        universityQuery,
-        teamQuery,
-    ]);
-
-    if (!universityInfo) throw createHttpError(404);
-
-    return { ...universityInfo, teams };
-};
-
-module.exports = { searchUniversities, getUniversityInfo };
+module.exports = { searchUniversities };

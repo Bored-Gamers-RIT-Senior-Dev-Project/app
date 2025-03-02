@@ -15,25 +15,24 @@ router.post("/test", async (req, res) => {
 });
 
 router.post("/search", async (req, res, next) => {
-    let { value } = req.body;
-    value = value ? value : "";
+    let { searchTerm } = req.body;
+    searchTerm = searchTerm ? searchTerm : "";
 
     try {
-        const universitySearch = universityService.searchUniversities(value);
-        const teamSearch = teamService.searchTeams(value);
+        const universitySearch = universityService.searchUniversities(
+            searchTerm,
+            searchTerm
+        );
+        const teamSearch = teamService.searchTeams(searchTerm);
 
         const [universities, teams] = await Promise.all([
             universitySearch,
             teamSearch,
         ]);
 
-        const result = [];
-        result.push(...universities);
-        result.push(...teams);
-
         return res.json({
-            count: result.length,
-            result: makeObjectCamelCase(result),
+            universities: makeObjectCamelCase(universities),
+            teams: makeObjectCamelCase(teams),
         });
     } catch (e) {
         console.error("Search Error: ", e.message);
