@@ -7,8 +7,7 @@ const universityModel = require("../models/universityModel");
  */
 const searchUniversities = async (universityName) => {
     const searchResult = await universityModel.searchUniversities(
-        universityModel,
-        true
+        universityName
     );
     return searchResult;
 };
