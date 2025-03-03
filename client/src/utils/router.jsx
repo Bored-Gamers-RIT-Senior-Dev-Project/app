@@ -1,11 +1,13 @@
 import { createBrowserRouter } from "react-router";
 import App from "../App";
+<<<<<<< Updated upstream
 import {
     Home,
     NotFound,
     Rules,
     Schedule,
     Search,
+    TeamsPage,
     University,
     UserSettings,
     UserSignIn,
@@ -51,6 +53,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "/university/:universityId",
+<<<<<<< Updated upstream
                 element: <University />,
             },
             {
@@ -81,5 +84,24 @@ const router = createBrowserRouter([
         ],
     },
 ]);
+=======
+                element: <University/>,
+              },
+              {
+                path: "/teamspage",
+                element: <TeamsPage/>,
+              },
+              {
+                  path: "/about",
+                  element: "TODO: About Page",
+              },
+              {
+                  path: "*",
+                  element: <NotFound />,
+              },
+          ],
+      },
+  ]);
+>>>>>>> Stashed changes
 
 export { router };

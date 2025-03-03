@@ -7,6 +7,7 @@ import { University } from "./University";
 import { UserSettings } from "./UserSettings";
 import { UserSignIn } from "./UserSignIn";
 import { UserSignUp } from "./UserSignUp";
+<<<<<<< Updated upstream
 export {
     Home,
     NotFound,
@@ -18,3 +19,9 @@ export {
     UserSignIn,
     UserSignUp,
 };
+=======
+import { University } from "./University";
+import { TeamsPage } from "./TeamsPage"; // Add this line
+
+export { Home, NotFound, Search, UserSignIn, UserSignUp,University, TeamsPage};
+>>>>>>> Stashed changes
