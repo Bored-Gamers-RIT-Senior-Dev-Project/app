@@ -7,6 +7,7 @@ import {
     Schedule,
     Search,
     University,
+    About,
     UserSettings,
     UserSignIn,
     UserSignUp,
@@ -55,7 +56,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "/about",
-                element: "TODO: About Page",
+                element: <About />,
             },
             {
                 path: "/settings",
