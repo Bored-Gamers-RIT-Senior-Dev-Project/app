@@ -8,6 +8,7 @@ import {
     Search,
     University,
     About,
+    UserSettings,
     UserSignIn,
     UserSignUp,
 } from "../pages";
@@ -25,7 +26,6 @@ const makeAction =
         if (spinner) events.publish("spinner.close");
         return response;
     };
-
 const router = createBrowserRouter([
     {
         path: "/",
@@ -57,6 +57,10 @@ const router = createBrowserRouter([
             {
                 path: "/about",
                 element: <About />,
+            },
+            {
+                path: "/settings",
+                element: <UserSettings />,
             },
             {
                 path: "/rules",

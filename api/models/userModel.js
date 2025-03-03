@@ -26,7 +26,7 @@ const createUser = async (
     try {
         const result = await db.query(
             `INSERT INTO
-                Users (FirebaseUID, Email, Username, FirstName, LastName, ProfileImageUrl, RoleId)
+                users (FirebaseUID, Email, Username, FirstName, LastName, ProfileImageUrl, RoleId)
                 VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [
                 firebaseUID,
@@ -111,7 +111,7 @@ const updateUser = async (firebaseUid, body) => {
         .join(", ");
 
     const [rows] = await db.query(
-        `UPDATE Users SET ${keys} WHERE FirebaseUID = ?`,
+        `UPDATE users SET ${keys} WHERE FirebaseUID = ?`,
         [...Object.values(body), firebaseUid]
     );
 
@@ -131,7 +131,7 @@ const getSharedUsernames = async (username) => {
     try {
         //Select all usernames that start with the given username
         const [rows] = await db.query(
-            `SELECT Username FROM Users WHERE lower(Username) LIKE lower(?)`,
+            `SELECT Username FROM users WHERE lower(Username) LIKE lower(?)`,
             [username + "%"]
         );
         //Return those rows.
