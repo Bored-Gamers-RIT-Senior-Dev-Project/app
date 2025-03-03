@@ -1,18 +1,19 @@
 // Adding for now to ban dumb things durning development, but we can remove
 // this later:
 "use strict";
-const createError = require("http-errors");
-const express = require("express");
-const path = require("path");
+
+//Require Middleware
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
-const bodyParser = require("body-parser");
 const cors = require("cors");
 
+// Require Routes
 const users = require("./routes/users");
 const test = require("./routes/test");
-const auth = require("./routes/auth");
+const createError = require("http-errors");
 
+//Initialize Express
+const express = require("express");
 const app = express();
 
 // Middleware
@@ -21,42 +22,30 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cors()); // Enable CORS
-app.use(bodyParser.json());
 
+// Routes
 app.use("/api/users", users);
 app.use("/api", test);
-app.use("/api/auth", auth);
 
-// catch 404 and forward to error handler
+//404 any routes not defined above
 app.use((_req, _res, next) => {
     next(createError(404));
 });
 
-// error handler
-app.use((err, req, res, _) => {
+// Error Handler
+app.use((err, req, res, _next) => {
+    //Only provide error in development
+    const error = req.app.get("env") === "development" ? err : {};
+
     // set locals, only providing error in development
+
     res.locals.message = err.message;
-    res.locals.error = req.app.get("env") === "development" ? err : {};
+    res.locals.error = error;
 
-    // render the error page
-    res.status(err.status || 500);
-    res.json({
+    // Send an error message
+    res.status(err.status || 500).json({
         message: err.message, // https://stackoverflow.com/a/32836884
-        error: err,
-    }); // FIXME: This is temporary, send to user friendly error page instead (Respond with an error response, React Router the frontend has the tools to do this.  -Nate)
-});
-
-// Catch 404 and forward to error handler
-app.use((req, res, next) => {
-    next(createError(404));
-});
-
-// Error handler
-app.use((err, req, res, next) => {
-    res.status(err.status || 500);
-    res.json({
-        message: err.message,
-        error: req.app.get("env") === "development" ? err : {}, // Hide stack trace in production
+        error,
     });
 });
 

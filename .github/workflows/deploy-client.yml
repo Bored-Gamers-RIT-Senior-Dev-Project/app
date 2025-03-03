@@ -1,56 +1,61 @@
-name: Build and Deploy (React App) Frontend to Staging Host
+name: Build and Deploy Client to Staging Host
 
 on:
-  workflow_dispatch:
-    inputs:
-      branch:
-        description: "Branch to deploy"
-        required: false
-        default: "main"
+    # Trigger on push to the main branch
+    #  push:
+    #    branches:
+    #      - main
+
+    workflow_dispatch:
+        inputs:
+            branch:
+                description: "Branch to deploy"
+                required: false
+                default: "main"
 
 jobs:
-  build-and-deploy:
-    runs-on: self-hosted
+    build-and-deploy:
+        runs-on: self-hosted
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch || github.ref_name }}
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.inputs.branch || github.ref_name }}
 
-      - name: Build Docker Image
-        run: |
-          docker build -t bg_frontend ./client
+            - name: Build Docker Image
+              run: |
+                  docker buildx build --network=host -t bg-client ./client
 
-      - name: Save and Transfer Docker Image to Server
-        run: |
-          docker save bg_frontend -o bg_frontend.tar
-          ssh-keyscan -t ed25519 ${{ secrets.SSH_STAGING_HOST }} >> ~/.ssh/known_hosts
-          scp bg_frontend.tar ${{ secrets.SSH_USER }}@${{ secrets.SSH_STAGING_HOST }}:/tmp/bg_frontend.tar
+            - name: Save and Transfer Docker Image to Server
+              run: |
+                  docker save bg-client -o bg-client.tar
+                  ssh-keyscan -t ed25519 ${{ secrets.SSH_STAGING_HOST }} >> ~/.ssh/known_hosts
+                  scp bg-client.tar ${{ secrets.SSH_USER }}@${{ secrets.SSH_STAGING_HOST }}:/tmp/bg-client.tar
 
-      - name: Deploy Application via SSH
-        run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_STAGING_HOST }} << 'EOF'
-            CONTAINER_NAME=bg_frontend_app
-            IMAGE_TAR=/tmp/bg_frontend.tar
-            echo "Container Name: $CONTAINER_NAME"
-            echo "Image .tar Name: $IMAGE_TAR"
+            - name: Deploy Application via SSH
+              run: |
+                  ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_STAGING_HOST }} << 'EOF'
+                    CONTAINER_NAME=bg-client_app
+                    IMAGE_TAR=/tmp/bg-client.tar
+                    echo "Container Name: $CONTAINER_NAME"
+                    echo "Image .tar Name: $IMAGE_TAR"
 
-            # Load the Docker image
-            echo "Loading $IMAGE_TAR"
-            docker load -i "$IMAGE_TAR"
+                    # Load the Docker image
+                    echo "Loading $IMAGE_TAR"
+                    docker load -i "$IMAGE_TAR"
 
-            # Stop and remove old container if it exists
-            echo "Stopping running containers..."
-            docker stop "$CONTAINER_NAME" || true
-            echo "Removing previous containers..."
-            docker rm "$CONTAINER_NAME" || true
+                    # Stop and remove old container if it exists
+                    echo "Stopping running containers..."
+                    docker stop "$CONTAINER_NAME" || true
+                    echo "Removing previous containers..."
+                    docker rm "$CONTAINER_NAME" || true
 
-            # Run the new container on port 5173
-            echo "Running container: $CONTAINER_NAME"
-            docker run -d --name "$CONTAINER_NAME" -p 5173:5173 bg_frontend
+                    # Run the new container on port 5173
+                    echo "Running container: $CONTAINER_NAME"
+                    docker run -d --name "$CONTAINER_NAME" -p 5173:5173 bg-client
 
-            # Clean up image tar file
-            echo "Cleaning up image file..."
-            rm -f "$IMAGE_TAR"
-          EOF
+                    # Clean up image tar file
+                    echo "Cleaning up image file..."
+                    rm -f "$IMAGE_TAR"
+                  EOF
