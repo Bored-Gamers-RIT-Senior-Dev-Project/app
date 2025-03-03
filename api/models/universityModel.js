@@ -33,7 +33,7 @@ const searchUniversities = async (universityName, partial = true) => {
             Description,
             WebsiteURL,
             'University' AS Type
-        FROM Universities
+        FROM universities
         WHERE 
             UniversityName LIKE ?`;
 

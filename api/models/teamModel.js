@@ -15,7 +15,6 @@ const searchTeams = async (
     partial = true,
     approvedOnly = true
 ) => {
-    //TODO create teamModel and move SQL interactions there
     let sql = `
         SELECT 
             t.TeamID AS Id, 
@@ -24,8 +23,8 @@ const searchTeams = async (
             t.Description,
             u.UniversityName,
             'Team' AS Type
-        FROM Teams t
-        JOIN Universities u ON t.UniversityID = u.UniversityID
+        FROM teams t
+        JOIN universities u ON t.UniversityID = u.UniversityID
         WHERE 
             (t.TeamName LIKE ?`;
     const fieldPacket = [partial ? `%${teamName}%` : teamName];
