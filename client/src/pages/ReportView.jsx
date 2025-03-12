@@ -28,7 +28,6 @@ const ReportView = () => {
                 flexDirection: "column",
                 alignItems: "center",
                 minHeight: "100vh",
-                background: "url('/background.jpg') center/cover",
                 p: 4,
                 ml: isSidebarOpen ? "250px" : "0",
                 width: isSidebarOpen ? "calc(100% - 250px)" : "100%",
