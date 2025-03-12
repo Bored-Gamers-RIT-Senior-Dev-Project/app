@@ -6,7 +6,7 @@ import {
     Tab,
     Paper,
     TextField,
-    Grid,
+    Grid2 as Grid,
     Button,
     useMediaQuery,
 } from "@mui/material";
