@@ -16,7 +16,6 @@ const ReportView = () => {
     const [tabIndex, setTabIndex] = useState(0);
     const [dates, setDates] = useState({ start: "", end: "" });
     const navigate = useNavigate();
-    const isSmallScreen = useMediaQuery("(max-width: 1200px)");
 
     const handleTabChange = (_, newIndex) => setTabIndex(newIndex);
     const handleDateChange = (field) => (e) => setDates({ ...dates, [field]: e.target.value });
