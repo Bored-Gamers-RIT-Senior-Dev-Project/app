@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router";
 
-const ReportView = ({ isSidebarOpen }) => {
+const ReportView = () => {
     const [tabIndex, setTabIndex] = useState(0);
     const [dates, setDates] = useState({ start: "", end: "" });
     const navigate = useNavigate();
