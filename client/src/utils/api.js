@@ -1,13 +1,41 @@
 import axios from "axios";
 import { events } from "./events";
+import { getIdToken } from "./firebase/auth";
+
 const API_URL = "http://localhost:3000/api";
 
-/**
- * Constructs the full API URL for a given path.
- * @param {string} path The API path for the given endpoint.
- * @returns The full API URL for the given path.
- */
-const url = (path) => `${API_URL}/${path}`;
+const buildUrl = (path) => `${API_URL}/${path}`;
+const addAuthorization = async (config) => {
+    const idToken = await getIdToken();
+    const headers = config?.headers ?? {};
+    if (idToken) {
+        config.headers = {
+            ...headers,
+            Authorization: `Bearer ${idToken}`,
+        };
+    }
+    return config;
+};
+
+const api = axios.create();
+const decorateRequest =
+    (f) =>
+    async (path, config = {}) => {
+        path = buildUrl(path);
+        config = await addAuthorization(config);
+        return await f(path, config);
+    };
+const decorateRequestWithBody =
+    (f) =>
+    async (path, body, config = {}) => {
+        path = buildUrl(path);
+        config = await addAuthorization(config);
+        return await f(path, body, config);
+    };
+api.post = decorateRequestWithBody(api.post);
+api.put = decorateRequestWithBody(api.put);
+api.get = decorateRequest(api.get);
+api.delete = decorateRequest(api.delete);
 
 //=========================== TEST ===========================
 /**
@@ -16,7 +44,7 @@ const url = (path) => `${API_URL}/${path}`;
  * @returns {Promise<*>} The same as params.
  */
 const sendTest = async (params) => {
-    let { data } = await axios.post(url("test"), params);
+    let { data } = await api.post("test", params);
     events.publish("message", { message: "Axios: " + JSON.stringify(data) });
     return data;
 };
@@ -24,7 +52,7 @@ const sendTest = async (params) => {
  * Server test function.
  * @returns {Promise<*>} A list of users.
  */
-const getTest = async () => axios.get(url("users"));
+const getTest = async () => axios.get("users");
 
 //========================== SEARCH ==========================
 /**
@@ -33,29 +61,29 @@ const getTest = async () => axios.get(url("users"));
  * @returns
  */
 const search = async (params) => {
-    let { data } = await axios.post(url("search"), params);
+    let { data } = await api.post("search", params);
     return data;
 };
 
 // ====================== AUTHENTICATION ======================
 //TODO: jsdocs for authentication.  Keeping it undone here solely because I already have another branch with a refactor of the authentication endpoints in progress.
 const handleSignIn = async (params) => {
-    let { data } = await axios.post(url("users/signin"), params);
+    let { data } = await api.post("users/signin", params);
     return data;
 };
 
 const handleSignUp = async (params) => {
-    let { data } = await axios.post(url("users/signup"), params);
+    let { data } = await api.post("users/signup", params);
     return data;
 };
 
 const getUserData = async (token) => {
-    let { data } = await axios.post(url("users/get"), { token });
+    let { data } = await api.post("users/get", { token });
     return data;
 };
 
 const updateUser = async (params) => {
-    let { data } = await axios.post(url("users/update"), params);
+    let { data } = await api.post("users/update", params);
     return data;
 };
 
@@ -66,7 +94,7 @@ const updateUser = async (params) => {
  * @returns {Promise<*>} The university's information.  Null if no university with the given ID exists.
  */
 const getUniversityInfo = async (universityId) => {
-    let { data } = await axios.get(url(`university/${universityId}`));
+    let { data } = await axios.get(`university/${universityId}`);
     return data;
 };
 
