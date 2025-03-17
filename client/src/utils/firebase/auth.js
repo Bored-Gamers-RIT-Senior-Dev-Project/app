@@ -39,7 +39,13 @@ const observeAuthState = (callback) => onAuthStateChanged(auth, callback);
 //TODO: .then() a snackbar confirming log-out was successful.
 const signOut = () => auth.signOut();
 
+const getIdToken = async () => {
+    if (!auth.currentUser) return null;
+    return await auth.currentUser.getIdToken();
+};
+
 export {
+    getIdToken,
     observeAuthState,
     // googleAuthProvider as authProvider,
     signInWithEmail,
