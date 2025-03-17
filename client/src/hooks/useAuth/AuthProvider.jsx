@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { getUserData } from "../../utils/api";
+import { users } from "../../utils/api";
 import { observeAuthState } from "../../utils/firebase/auth";
 import { AuthContext } from "./AuthContext";
 
@@ -14,7 +14,7 @@ const AuthProvider = ({ children }) => {
         //Returns unsubscribe function as per Copilot recommendation.
         return observeAuthState(async (firebaseUser) => {
             if (firebaseUser) {
-                getUserData().then(setUser);
+                users.getProfile().then(setUser);
             } else {
                 setUser(null);
             }

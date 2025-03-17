@@ -1,6 +1,12 @@
 const { verifyUser, deleteUser } = require("../config/firebase");
 const User = require("../models/userModel");
 
+const getUser = async (idToken) => {
+    const firebaseUser = await verifyUser(idToken);
+    const user = await User.readUser(firebaseUser.uid);
+    return user;
+};
+
 const signUp = async (idToken, email, username, firstName, lastName) => {
     const firebaseUser = await verifyUser(idToken);
     try {
@@ -38,12 +44,6 @@ const googleSignIn = async (idToken, email, displayName, photoURL) => {
             photoURL
         );
     }
-    return user;
-};
-
-const getUser = async (idToken) => {
-    const firebaseUser = await verifyUser(idToken);
-    const user = await User.readUser(firebaseUser.uid);
     return user;
 };
 

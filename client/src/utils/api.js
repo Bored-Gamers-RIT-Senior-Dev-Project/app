@@ -65,26 +65,26 @@ const search = async (params) => {
     return data;
 };
 
-// ====================== AUTHENTICATION ======================
-//TODO: jsdocs for authentication.  Keeping it undone here solely because I already have another branch with a refactor of the authentication endpoints in progress.
-const handleSignIn = async (params) => {
-    let { data } = await api.post("users/signin", params);
-    return data;
-};
-
-const handleSignUp = async (params) => {
-    let { data } = await api.post("users/signup", params);
-    return data;
-};
-
-const getUserData = async () => {
-    let { data } = await api.get("users/user");
-    return data;
-};
-
-const updateUser = async (params) => {
-    let { data } = await api.put("users/user", params);
-    return data;
+/******************
+ * AUTHENTICATION *
+ ******************/
+const users = {
+    getProfile: async () => {
+        let { data } = await api.get("users/profile");
+        return data;
+    },
+    google: async (params) => {
+        let { data } = await api.post("users/google", params);
+        return data;
+    },
+    signUp: async (params) => {
+        let { data } = await api.post("users", params);
+        return data;
+    },
+    update: async (params) => {
+        let { data } = await api.put("users", params);
+        return data;
+    },
 };
 
 // ======================== UNIVERSITY ========================
@@ -98,13 +98,4 @@ const getUniversityInfo = async (universityId) => {
     return data;
 };
 
-export {
-    getTest,
-    getUniversityInfo,
-    getUserData,
-    handleSignIn,
-    handleSignUp,
-    search,
-    sendTest,
-    updateUser,
-};
+export { getTest, getUniversityInfo, search, sendTest, users };
