@@ -70,9 +70,6 @@ const search = async (params) => {
     return data;
 };
 
-/******************
- * AUTHENTICATION *
- ******************/
 const users = {
     getProfile: async () => {
         let { data } = await api.get("users/profile");
