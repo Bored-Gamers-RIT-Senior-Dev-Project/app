@@ -21,7 +21,6 @@ router.post("/signin", async (req, res, next) => {
     }
     try {
         let user;
-        //TODO: change the way the front-end calls endpoints so that we don't need to do this.  Create a separate endpoint for Google sign-ups and use "/get" route for all user data retrieval.
         switch (method) {
             case "google":
                 user = await UserService.googleSignIn(
