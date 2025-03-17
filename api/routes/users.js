@@ -1,11 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const UserService = require("../services/userService");
-const createError = require("http-errors");
 
-router.get("/user", async (req, res, next) => {
+router.get("/profile", async (req, res, next) => {
     const { authorization } = req.headers;
-    if (!authorization) return req.status(401);
+    if (!authorization) return res.status(401).send();
     try {
         const user = await UserService.getUser(authorization.split(" ")[1]);
         return res.status(200).json(user);
@@ -14,44 +13,7 @@ router.get("/user", async (req, res, next) => {
     }
 });
 
-router.post("/signin", async (req, res, next) => {
-    const { idToken, method, email, displayName, photoURL } = req.body;
-    if (!idToken || !method) {
-        return res.status(400).json({ message: "Invalid request format." });
-    }
-    try {
-        let user;
-        //TODO: change the way the front-end calls endpoints so that we don't need to do this.  Create a separate endpoint for Google sign-ups and use "/get" route for all user data retrieval.
-        switch (method) {
-            case "google":
-                user = await UserService.googleSignIn(
-                    idToken,
-                    email,
-                    displayName,
-                    photoURL
-                );
-                break;
-            case "email":
-                user = await UserService.getUser(idToken);
-                if (!user) {
-                    throw createError(404, "User not found.");
-                }
-                break;
-            default:
-                return res
-                    .status(400)
-                    .json({ message: "Invalid sign-in method." });
-        }
-        return res.status(200).json({
-            message: "Sign-in successful!",
-            user,
-        }); //Successful sign-in.  Report to user and send the dbUser information for the frontend to store
-    } catch (error) {
-        next(error);
-    }
-});
-
-router.post("/signup", async (req, res, next) => {
+router.post("", async (req, res, next) => {
     const { idToken, email, username, firstName, lastName } = req.body;
     if (!email || !username || !idToken || !firstName || !lastName) {
         return res.status(400).json({ message: "Invalid request format." });
@@ -73,7 +35,30 @@ router.post("/signup", async (req, res, next) => {
     }
 });
 
-router.post("/update", async (req, res, next) => {
+router.post("/google", async (req, res, next) => {
+    const { email, displayName, photoURL } = req.body;
+    const { authorization } = req.headers;
+    if (!authorization) {
+        return res.status(401).send();
+    }
+
+    try {
+        const user = await UserService.googleSignIn(
+            authorization.split(" ")[1],
+            email,
+            displayName,
+            photoURL
+        );
+        return res.status(200).json({
+            message: "Welcome!",
+            user,
+        }); //Successful sign-in.  Report to user and send the dbUser information for the frontend to store
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.put("", async (req, res, next) => {
     const { idToken, ...body } = req.body;
     try {
         const user = await UserService.updateUser(idToken, body);

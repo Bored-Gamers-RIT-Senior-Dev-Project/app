@@ -14,13 +14,7 @@ import {
     UserSignUp,
 } from "../pages";
 import { UserPreferences } from "../pages/UserPreferences.DEMO";
-import {
-    getUniversityInfo,
-    handleSignIn,
-    handleSignUp,
-    search,
-    updateUser,
-} from "./api";
+import { getUniversityInfo, search, users } from "./api";
 import { events } from "./events";
 
 /**
@@ -56,12 +50,12 @@ const router = createBrowserRouter([
             {
                 path: "/signin",
                 element: <UserSignIn />,
-                action: makeAction(handleSignIn),
+                action: makeAction(users.google),
             },
             {
                 path: "/signup",
                 element: <UserSignUp />,
-                action: makeAction(handleSignUp),
+                action: makeAction(users.signUp),
             },
             {
                 path: "/search",
@@ -79,7 +73,7 @@ const router = createBrowserRouter([
                 loader: async ({ params }) => {
                     const { universityId } = params;
                     try {
-                        if (isNaN(Number(universityId))){
+                        if (isNaN(Number(universityId))) {
                             const error = new Error("Bad Request");
                             error.status = 404;
                             throw error;
@@ -112,7 +106,7 @@ const router = createBrowserRouter([
             {
                 path: "/user_preferences",
                 element: <UserPreferences />,
-                action: makeAction(updateUser),
+                action: makeAction(users.update),
             },
             {
                 path: "*",
@@ -123,4 +117,3 @@ const router = createBrowserRouter([
 ]);
 
 export { router };
-

@@ -35,14 +35,6 @@ const UserSignIn = () => {
         e.preventDefault();
         events.publish("spinner.open");
         try {
-            /**
-             * const user = await signInWithEmail(
-                signInData.email,
-                signInData.password
-            );
-            const idToken = await user.getIdToken();
-            submit({ idToken, method: "email" });
-             */
             await signInWithEmail(signInData.email, signInData.password); //Authentication updates for preexisting users handled in AuthProvider.
         } catch (error) {
             handleErrors(error);
@@ -55,14 +47,11 @@ const UserSignIn = () => {
         try {
             const signIn = await signInWithGoogle();
             if (signIn.additionalUserInfo.isNewUser) {
-                const idToken = await signIn.user.getIdToken();
                 const { displayName, photoURL, email } = signIn.user;
                 submit({
-                    idToken,
                     displayName,
                     photoURL,
                     email,
-                    method: "google",
                 });
             }
         } catch (error) {
