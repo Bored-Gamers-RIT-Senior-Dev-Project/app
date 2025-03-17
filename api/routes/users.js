@@ -3,10 +3,11 @@ const router = express.Router();
 const UserService = require("../services/userService");
 const createError = require("http-errors");
 
-router.post("/get", async (req, res, next) => {
-    const { token } = req.body;
+router.get("/user", async (req, res, next) => {
+    const { authorization } = req.headers;
+    if (!authorization) return req.status(401);
     try {
-        const user = await UserService.getUser(token);
+        const user = await UserService.getUser(authorization.split(" ")[1]);
         return res.status(200).json(user);
     } catch (error) {
         next(error);

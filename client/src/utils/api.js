@@ -77,13 +77,13 @@ const handleSignUp = async (params) => {
     return data;
 };
 
-const getUserData = async (token) => {
-    let { data } = await api.post("users/get", { token });
+const getUserData = async () => {
+    let { data } = await api.get("users/user");
     return data;
 };
 
 const updateUser = async (params) => {
-    let { data } = await api.post("users/update", params);
+    let { data } = await api.put("users/user", params);
     return data;
 };
 

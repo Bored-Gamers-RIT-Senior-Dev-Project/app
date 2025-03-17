@@ -5,8 +5,7 @@ import { observeAuthState } from "../../utils/firebase/auth";
 import { AuthContext } from "./AuthContext";
 
 const AuthProvider = ({ children }) => {
-    const [token, setToken] = useState("");
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(undefined);
 
     // useEffect with empty array only runs on component initialization.
     // Uses firebase onAuthStateChanged via firebase/auth.js to subscribe to auth state changes.
@@ -15,27 +14,15 @@ const AuthProvider = ({ children }) => {
         //Returns unsubscribe function as per Copilot recommendation.
         return observeAuthState(async (firebaseUser) => {
             if (firebaseUser) {
-                const token = await firebaseUser.getIdToken();
-                setToken(token);
+                getUserData().then(setUser);
             } else {
-                setToken(null);
+                setUser(null);
             }
         });
     }, []);
 
-    // useEffect with token deps will update whenever the token state is changed.
-    // - Get user data from the API and store it in userData state.
-    // - If token updates to null (logged out), user follows suit and updates to null.
-    useEffect(() => {
-        if (token) {
-            getUserData(token).then((data) => setUser(data));
-        } else {
-            setUser(null);
-        }
-    }, [token]);
-
     return (
-        <AuthContext.Provider value={{ user, idToken: token, setUser }}>
+        <AuthContext.Provider value={{ user, setUser }}>
             {children}
         </AuthContext.Provider>
     );
