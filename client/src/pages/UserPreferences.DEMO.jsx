@@ -5,14 +5,14 @@ import { useAuth } from "../hooks/useAuth";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 
 const UserPreferences = () => {
-    const { user, idToken } = useAuth();
+    const { user } = useAuth();
     const [usernameBar, setUsernameBar] = useState(user?.username);
     const submit = usePostSubmit();
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (idToken === null) navigate("/signin");
-    }, [idToken, navigate]);
+        if (user === null) navigate("/signin");
+    }, [user, navigate]);
 
     return (
         <Paper
@@ -31,12 +31,11 @@ const UserPreferences = () => {
                 value={usernameBar}
                 onChange={(event) => setUsernameBar(event.target.value)}
                 onKeyDown={(event) =>
-                    event.key === "Enter" &&
-                    submit({ idToken, username: usernameBar })
+                    event.key === "Enter" && submit({ username: usernameBar })
                 }
             />
             <Button
-                onClick={() => submit({ idToken, username: usernameBar })}
+                onClick={() => submit({ username: usernameBar })}
                 variant="contained"
             >
                 Update Username
@@ -44,7 +43,6 @@ const UserPreferences = () => {
             <Button
                 onClick={() =>
                     submit({
-                        idToken,
                         teamId: 1,
                         roleId: 4,
                     })
@@ -57,7 +55,6 @@ const UserPreferences = () => {
             <Button
                 onClick={() =>
                     submit({
-                        idToken,
                         teamId: 49,
                         roleId: 4,
                     })
@@ -70,7 +67,6 @@ const UserPreferences = () => {
             <Button
                 onClick={() =>
                     submit({
-                        idToken,
                         teamId: null,
                         roleId: 2,
                         universityId: null,
@@ -84,7 +80,6 @@ const UserPreferences = () => {
             <Button
                 onClick={() =>
                     submit({
-                        idToken,
                         teamId: null,
                         roleId: 3,
                         universityId: 1,
@@ -98,7 +93,6 @@ const UserPreferences = () => {
             <Button
                 onClick={() =>
                     submit({
-                        idToken,
                         teamId: null,
                         roleId: 3,
                         universityId: 7,
