@@ -4,6 +4,11 @@ import { getIdToken } from "./firebase/auth";
 
 const API_URL = "http://localhost:3000/api";
 
+/**
+ * Constructs the full API URL for a given path.
+ * @param {string} path The API path for the given endpoint.
+ * @returns The full API URL for the given path.
+ */
 const buildUrl = (path) => `${API_URL}/${path}`;
 const addAuthorization = async (config) => {
     const idToken = await getIdToken();
@@ -52,7 +57,7 @@ const sendTest = async (params) => {
  * Server test function.
  * @returns {Promise<*>} A list of users.
  */
-const getTest = async () => axios.get("users");
+const getTest = async () => api.get("users");
 
 //========================== SEARCH ==========================
 /**
