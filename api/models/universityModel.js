@@ -17,7 +17,7 @@ const searchUniversities = async (universityName, partial = true) => {
             Description,
             WebsiteURL,
             'University' AS Type
-        FROM Universities
+        FROM universities
         WHERE 
             UniversityName LIKE ?`;
 
@@ -29,7 +29,7 @@ const searchUniversities = async (universityName, partial = true) => {
 
 const getUniversityById = async (universityId) => {
     let sql = `SELECT *
-        FROM Universities
+        FROM universities
         WHERE UniversityId = ?`;
 
     const query = await db.query(sql, [universityId]);

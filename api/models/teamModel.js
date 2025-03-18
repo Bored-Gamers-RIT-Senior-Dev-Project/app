@@ -24,8 +24,8 @@ const searchTeams = async (
             t.Description,
             u.UniversityName,
             'Team' AS Type
-        FROM Teams t
-        JOIN Universities u ON t.UniversityID = u.UniversityID
+        FROM teams t
+        JOIN universities u ON t.UniversityID = u.UniversityID
         WHERE 
             (t.TeamName LIKE ?`;
     const fieldPacket = [partial ? `%${teamName}%` : teamName];
@@ -44,7 +44,7 @@ const searchTeams = async (
 
 const getTeamsByUniversityId = async (universityId, approvedOnly = true) => {
     let sql = `SELECT *
-        FROM Teams
+        FROM teams
         WHERE
             UniversityId = ?`;
     if (approvedOnly) sql += "\n AND IsApproved = true";
