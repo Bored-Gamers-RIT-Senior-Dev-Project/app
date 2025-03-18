@@ -14,7 +14,7 @@ import {
     UserSignUp,
 } from "../pages";
 import { UserPreferences } from "../pages/UserPreferences.DEMO";
-import { getUniversityInfo, search, users } from "./api";
+import { search, university, users } from "./api";
 import { events } from "./events";
 
 /**
@@ -78,7 +78,7 @@ const router = createBrowserRouter([
                             error.status = 404;
                             throw error;
                         }
-                        return await getUniversityInfo(universityId);
+                        return await university.getInfo(universityId);
                     } catch (e) {
                         if (e.status === 404) {
                             return redirect("/notfound");
