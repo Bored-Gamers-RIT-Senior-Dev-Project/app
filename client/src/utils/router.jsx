@@ -23,15 +23,26 @@ import {
 } from "./api";
 import { events } from "./events";
 
-//Make an action out of an api call
+/**
+ * Creates an action that handles API requests with optional spinner.
+ * @param {(*) => Promise<*>} action The function that handles the API call.
+ * @param {boolean} [spinner=true] Whether to show a spinner during the request.
+ */
 const makeAction =
     (action, spinner = true) =>
     async (params) => {
-        if (spinner) events.publish("spinner.open");
-        const data = await params.request.json();
-        const response = await action(data);
-        if (spinner) events.publish("spinner.close");
-        return response;
+        if (spinner) {
+            events.publish("spinner.open");
+        }
+        try {
+            const data = await params.request.json();
+            const response = await action(data);
+            return response;
+        } finally {
+            if (spinner) {
+                events.publish("spinner.close");
+            }
+        }
     };
 const router = createBrowserRouter([
     {
@@ -60,15 +71,15 @@ const router = createBrowserRouter([
             },
             {
                 path: "/teamspage",
-                element: <TeamsPage/>,
+                element: <TeamsPage />,
             },
             {
                 path: "/university/:universityId",
                 element: <University />,
                 loader: async ({ params }) => {
                     const { universityId } = params;
-                    if (isNaN(parseInt(universityId))) {
-                        return redirect("/404");
+                    if (isNaN(Number(universityId))) {
+                        return redirect("/notfound");
                     }
                     return await getUniversityInfo(universityId);
                 },
@@ -95,12 +106,8 @@ const router = createBrowserRouter([
                 action: makeAction(updateUser),
             },
             {
-                path: "404",
-                element: <NotFound />,
-            },
-            {
                 path: "*",
-                loader: () => redirect("/404"),
+                element: <NotFound />,
             },
         ],
     },
