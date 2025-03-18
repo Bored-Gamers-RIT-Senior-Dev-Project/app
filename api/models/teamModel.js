@@ -47,7 +47,9 @@ const getTeamsByUniversityId = async (universityId, approvedOnly = true) => {
         FROM teams
         WHERE
             UniversityId = ?`;
-    if (approvedOnly) sql += "\n AND IsApproved = true";
+    if (approvedOnly) {
+        sql += "\n AND IsApproved = true";
+    }
 
     const query = await db.query(sql, [universityId]);
 
