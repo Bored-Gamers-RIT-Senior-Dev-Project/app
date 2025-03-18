@@ -27,6 +27,11 @@ const searchUniversities = async (universityName, partial = true) => {
     return query[0];
 };
 
+/**
+ * Gets a university by its ID.
+ * @param {number} universityId - The ID of the university that should be returned
+ * @return {*} The university with the given ID, or null if no such university exists.
+ */
 const getUniversityById = async (universityId) => {
     let sql = `SELECT *
         FROM universities
