@@ -67,7 +67,6 @@ const router = createBrowserRouter([
                 element: <University />,
                 loader: async ({ params }) => {
                     const { universityId } = params;
-                    console.log(parseInt(universityId));
                     if (isNaN(parseInt(universityId))) {
                         return redirect("/404");
                     }
