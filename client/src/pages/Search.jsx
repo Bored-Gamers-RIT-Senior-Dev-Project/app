@@ -141,6 +141,10 @@ const Search = () => {
                                 value={searchBar}
                                 onChange={(e) => setSearchBar(e.target.value)}
                                 sx={{ width: "100%" }}
+                                options={{
+                                    alphabetical: "Alphabetical",
+                                    universityName: "University Name",
+                                }}
                             />
                         </FormControl>
                     </Grid>
