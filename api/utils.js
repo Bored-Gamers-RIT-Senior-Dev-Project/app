@@ -13,6 +13,7 @@ const makeObjectCamelCase = (object) => {
     for (const [key, value] of Object.entries(object)) {
         // Using lodash, convert each key to camelCase.
         const camelCaseKey = camelCase(key);
+
         // Apply transformation recursively
         let transformedValue = value;
         if (value && typeof value === "object") {
@@ -23,8 +24,6 @@ const makeObjectCamelCase = (object) => {
         newObject[camelCaseKey] = transformedValue;
     }
 
-    // Return the new object
-    // Return the new object
     return newObject;
 };
 
