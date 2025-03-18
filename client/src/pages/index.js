@@ -5,6 +5,7 @@ import { Schedule } from "./Schedule";
 import { Search } from "./Search";
 import { About } from "./About";
 import { University } from "./University";
+import { TeamsPage } from "./TeamsPage";
 import { UserSettings } from "./UserSettings";
 import { UserSignIn } from "./UserSignIn";
 import { UserSignUp } from "./UserSignUp";
@@ -17,6 +18,7 @@ export {
     Search,
     About,
     University,
+    TeamsPage,
     UserSettings,
     UserSignIn,
     UserSignUp,

@@ -6,6 +6,7 @@ import {
     Rules,
     Schedule,
     Search,
+    TeamsPage,
     University,
     About,
     UserSettings,
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
                 element: <Search />,
                 action: makeAction(search),
                 loader: () => search({ value: "" }),
+            },
+            {
+                path: "/teamspage",
+                element: <TeamsPage/>,
             },
             {
                 path: "/university/:universityId",
