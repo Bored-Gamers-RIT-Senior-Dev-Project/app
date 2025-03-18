@@ -42,6 +42,12 @@ const searchTeams = async (
     return teamQuery[0];
 };
 
+/**
+ * Gets all teams associated with a university by university ID
+ * @param {*} universityId The ID of the university.
+ * @param {boolean} [approvedOnly=true] Determines if the query should only return teams approved by a University Rep.
+ * @return {*} A promise that resolves to an array of teams.
+ */
 const getTeamsByUniversityId = async (universityId, approvedOnly = true) => {
     let sql = `SELECT *
         FROM teams
