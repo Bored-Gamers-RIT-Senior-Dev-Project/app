@@ -14,6 +14,12 @@ const searchUniversities = async (universityName) => {
     return searchResult;
 };
 
+/**
+ * Gets a university by its ID.  Throws a 404 error if no such university exists.
+ * @param {Number} universityId The ID of the university that should be returned
+ * @returns {Promise<Object>} The university with the given ID, or null if no such university exists.
+ * @throws {import("http-errors").HttpError} If no university with the given ID exists.
+ */
 const getUniversityInfo = async (universityId) => {
     const universityQuery = universityModel.getUniversityById(universityId);
     const teamQuery = teamModel.getTeamsByUniversityId(universityId);
