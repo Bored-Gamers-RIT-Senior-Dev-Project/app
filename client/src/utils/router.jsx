@@ -78,10 +78,19 @@ const router = createBrowserRouter([
                 element: <University />,
                 loader: async ({ params }) => {
                     const { universityId } = params;
-                    if (isNaN(Number(universityId))) {
-                        return redirect("/notfound");
+                    try {
+                        if (isNaN(Number(universityId))){
+                            const error = new Error("Bad Request");
+                            error.status = 404;
+                            throw error;
+                        }
+                        return await getUniversityInfo(universityId);
+                    } catch (e) {
+                        if (e.status === 404) {
+                            return redirect("/notfound");
+                        }
+                        throw e;
                     }
-                    return await getUniversityInfo(universityId);
                 },
             },
             {
@@ -114,3 +123,4 @@ const router = createBrowserRouter([
 ]);
 
 export { router };
+
