@@ -1,4 +1,3 @@
-require("dotenv").config();
 const admin = require("firebase-admin");
 //chatgpt  helped me create a .env file never created before
 // Initialize Firebase Admin SDK using environment variables
