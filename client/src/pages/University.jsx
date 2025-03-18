@@ -12,24 +12,27 @@ import { useState } from "react";
 import { useLoaderData } from "react-router";
 import { InfoElement } from "../components/InfoElement";
 
+/**
+ * The University page component.
+ * @returns {JSX.Element} University Page
+ */
 const University = () => {
     const university = useLoaderData();
     const [universityData, setUniversityData] = useState(university);
     const [selectedTab, setSelectedTab] = useState(0);
 
-    // Save university name (future API call)
+    /**
+     * Handles the save action for the university name.
+     */
     const handleSaveUniversityName = () => {
         console.log("Saved:", universityData);
     };
 
-    // // Handle removing a team
-    // const handleRemoveTeam = (id) => {
-    //     setUniversityData((current) => ({
-    //         ...current,
-    //         teams: current.teams.filter((team) => team.id !== id),
-    //     }));
-    // };
-
+    /**
+     * Handles how components process form changes
+     * @param {string} key The key of the universityData object to update.
+     * @param {*} value The value to set for the specified key.
+     */
     const handleFormChange = (key, value) => {
         setUniversityData((current) => ({ ...current, [key]: value }));
     };
