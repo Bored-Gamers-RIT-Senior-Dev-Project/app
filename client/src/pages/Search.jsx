@@ -138,36 +138,13 @@ const Search = () => {
                                         ),
                                     },
                                 }}
-                                value={searchBar}
-                                onChange={(e) => setSearchBar(e.target.value)}
+                                value={sorting}
+                                onChange={(e) => setSorting(e.target.value)}
                                 sx={{ width: "100%" }}
                                 options={{
                                     alphabetical: "Alphabetical",
                                     universityName: "University Name",
                                 }}
-                            />
-                        </FormControl>
-                    </Grid>
-                    <Grid size={{ xs: 6, md: 3 }}>
-                        <FormControl fullWidth>
-                            <InputLabel htmlFor="sortBy" id="sortByLabel">
-                                Sort By
-                            </InputLabel>
-                            <DynamicSelect
-                                fullWidth
-                                id="sortBy"
-                                labelId="sortByLabel"
-                                label="Sort By"
-                                variant="outlined"
-                                value={sorting}
-                                onChange={({ target }) =>
-                                    setSorting(target.value)
-                                }
-                                options={{
-                                    alphabetical: "Alphabetical",
-                                    universityName: "University Name",
-                                }}
-                                onKeyDown={(e) => console.log(e)}
                             />
                         </FormControl>
                     </Grid>
