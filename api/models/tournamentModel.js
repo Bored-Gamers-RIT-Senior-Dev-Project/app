@@ -56,7 +56,7 @@ const createTournament = async (
  * @param {boolean} sortAsDescending - If true, sorts the results by DESCENDING. Defaults to ASCENDING.
  * @throws {Error} Throws an error if the database update fails.
  */
-const searchtournaments = async (
+const searchTournaments = async (
     tournamentID,
     tournamentName,
     startDate,
@@ -149,7 +149,7 @@ const searchtournaments = async (
     }
 };
 
-const addtournament_participants = async (tournamentID, teamID) => {
+const addTournamentParticipant = async (tournamentID, teamID) => {
     try {
         await db.query(
             `INSERT INTO tournament_participants (TournamentID, TeamID) VALUES (?, ?)`,
@@ -161,7 +161,7 @@ const addtournament_participants = async (tournamentID, teamID) => {
     }
 };
 
-const removetournament_participants = async (tournamentID, teamID) => {
+const removeTournamentParticipant = async (tournamentID, teamID) => {
     try {
         await db.query(
             `DELETE FROM tournament_participants WHERE TournamentID = ? AND TeamID = ?`,
@@ -354,7 +354,7 @@ const searchTournamentParticipants = async (
 const addTournamentFacilitator = async (tournamentID, userID) => {
     try {
         const [result] = await db.query(
-            `INSERT INTO TournamentFacilitators (TournamentID, UserID)
+            `INSERT INTO tournament_facilitators (TournamentID, UserID)
              VALUES (?, ?)`,
             [tournamentID, userID]
         );
@@ -367,7 +367,7 @@ const addTournamentFacilitator = async (tournamentID, userID) => {
 const removeTournamentFacilitator = async (tournamentID, userID) => {
     try {
         await db.query(
-            `DELETE FROM TournamentFacilitators WHERE TournamentID = ? AND UserID = ?`,
+            `DELETE FROM tournament_facilitators WHERE TournamentID = ? AND UserID = ?`,
             [tournamentID, userID]
         );
     } catch (error) {
@@ -386,7 +386,7 @@ const searchTournamentFacilitators = async (
     try {
         console.log("Setting params");
         let search =
-            "SELECT users.UserID, CONCAT(users.FirstName, ' ', users.LastName) AS FullName, Email, ProfileImageURL FROM TournamentFacilitators JOIN users ON TournamentFacilitators.UserID = users.UserID WHERE 1=1";
+            "SELECT users.UserID, CONCAT(users.FirstName, ' ', users.LastName) AS FullName, Email, ProfileImageURL FROM tournament_facilitators JOIN users ON tournament_facilitators.UserID = users.UserID WHERE 1=1";
         const params = [];
 
         // Only add a search parameter if the parameter is not null
@@ -524,10 +524,10 @@ const searchMatches = async (
         if (matchID) {
             const [rows] = await db.query(
                 `
-                SELECT * 
-                FROM matches
-                WHERE MatchID = ?
-                `,
+          SELECT * 
+          FROM matches
+          WHERE MatchID = ?
+          `,
                 [matchID]
             );
             if (rows.length === 0) {
@@ -537,7 +537,7 @@ const searchMatches = async (
             }
             return rows[0];
         } else {
-            // If matchID is not set, build query using other search criteria
+            // Build query using other search criteria
             let search = `
             SELECT
                 matches.TournamentID,
@@ -549,22 +549,20 @@ const searchMatches = async (
                 team2.TeamName,
                 matches.Score2,
                 CASE 
-                    WHEN matches.WinnerID IS NOT NULL THEN participant1.Round
-                    ELSE 
-                        CASE 
-                            WHEN matches.WinnerID = matches.Team1ID THEN participant2.Round
-                            ELSE participant1.Round
-                        END
+                WHEN matches.WinnerID IS NOT NULL THEN participant1.Round
+                ELSE 
+                    CASE 
+                    WHEN matches.WinnerID = matches.Team1ID THEN participant2.Round
+                    ELSE participant1.Round
+                    END
                 END AS MatchRound
-                FROM matches
-                JOIN teams team1 ON matches.Team1ID = team1.TeamID
-                JOIN teams team2 ON matches.Team2ID = team2.TeamID
-                JOIN tournament_participants participant1
-                    ON matches.TournamentID = participant1.TournamentID AND matches.Team1ID = participant1.TeamID
-                JOIN tournament_participants participant2
-                    ON matches.TournamentID = participant2.TournamentID AND matches.Team1ID = participant2.TeamID
+            FROM matches
+            JOIN teams team1 ON matches.Team1ID = team1.TeamID
+            JOIN teams team2 ON matches.Team2ID = team2.TeamID
+            JOIN tournament_participants participant1 ON matches.TournamentID = participant1.TournamentID AND matches.Team1ID = participant1.TeamID
+            JOIN tournament_participants participant2 ON matches.TournamentID = participant2.TournamentID AND matches.Team1ID = participant2.TeamID
             WHERE 1=1
-            `;
+        `;
             const params = [];
             if (tournamentID) {
                 search += " AND matches.TournamentID = ?";
@@ -579,7 +577,7 @@ const searchMatches = async (
                 params.push(before);
             }
             if (after) {
-                search += " AND matches.MatchTime>= ?";
+                search += " AND matches.MatchTime >= ?";
                 params.push(after);
             }
             if (bracketSide) {
@@ -592,8 +590,8 @@ const searchMatches = async (
             if (sortBy && sortAsDescending) {
                 search += " DESC";
             }
+            console.log("Tournament Search Query: " + search, params);
             const [rows] = await db.query(search, params);
-
             if (rows.length === 0) {
                 return null;
             }
@@ -636,10 +634,10 @@ const updateMatchResult = async (matchID, winnerID, team1Score, team2Score) => {
 
 module.exports = {
     createTournament,
-    searchtournaments,
+    searchTournaments,
     updateTournamentDetails,
-    addtournament_participants,
-    removetournament_participants,
+    addTournamentParticipant,
+    removeTournamentParticipant,
     updateTournamentParticipant,
     searchTournamentParticipants,
     addTournamentFacilitator,

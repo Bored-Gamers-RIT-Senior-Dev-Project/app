@@ -167,7 +167,7 @@ const updateTournamentDetails = async (
     try {
         const tournamentIDnum = Number(tournamentID);
         validateInteger(tournamentIDnum, "tournamentID");
-        await TournamentModel.updateTournament(
+        await TournamentModel.updateTournamentDetails(
             tournamentID,
             tournamentName,
             startDate,
@@ -405,7 +405,7 @@ const searchMatches = async (
 ) => {
     try {
         // If matchID is provided, use it exclusively for the search.
-        if (matchID !== null) {
+        if (matchID) {
             // Convert the matchID to a number for validation.
             matchID = validateInteger(matchID, "matchID");
             match = await TournamentModel.searchMatches(

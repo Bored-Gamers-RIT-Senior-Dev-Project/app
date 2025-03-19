@@ -72,7 +72,7 @@ router.post("/updateDetails", async (req, res, next) => {
         return res.status(400).json({ message: "Invalid request format." });
     }
     try {
-        const tournament = await TournamentService.updateTournament(
+        const tournament = await TournamentService.updateTournamentDetails(
             tournamentID,
             tournamentName,
             startDate,
@@ -95,7 +95,7 @@ router.post("/cancel", async (req, res, next) => {
         return res.status(400).json({ message: "Invalid request format." });
     }
     try {
-        const tournament = await TournamentService.updateTournament(
+        const tournament = await TournamentService.updateTournamentDetails(
             tournamentID,
             null,
             null,
