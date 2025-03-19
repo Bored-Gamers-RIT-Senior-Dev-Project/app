@@ -349,38 +349,10 @@ router.get("/getBracket", async (req, res, next) => {
         if (!leftBracket.length && !rightBracket.length) {
             return res.status(404).json({ error: "Please start tournament" });
         }
-
-        const formatBracket = (matches) => {
-            const rounds = Array.from({ length: totalRounds }, (_, i) => ({
-                title: `Round ${i + 1}`,
-                seeds: [],
-            }));
-
-            matches.forEach((match) => {
-                console.log(match);
-                const roundIndex = match.round - 1;
-                if (roundIndex >= 0 && roundIndex < totalRounds) {
-                    rounds[roundIndex].seeds.push({
-                        id: match.matchID,
-                        date: new Date(match.MatchTime).toDateString(),
-                        teams: [
-                            { name: match.Team1Name || "TBD" },
-                            { name: match.Team2Name || "TBD" },
-                        ],
-                    });
-                }
-            });
-
-            return rounds.filter((round) => round.seeds.length > 0); // Remove empty rounds
-        };
-
-        // Step 5: Format both brackets
-        const formattedLeftBracket = formatBracket(leftBracket);
-        const formattedRightBracket = formatBracket(rightBracket);
-
-        return res
-            .status(200)
-            .json([...formattedLeftBracket, ...formattedRightBracket]);
+        return res.status(200).json({
+            TournamentID: tournamentID,
+            Bracket: [{ leftBracket, rightBracket }],
+        });
     } catch (error) {
         next(error);
     }
