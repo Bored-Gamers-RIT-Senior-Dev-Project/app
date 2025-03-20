@@ -34,6 +34,11 @@ const getUniversityInfo = async (universityId) => {
     return { ...universityInfo, teams };
 };
 
+const getUniversities = async () => {
+    const universities = await universityModel.searchUniversities("");
+    return universities;
+};
+
 const createUniversity = async (
     uid,
     universityName,
@@ -48,4 +53,24 @@ const createUniversity = async (
     return {};
 };
 
-module.exports = { searchUniversities, getUniversityInfo };
+const deleteUniversity = async (universityId) => {
+    //TODO: If we allow this action, we'll need to figure out what business logic we need to reassign or delete teams, users, etc.
+    //Delete university in universityModel
+
+    return true;
+};
+
+const updateUniversity = async (uid, universityId, updateBody) => {
+    //TODO: Confirm that User is an admin or the University Rep.  Otherwise throw 403.
+    //TODO: Validate and sanitize updateBody to prevent SQL injection or other attacks/errors.
+    //TODO: Update university in universityModel.
+    //TODO: Return updated university.
+    return {};
+};
+
+module.exports = {
+    createUniversity,
+    getUniversities,
+    searchUniversities,
+    getUniversityInfo,
+};
