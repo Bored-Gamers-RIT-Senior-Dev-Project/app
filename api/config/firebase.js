@@ -37,10 +37,10 @@ const deleteUser = async (uid) => {
 
 /**
  * Authentication function retrieves the user's token from the authentication header and verifies it with Firebase.
- * @param {*} req
- * @param {*} res
- * @param {*} next
- * @returns
+ * @param {*} req The Express Request Object
+ * @param {*} res The Express Response Object
+ * @param {*} next The Express next() function to pass the request to the next function in the chain.
+ * @returns next() [on authentication failed] or res.status(401).send() [If authentication failed]
  */
 const authenticationMiddleware = async (req, res, next) => {
     //Retrieve token from the authorization header.
