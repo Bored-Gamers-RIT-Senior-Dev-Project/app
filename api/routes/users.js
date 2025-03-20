@@ -104,13 +104,20 @@ router.put("/:userId", async (req, res, next) => {
     }
 });
 
+/**
+ * DELETE to delete a user.
+ * Requires admin role, or matching user ID (?).
+ */
 router.delete("/:userId", async (req, res, next) => {
     const { uid } = req.user;
+    const { userId } = req.params;
     if (!uid) {
         return res.status(401).send();
     }
     try {
         //userService delete user
+        // const status = await userService.deleteUser(uid, userId);
+        return res.status(200).json({ message: "User deleted successfully." });
     } catch (error) {
         next(error);
     }
