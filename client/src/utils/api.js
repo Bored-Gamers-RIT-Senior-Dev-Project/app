@@ -9,6 +9,12 @@ const API_URL = "http://localhost:3000/api";
  * @returns The full API URL for the given path.
  */
 const buildUrl = (path) => `${API_URL}/${path}`;
+
+/**
+ * Add the authorization header to an HTTP request's config object
+ * @param {*} config The incoming HTTP configuration
+ * @returns The HTTP configuration with the authorization header added.
+ */
 const addAuthorization = async (config) => {
     const idToken = await getIdToken();
     const headers = config?.headers ?? {};
@@ -55,12 +61,13 @@ api.get = decorateRequest(api.get);
 api.delete = decorateRequest(api.delete);
 
 /**
- *
- * @param {*} params
- * @returns
+ * Searches for universities and teams based on the required parameters
+ * @param {*} params The body of the request
+ * @param {string} params.value The search query to search for.
+ * @returns {Promise<*>} The search results for the specified search query.
  */
 const search = async (params) => {
-    let { data } = await api.post("search", params);
+    const { data } = await api.post("search", params);
     return data;
 };
 
@@ -70,7 +77,7 @@ const users = {
      * @returns The user profile for the currently logged in user.
      */
     getProfile: async () => {
-        let { data } = await api.get("users/profile");
+        const { data } = await api.get("users/profile");
         return data;
     },
     /**
@@ -82,7 +89,7 @@ const users = {
      * @returns The user profile, either newly created or existing, of the currently logged in user.
      */
     google: async (params) => {
-        let { data } = await api.post("users/google", params);
+        const { data } = await api.post("users/google", params);
         return data;
     },
     /**
@@ -95,7 +102,7 @@ const users = {
      * @returns {object} The newly created user and a welcome message.
      */
     signUp: async (params) => {
-        let { data } = await api.post("users", params);
+        const { data } = await api.post("users", params);
         return data;
     },
     /**
@@ -105,7 +112,7 @@ const users = {
      * @returns {Promise<*>} A confirmation of the update
      */
     update: async (params) => {
-        let { data } = await api.put("users", params);
+        const { data } = await api.put("users", params);
         return data;
     },
 };
@@ -117,7 +124,7 @@ const university = {
      * @returns {Promise<*>} The university information for the specified university
      */
     getInfo: async (universityId) => {
-        let { data } = await api.get(`university/${universityId}`);
+        const { data } = await api.get(`university/${universityId}`);
         return data;
     },
 };
