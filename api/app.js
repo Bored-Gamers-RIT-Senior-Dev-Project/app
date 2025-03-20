@@ -16,7 +16,6 @@ const teams = require("./routes/teams");
 const createError = require("http-errors");
 
 const uploadService = require("./services/uploadService");
-uploadService.test();
 
 //Initialize Express
 const express = require("express");

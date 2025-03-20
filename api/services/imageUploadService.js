@@ -60,17 +60,4 @@ const saveImage = async (name, image) => {
     });
 };
 
-const test = async () => {
-    // TODO: Delete me, also, real unit testing
-    const jpeg = await fs.readFile(__dirname + "/test.jpg");
-    const webp = await encodeImage(jpeg);
-    const h = hash(webp);
-    saveImage(`${h}.webp`, webp);
-
-    const worstCase = await fs.readFile(__dirname + "/worst_case.png");
-    const worstCaseWebp = await encodeImage(worstCase);
-    const worstCaseHash = hash(worstCaseWebp);
-    saveImage(`${worstCaseHash}.webp`, worstCase);
-};
-
-module.exports = { encodeImage, hash, saveImage, test };
+module.exports = { encodeImage, hash, saveImage };
