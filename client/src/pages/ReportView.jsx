@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router";
 
-const ReportView = ({ isSidebarOpen }) => {
+const ReportView = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [dates, setDates] = useState({ start: "", end: "" });
   const navigate = useNavigate();
@@ -29,8 +29,7 @@ const ReportView = ({ isSidebarOpen }) => {
         minHeight: "100vh",
         background: "url('/background.jpg') center/cover",
         p: 4,
-        ml: isSidebarOpen ? "250px" : "0",
-        width: isSidebarOpen ? "calc(100% - 250px)" : "100%",
+        width: "100%",
         transition: "margin 0.3s ease",
         textAlign: "center",
       }}
