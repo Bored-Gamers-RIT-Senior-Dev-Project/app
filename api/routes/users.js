@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const UserService = require("../services/userService");
 
+//Gets a user's profile information
 router.get("/profile", async (req, res, next) => {
     const { uid } = req.user;
     if (!uid) return res.status(401).send();
@@ -13,7 +14,8 @@ router.get("/profile", async (req, res, next) => {
     }
 });
 
-router.post("", async (req, res, next) => {
+//User sign-in, expects the sender to have authenticated with Firebase
+router.post("register", async (req, res, next) => {
     const { uid } = req.user;
     const { email, username, firstName, lastName } = req.body;
 
@@ -41,7 +43,8 @@ router.post("", async (req, res, next) => {
     }
 });
 
-router.post("/google", async (req, res, next) => {
+//Google sign-in, used to create local records of firebase sign-in
+router.post("/register/google", async (req, res, next) => {
     const { email, displayName, photoURL } = req.body;
     const { uid } = req.user;
     console.log(req.user);
@@ -66,7 +69,27 @@ router.post("/google", async (req, res, next) => {
     }
 });
 
-router.put("", async (req, res, next) => {
+/**
+ * POST to manually create a user.
+ * Unlike 'register', the UID of the responsible user is defined separately from the user being created.
+ * Requires admin role.
+ */
+router.post("", async (req, res, next) => {
+    const { uid } = req.user;
+    if (!uid) return res.status(401).send();
+    try {
+        //userService create user
+    } catch (error) {
+        next(error);
+    }
+});
+
+/**
+ * PUT to Update a user.
+ * TODO: Update this version to serve as our admin update user function and lock down to Admin roles.
+ * TODO: Separate route to update a user profile accessible only to the user themselves (and possibly University Rep?)
+ */
+router.put("/:userId", async (req, res, next) => {
     const { uid } = req.user;
     if (!uid) {
         return res.status(401).send();
@@ -80,4 +103,17 @@ router.put("", async (req, res, next) => {
         next(error);
     }
 });
+
+router.delete("/:userId", async (req, res, next) => {
+    const { uid } = req.user;
+    if (!uid) {
+        return res.status(401).send();
+    }
+    try {
+        //userService delete user
+    } catch (error) {
+        next(error);
+    }
+});
+
 module.exports = router;

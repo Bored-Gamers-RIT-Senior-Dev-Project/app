@@ -1,5 +1,6 @@
 const { verifyUser, deleteUser } = require("../config/firebase");
 const User = require("../models/userModel");
+const { createHttpError } = require("http-errors");
 
 /**
  * An alias for User.readUser()
@@ -68,6 +69,38 @@ const googleSignIn = async (uid, email, displayName, photoURL) => {
 };
 
 /**
+ * Creates a user in the database.
+ * @param {*} requestUid The user's Firebase UID provided through authentication.
+ * @param {*} firstName The first name of the user to be created.
+ * @param {*} lastName
+ * @param {*} username
+ * @param {*} email
+ * @param {*} profileImageUrl
+ * @param {*} roleId
+ * @param {*} universityId
+ */
+const createUser = async (
+    requestUid,
+    firstName,
+    lastName,
+    username,
+    email,
+    profileImageUrl,
+    roleId,
+    universityId
+) => {
+    const user = await getUser(requestUid);
+    if (user.role !== "Super Admin") {
+        throw createHttpError(403);
+    }
+    //TODO: Validate and sanitize inputs
+    //TODO: Create user record in Firebase Authentication and get UID
+    //TODO: Create user record in local database using UID from Firebase Authentication
+    //TODO: Return user record from local database
+    return {};
+};
+
+/**
  * Updates a user's information in the database.
  * @param {string} uid The user's Firebase UID provided through authentication.s
  * @param {*} body The information to update.
@@ -78,4 +111,15 @@ const updateUser = async (uid, body) => {
     return user;
 };
 
-module.exports = { signUp, getUser, googleSignIn, updateUser };
+const deleteUser = async (uid, userId) => {
+    const user = await getUser(uid);
+    if (user.role !== "Super Admin" /* && user.UserId !== userId */) {
+        throw createHttpError(403);
+    }
+    //TODO: Delete user from local database.  Get the firebase uid from the local database.
+    //TODO: Delete user from Firebase Authentication.
+
+    return true;
+};
+
+module.exports = { createUser, signUp, getUser, googleSignIn, updateUser };

@@ -89,7 +89,7 @@ const users = Object.freeze({
      * @returns The user profile, either newly created or existing, of the currently logged in user.
      */
     google: async (params) => {
-        const { data } = await api.post("users/google", params);
+        const { data } = await api.post("users/register/google", params);
         return data;
     },
     /**
@@ -102,7 +102,7 @@ const users = Object.freeze({
      * @returns {object} The newly created user and a welcome message.
      */
     signUp: async (params) => {
-        const { data } = await api.post("users", params);
+        const { data } = await api.post("users/register", params);
         return data;
     },
     /**
