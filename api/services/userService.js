@@ -71,7 +71,7 @@ const googleSignIn = async (uid, email, displayName, photoURL) => {
  * Updates a user's information in the database.
  * @param {string} uid The user's Firebase UID provided through authentication.s
  * @param {*} body The information to update.
- * @returns
+ * @returns The updated user object.
  */
 const updateUser = async (uid, body) => {
     const user = await User.updateUser(uid, body);
