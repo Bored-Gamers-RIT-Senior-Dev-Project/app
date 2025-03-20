@@ -45,13 +45,15 @@ const deleteUser = async (uid) => {
 const authenticationMiddleware = async (req, res, next) => {
     //Retrieve token from the authorization header.
     const { authorization } = req.headers;
-    //If the user included an authorization header, grab the information from
+
+    //If the request included an authorization header, grab the firebase information and verify it.
     if (authorization) {
         try {
             const token = authorization.split(" ")[1];
             const user = await verifyUser(token);
             req.user = user;
         } catch (error) {
+            //If there's an error validating, log it and return an unauthorized warning
             console.error("Request failed token validation: ", error);
             return res.status(401).send();
         }
