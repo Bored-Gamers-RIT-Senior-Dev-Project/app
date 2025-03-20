@@ -77,18 +77,12 @@ const users = {
      * Processes a google sign-in to construct a Google user if none exists.
      * @param {object} params to build the google user: {email, username, firstName, lastName}
      * @param {string} params.email The email of the user.
-     * @param {string} params.username The username of the user.
-     * @param {string} params.firstName The first name of the user.
-     * @param {string} params.lastName The last name of the user.
+     * @param {string} params.photoURL The default photo url from the user's firebase profile.
+     * @param {string} params.displayName The user's display name.
      * @returns The user profile, either newly created or existing, of the currently logged in user.
      */
-    google: async ({ email, username, firstName, lastName }) => {
-        let { data } = await api.post("users/google", {
-            email,
-            username,
-            firstName,
-            lastName,
-        });
+    google: async (params) => {
+        let { data } = await api.post("users/google", params);
         return data;
     },
     /**
