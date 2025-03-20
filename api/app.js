@@ -15,7 +15,7 @@ const university = require("./routes/university");
 const teams = require("./routes/teams");
 const createError = require("http-errors");
 
-const uploadService = require("./services/uploadService");
+const uploadService = require("./services/imageUploadService");
 
 //Initialize Express
 const express = require("express");
