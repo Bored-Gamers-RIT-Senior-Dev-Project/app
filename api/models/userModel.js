@@ -62,6 +62,7 @@ const readUser = async (uid) => {
             FROM users AS user
             LEFT JOIN universities AS uni ON user.UniversityID = uni.UniversityId
             LEFT JOIN teams AS team ON user.TeamID = team.TeamId
+            JOIN roles AS role ON user.RoleId = role.RoleId
             WHERE user.FirebaseUID = ?;
         `,
             [uid]
@@ -185,5 +186,7 @@ const checkUsername = async (username, strict = false) => {
     }
     return await generateUsername(username, sharedUsernames);
 };
+
+const getPermissions = async (roleId) => {};
 
 module.exports = { createUser, readUser, updateUser, checkUsername };
