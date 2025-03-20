@@ -71,7 +71,7 @@ const search = async (params) => {
     return data;
 };
 
-const users = {
+const users = Object.freeze({
     /**
      * Gets the user profile for the currently logged in user.
      * @returns The user profile for the currently logged in user.
@@ -115,9 +115,9 @@ const users = {
         const { data } = await api.put("users", params);
         return data;
     },
-};
+});
 
-const university = {
+const university = Object.freeze({
     /**
      * Gets the university information for the specified university
      * @param {*} universityId
@@ -127,6 +127,6 @@ const university = {
         const { data } = await api.get(`university/${universityId}`);
         return data;
     },
-};
+});
 
 export { search, university, users };
