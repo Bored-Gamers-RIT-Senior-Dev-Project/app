@@ -3,6 +3,7 @@ const router = express.Router();
 
 /**
  * Get a list of all teams
+ * @param {boolean} req.query.showUnapproved Whether to show unapproved teams. Defaults to false.
  */
 router.get("", async (req, res, next) => {
     const { showUnapproved = false } = req.query;
@@ -20,13 +21,13 @@ router.get("", async (req, res, next) => {
  * Get a team's information by ID
  * @param {number} req.params.id The ID of the team to get.
  */
-router.get("/:id", async (req, res, next) => {
+router.get("/:teamId", async (req, res, next) => {
     const { uid = null } = req.user;
     const { showUnapproved = false, showPendingChanges = false } = req.query;
-    const { id } = req.params;
+    const { teamId } = req.params;
 
     try {
-        //const team = await teamService.getTeam(req.params.id);
+        //const {team, pending} = await teamService.getTeam(uid, teamId, showUnapproved, showPendingChanges);
         return res.status(200).json({});
     } catch (error) {
         return next(error);
