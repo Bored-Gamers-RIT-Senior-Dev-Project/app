@@ -43,14 +43,17 @@ const deleteUser = async (uid) => {
  * @returns next() [on authentication failed] or res.status(401).send() [If authentication failed]
  */
 const authenticationMiddleware = async (req, res, next) => {
-    //Retrieve token from the authorization header.
+    //Retrieve authorization header from the request headers.
     const { authorization } = req.headers;
 
     //If the request included an authorization header, grab the firebase information and verify it.
     if (authorization) {
         try {
+            //Grab the token (sent in format "Bearer <token>") and verify it with Firebase.
             const token = authorization.split(" ")[1];
             const user = await verifyUser(token);
+
+            //Add the user to the request object so that it can be accessed in our endpoint functions.
             req.user = user;
         } catch (error) {
             //If there's an error validating, log it and return an unauthorized warning
@@ -58,6 +61,8 @@ const authenticationMiddleware = async (req, res, next) => {
             return res.status(401).send();
         }
     }
+
+    //Pass the request to the next function in the chain.
     return next();
 };
 
