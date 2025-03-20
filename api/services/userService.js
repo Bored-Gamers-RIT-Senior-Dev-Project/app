@@ -1,18 +1,16 @@
 const { verifyUser, deleteUser } = require("../config/firebase");
 const User = require("../models/userModel");
 
-const getUser = async (idToken) => {
-    const firebaseUser = await verifyUser(idToken);
-    const user = await User.readUser(firebaseUser.uid);
+const getUser = async (uid) => {
+    const user = await User.readUser(uid);
     return user;
 };
 
-const signUp = async (idToken, email, username, firstName, lastName) => {
-    const firebaseUser = await verifyUser(idToken);
+const signUp = async (uid, email, username, firstName, lastName) => {
     try {
         username = await User.checkUsername(username);
         const result = await User.createUser(
-            firebaseUser.uid,
+            uid,
             email,
             firstName,
             lastName,
@@ -21,14 +19,13 @@ const signUp = async (idToken, email, username, firstName, lastName) => {
         return result;
     } catch (error) {
         //If there's an error adding the FirebaseUser to the local database, delete the record from Firebase to avoid mismatched records.
-        await deleteUser(firebaseUser.uid);
+        await deleteUser(uid);
         throw error;
     }
 };
 
-const googleSignIn = async (idToken, email, displayName, photoURL) => {
-    const firebaseUser = await verifyUser(idToken);
-    let user = await User.readUser(firebaseUser.uid);
+const googleSignIn = async (uid, email, displayName, photoURL) => {
+    let user = await User.readUser(uid);
 
     if (!user) {
         const names = displayName.split(" ");
@@ -36,7 +33,7 @@ const googleSignIn = async (idToken, email, displayName, photoURL) => {
         const lastName = names.slice(1).join(" ");
         const username = await User.checkUsername(email.split("@")[0]);
         user = await User.createUser(
-            firebaseUser.uid,
+            uid,
             email,
             firstName,
             lastName,
@@ -47,8 +44,7 @@ const googleSignIn = async (idToken, email, displayName, photoURL) => {
     return user;
 };
 
-const updateUser = async (idToken, body) => {
-    const { uid } = await verifyUser(idToken);
+const updateUser = async (uid, body) => {
     const user = await User.updateUser(uid, body);
     return user;
 };

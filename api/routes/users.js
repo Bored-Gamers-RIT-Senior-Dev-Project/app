@@ -3,10 +3,10 @@ const router = express.Router();
 const UserService = require("../services/userService");
 
 router.get("/profile", async (req, res, next) => {
-    const { authorization } = req.headers;
-    if (!authorization) return res.status(401).send();
+    const { uid } = req.user;
+    if (!uid) return res.status(401).send();
     try {
-        const user = await UserService.getUser(authorization.split(" ")[1]);
+        const user = await UserService.getUser(uid);
         return res.status(200).json(user);
     } catch (error) {
         next(error);
@@ -14,13 +14,19 @@ router.get("/profile", async (req, res, next) => {
 });
 
 router.post("", async (req, res, next) => {
-    const { idToken, email, username, firstName, lastName } = req.body;
-    if (!email || !username || !idToken || !firstName || !lastName) {
+    const { uid } = req.user;
+    const { email, username, firstName, lastName } = req.body;
+
+    if (!uid) {
+        return res.status(401).send();
+    }
+
+    if (!email || !username || !firstName || !lastName) {
         return res.status(400).json({ message: "Invalid request format." });
     }
     try {
         const user = await UserService.signUp(
-            idToken,
+            uid,
             email,
             username,
             firstName,
@@ -37,14 +43,16 @@ router.post("", async (req, res, next) => {
 
 router.post("/google", async (req, res, next) => {
     const { email, displayName, photoURL } = req.body;
-    const { authorization } = req.headers;
-    if (!authorization) {
+    const { uid } = req.user;
+    console.log(req.user);
+    console.log(req.body);
+    if (!uid) {
         return res.status(401).send();
     }
 
     try {
         const user = await UserService.googleSignIn(
-            authorization.split(" ")[1],
+            uid,
             email,
             displayName,
             photoURL
@@ -59,9 +67,12 @@ router.post("/google", async (req, res, next) => {
 });
 
 router.put("", async (req, res, next) => {
-    const { idToken, ...body } = req.body;
+    const { uid } = req.user;
+    if (!uid) {
+        return res.status(401).send();
+    }
     try {
-        const user = await UserService.updateUser(idToken, body);
+        const user = await UserService.updateUser(uid, req.body);
         res.status(200).json({
             message: "User updated",
         });

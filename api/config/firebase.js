@@ -35,4 +35,28 @@ const deleteUser = async (uid) => {
     }
 };
 
-module.exports = { deleteUser, verifyUser };
+/**
+ * Authentication function retrieves the user's token from the authentication header and verifies it with Firebase.
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @returns
+ */
+const authenticationMiddleware = async (req, res, next) => {
+    //Retrieve token from the authorization header.
+    const { authorization } = req.headers;
+    //If the user included an authorization header, grab the information from
+    if (authorization) {
+        try {
+            const token = authorization.split(" ")[1];
+            const user = await verifyUser(token);
+            req.user = user;
+        } catch (error) {
+            console.error("Request failed token validation: ", error);
+            return res.status(401).send();
+        }
+    }
+    return next();
+};
+
+module.exports = { authenticationMiddleware, deleteUser, verifyUser };
