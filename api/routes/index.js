@@ -16,7 +16,7 @@ router.post("/test", async (req, res) => {
 
 router.post("/search", async (req, res, next) => {
     let { value } = req.body;
-    value = value ? value : "";
+    value = value ?? "";
 
     try {
         const universitySearch = universityService.searchUniversities(value);
