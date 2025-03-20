@@ -51,7 +51,7 @@ const UserManager = () => {
 
         return (
             <Modal open onClose={handleCloseModal}>
-                <Box sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", bgcolor: "white", borderRadius: 2, boxShadow: 24, p: 3, width: 400 }}>
+                <Box sx={{position: "absolute", top: "50%", left: "50%",transform: "translate(-50%, -50%)",bgcolor: "white", borderRadius: 2, boxShadow: 24, p: 3, width: 400}}>
                     <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                         <Typography variant="h6">Add {modalType}</Typography>
                         <IconButton onClick={handleCloseModal}><CloseIcon /></IconButton>
@@ -73,7 +73,7 @@ const UserManager = () => {
     };
 
     return (
-        <Box p={3} display="flex" flexDirection="column" alignItems="center" height="90vh">
+        <Box p={{flexGrow: 1,display: "flex",flexDirection: "column",alignItems: "center",height: "90vh",paddingLeft: { xs: 0, sm: 30 },paddingRight: 2,}}>
             <Typography variant="h4" mb={2} textAlign="center">User Manager</Typography>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} width="100%" maxWidth="1200px">
                 <TextField
@@ -97,8 +97,8 @@ const UserManager = () => {
                     <MenuItem onClick={() => handleOpenModal("University")}>New University</MenuItem>
                 </Menu>
             </Box>
-            <Box className="ag-theme-alpine" style={{ height: "75vh", width: "80vw", maxWidth: "1200px" }}>
-                <AgGridReact rowData={rowData} columnDefs={columnDefs} pagination domLayout="autoHeight" autoSizeStrategy={{ type: "fitGridWidth" }} suppressDragLeaveHidesColumns />
+            <Box className="ag-theme-alpine" style={{ height: "75vh", width: "100%", maxWidth: "1200px" }}>
+                <AgGridReact rowData={rowData} columnDefs={columnDefs} pagination domLayout="autoHeight" />
             </Box>
             {renderModalContent()}
         </Box>
