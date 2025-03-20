@@ -34,4 +34,18 @@ const getUniversityInfo = async (universityId) => {
     return { ...universityInfo, teams };
 };
 
+const createUniversity = async (
+    uid,
+    universityName,
+    location,
+    logoURL,
+    bannerUrl,
+    description,
+    websiteUrl
+) => {
+    //TODO: Check uid role and throw 403 if not admin. (Only administrators can create universities)
+    //TODO: Create university in database and return its ID.
+    return {};
+};
+
 module.exports = { searchUniversities, getUniversityInfo };
