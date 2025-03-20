@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo} from "react";
+import { useState, useCallback, useMemo } from "react";
 import {
     Box,
     Button,
@@ -18,6 +18,16 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 
+/**
+ * Sample admin items data.
+ * @typedef {Object} AdminItem
+ * @property {string} title - The title of the admin item.
+ * @property {string} details - Additional details about the item.
+ * @property {string} submitted - Submission date (YYYY-MM-DD format).
+ * @property {string} lastUpdated - Last updated date (YYYY-MM-DD format).
+ * @property {string} status - Current status of the item.
+ * @property {string} buttonText - Text to display on the button.
+ */
 const adminItems = [
     {
         title: "Team Page Edited",
@@ -51,9 +61,12 @@ const adminItems = [
         status: "In Review",
         buttonText: "REVIEW TICKET",
     },
-
 ];
 
+/**
+ * Component for displaying an admin item card.
+ * @param {AdminItem} props - Admin item properties.
+ */
 const AdminItemCard = ({ title, details, submitted, lastUpdated, status, buttonText }) => (
     <Card sx={{ mb: 2, p: 2, backgroundColor: "#f0f0f0", boxShadow: 2, borderRadius: "12px" }}>
         <CardContent sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -85,24 +98,39 @@ const AdminDashboard = () => {
     const [search, setSearch] = useState("");
     const [ticketType, setTicketType] = useState("All");
 
+    /**
+     * Handles the search input change.
+     * @param {React.ChangeEvent<HTMLInputElement>} e - The event object.
+     */
     const handleSearchChange = useCallback((e) => setSearch(e.target.value), []);
+
+    /**
+     * Handles the ticket type selection change.
+     * @param {React.ChangeEvent<{ value: unknown }>} e - The event object.
+     */
     const handleTicketTypeChange = useCallback((e) => setTicketType(e.target.value), []);
 
-    //Filtering logic
-    const filteredItems = useMemo(() => {
+    /**
+     * Filters admin items based on search, date range, and ticket type.
+     * @returns {AdminItem[]} The filtered list of admin items.
+     */
+    const getFilteredItems = useCallback(() => {
         return adminItems.filter((item) => {
             const submittedDate = dayjs(item.submitted);
             const isWithinDateRange =
-                (!startDate || submittedDate.isAfter(startDate)|| submittedDate.isSame(startDate)) && (!endDate || submittedDate.isBefore(endDate) || submittedDate.isSame(endDate));
+                (!startDate || submittedDate.isAfter(startDate) || submittedDate.isSame(startDate)) &&
+                (!endDate || submittedDate.isBefore(endDate) || submittedDate.isSame(endDate));
 
             const matchesSearch =
-            item.title.toLowerCase().includes(search.toLowerCase()) || item.details.toLowerCase().includes(search.toLowerCase());
+                item.title.toLowerCase().includes(search.toLowerCase()) ||
+                item.details.toLowerCase().includes(search.toLowerCase());
 
             const matchesType = ticketType === "All" || item.title.includes(ticketType);
             return isWithinDateRange && matchesSearch && matchesType;
         });
     }, [search, ticketType, startDate, endDate]);
 
+    const filteredItems = useMemo(() => getFilteredItems(), [getFilteredItems]);
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -149,12 +177,12 @@ const AdminDashboard = () => {
                         sx={{ width: 200 }}
                     />
                 </Box>
+
                 {filteredItems.length > 0 ? (
-                    filteredItems.map((item, index) => <AdminItemCard key={index} {...item} />)           
+                    filteredItems.map((item, index) => <AdminItemCard key={index} {...item} />)
                 ) : (
                     <Typography textAlign="center" color="textSecondary">
                         No matching tickets found.
-
                     </Typography>
                 )}
             </Box>
