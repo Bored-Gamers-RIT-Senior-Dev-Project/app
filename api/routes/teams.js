@@ -126,7 +126,7 @@ router.post("/:teamId/update", async (req, res, next) => {
 });
 
 /**
- * Approve a team.
+ * If the team is not approved, approve it.  If the team has pending changes, apply and approve.
  * Requires [Admin Role] or [University Rep role and matching university ID]
  * @param {number} req.params.id The ID of the team to approve.
  */

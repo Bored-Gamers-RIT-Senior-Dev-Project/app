@@ -42,6 +42,16 @@ const searchTeams = async (
     return teamQuery[0];
 };
 
+const getTeams = async (approvedOnly = true) => {
+    let sql = `SELECT * FROM teams`;
+    if (approvedOnly) {
+        sql += ` WHERE approvedOnly = true`;
+    }
+
+    const query = await db.query(sql);
+    return query[0];
+};
+
 /**
  * Gets all teams associated with a university by university ID
  * @param {*} universityId The ID of the university.
@@ -62,4 +72,22 @@ const getTeamsByUniversityId = async (universityId, approvedOnly = true) => {
     return query[0];
 };
 
-module.exports = { searchTeams, getTeamsByUniversityId };
+const getTeamById = async (teamId, showUnapproved, showPendingChanges) => {
+    const sql = `SELECT * FROM teams WHERE TeamID = ?`;
+    if (!showUnapproved) {
+        sql += " AND IsApproved = true";
+    }
+    //TODO: Logic to handle showPendingChanges once we've established how pending changes are stored.
+    const result = await db.query(sql, [teamId]);
+    if (result[0].length === 0) {
+        return null;
+    }
+    return result[0][0];
+};
+
+module.exports = {
+    getTeams,
+    getTeamById,
+    searchTeams,
+    getTeamsByUniversityId,
+};
