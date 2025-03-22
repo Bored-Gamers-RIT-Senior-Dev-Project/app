@@ -12,6 +12,9 @@ import {
     UserSettings,
     UserSignIn,
     UserSignUp,
+    ReportView,
+    AdminDashboard,
+    UserManager
 } from "../pages";
 import { UserPreferences } from "../pages/UserPreferences.DEMO";
 import { search, university, users } from "./api";
@@ -102,6 +105,18 @@ const router = createBrowserRouter([
             {
                 path: "/schedule",
                 element: <Schedule />,
+            },
+            {
+                path: "/admin/reports",
+                element: <ReportView />,
+            },
+            {
+                path:"/admin",
+                element: <AdminDashboard />,
+            },
+            {
+                path:"/admin/users",
+                element: <UserManager />,
             },
             {
                 path: "/user_preferences",

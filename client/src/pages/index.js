@@ -9,6 +9,9 @@ import { TeamsPage } from "./TeamsPage";
 import { UserSettings } from "./UserSettings";
 import { UserSignIn } from "./UserSignIn";
 import { UserSignUp } from "./UserSignUp";
+import { ReportView } from "./ReportView";
+import { AdminDashboard } from "./AdminDashboard";
+import { UserManager } from "./UserManager";
 
 export {
     Home,
@@ -22,5 +25,8 @@ export {
     UserSettings,
     UserSignIn,
     UserSignUp,
+    ReportView,
+    AdminDashboard,
+    UserManager,
 };
 
