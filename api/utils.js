@@ -1,22 +1,30 @@
-const _ = require("lodash");
+const camelCase = require("lodash/camelCase");
 const makeObjectCamelCase = (object) => {
+    if (!object) return null;
+
     const newObject = {};
 
-    //Loop through each object value
-    for (let [key, value] of Object.entries(object)) {
-        //Using lodash, update each key to camelCase.
-        key = _.camelCase(key);
+    // If the object is an array, make each entry camel case.
+    if (Array.isArray(object)) {
+        return object.map((item) => makeObjectCamelCase(item));
+    }
 
-        //Apply recursively
+    // Loop through each key-value pair in the object
+    for (const [key, value] of Object.entries(object)) {
+        // Using lodash, convert each key to camelCase.
+        const camelCaseKey = camelCase(key);
+
+        // Apply transformation recursively
+        let transformedValue = value;
         if (value && typeof value === "object") {
-            value = makeObjectCamelCase(value);
+            transformedValue = makeObjectCamelCase(value);
         }
 
         //Add to new object
-        newObject[key] = value;
+        newObject[camelCaseKey] = transformedValue;
     }
 
-    //Return the new object
+    // Return the new object
     return newObject;
 };
 

@@ -6,6 +6,7 @@ import {
     Rules,
     Schedule,
     Search,
+    TeamsPage,
     University,
     About,
     UserSettings,
@@ -16,7 +17,7 @@ import {
     UserManager
 } from "../pages";
 import { UserPreferences } from "../pages/UserPreferences.DEMO";
-import { handleSignIn, handleSignUp, sendTest, updateUser } from "./api";
+import { handleSignIn, handleSignUp, search, updateUser } from "./api";
 import { events } from "./events";
 
 //Make an action out of an api call
@@ -51,7 +52,12 @@ const router = createBrowserRouter([
             {
                 path: "/search",
                 element: <Search />,
-                action: makeAction(sendTest),
+                action: makeAction(search),
+                loader: () => search({ value: "" }),
+            },
+            {
+                path: "/teamspage",
+                element: <TeamsPage/>,
             },
             {
                 path: "/university/:universityId",
