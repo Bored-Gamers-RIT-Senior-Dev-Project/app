@@ -7,7 +7,7 @@ router.get("/profile", async (req, res, next) => {
     const { uid } = req.user;
     if (!uid) return res.status(401).send();
     try {
-        const user = await UserService.getUser(uid);
+        const user = await UserService.getUserByFirebaseId(uid);
         return res.status(200).json(user);
     } catch (error) {
         next(error);

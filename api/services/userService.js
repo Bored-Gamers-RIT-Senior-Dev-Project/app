@@ -3,13 +3,24 @@ const User = require("../models/userModel");
 const { createHttpError } = require("http-errors");
 
 /**
- * An alias for User.readUser()
+ * An alias for User.getUserByFirebaseId()
  * @param {string} uid The firebase UID of the user.  Should be validated from a token.
  * @return {Promise<object>} The user object from the database.
  * @throws {Error} If the user is not found.
  */
-const getUser = async (uid) => {
-    const user = await User.readUser(uid);
+const getUserByFirebaseId = async (uid) => {
+    const user = await User.getUserByFirebaseId(uid);
+    return user;
+};
+
+/**
+ * An alias for User.getUserByUserId()
+ * @param {number} userId The local User Id of the user.
+ * @return {Promise<object>} The user object from the database.
+ * @throws {Error} If the user is not found.
+ */
+const getUserByUserId = async (userId) => {
+    const user = await User.getUserByUserId(userId);
     return user;
 };
 
@@ -49,7 +60,7 @@ const signUp = async (uid, email, username, firstName, lastName) => {
  * @returns The newly created user object, or the existing user object if it already exists.
  */
 const googleSignIn = async (uid, email, displayName, photoURL) => {
-    let user = await User.readUser(uid);
+    let user = await User.getUserByFirebaseId(uid);
 
     if (!user) {
         const names = displayName.split(" ");
@@ -130,8 +141,12 @@ const deleteUser = async (uid, userId) => {
     if (user.role !== "Super Admin" /* && user.UserId !== userId */) {
         throw createHttpError(403);
     }
-    //TODO: Delete user from local database.  Get the firebase uid from the local database.
+
+    // Delete user from local database.  Get the firebase uid from the local database.
+    const deletedUser = await User.deleteUser(userId);
+
     //TODO: Delete user from Firebase Authentication.
+    await Firebase.deleteUser(deletedUser.firebaseUid);
 
     return true;
 };
@@ -139,7 +154,8 @@ const deleteUser = async (uid, userId) => {
 module.exports = {
     createUser,
     deleteUser,
-    getUser,
+    getUserByFirebaseId,
+    getUserByUserId,
     googleSignIn,
     signUp,
     updateUser,

@@ -18,7 +18,7 @@ const searchTeams = async (teamName, universityName = null) => {
 const getTeams = async (uid, universityId = null, showUnapproved = false) => {
     //Get user permissions if showUnapproved is true.  Otherwise, we don't care about their role and this can be skipped.
     if (showUnapproved) {
-        const user = await userModel.readUser(uid);
+        const user = await userModel.getUserByFirebaseId(uid);
         switch (true) {
             case user.Role === "Super Admin":
             case user.Role === "University Rep" &&
