@@ -21,7 +21,7 @@ import { AddUniversityModal } from "../pages/modals/AddUniversityModal";
 import { AddUserModal } from "../pages/modals/AddUserModal";
 import { DeleteModal } from "../pages/modals/DeleteModal";
 import { EditUserModal } from "../pages/modals/EditUserModal";
-import { admin, search, teams, university, users } from "./api";
+import { admin, search, settings, teams, university, users } from "./api";
 import { events } from "./events";
 
 /**
@@ -103,6 +103,7 @@ const routes = [
             {
                 path: "/settings",
                 element: <UserSettings />,
+                action: makeAction(settings.saveProfilePicture),
             },
             {
                 path: "/rules",
