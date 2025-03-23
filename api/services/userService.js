@@ -1,4 +1,4 @@
-const { verifyUser, deleteUser } = require("../config/firebase");
+const Firebase = require("../config/firebase");
 const User = require("../models/userModel");
 const { createHttpError } = require("http-errors");
 
@@ -35,7 +35,7 @@ const signUp = async (uid, email, username, firstName, lastName) => {
         return result;
     } catch (error) {
         //If there's an error adding the FirebaseUser to the local database, delete the record from Firebase to avoid mismatched records.
-        await deleteUser(uid);
+        await Firebase.deleteUser(uid);
         throw error;
     }
 };
@@ -122,4 +122,11 @@ const deleteUser = async (uid, userId) => {
     return true;
 };
 
-module.exports = { createUser, signUp, getUser, googleSignIn, updateUser };
+module.exports = {
+    createUser,
+    deleteUser,
+    getUser,
+    googleSignIn,
+    signUp,
+    updateUser,
+};
