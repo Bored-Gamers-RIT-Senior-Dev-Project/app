@@ -46,4 +46,69 @@ const getUniversityById = async (universityId) => {
     return query[0][0];
 };
 
-module.exports = { searchUniversities, getUniversityById };
+const createUniversity = async (
+    universityName,
+    location = "",
+    logoURL,
+    bannerUrl,
+    description,
+    websiteUrl
+) => {
+    const insert = await db.query(`
+        INSERT INTO
+            universities (UniversityName, Location, LogoURL, BannerURL, Description, WebsiteURL)
+            VALUES (?, ?, ?, ?, ?, ?);
+    `);
+
+    //TODO: figure out a way to get the inserted value here when we don't know any unique values until after it's created :/
+
+    return true;
+};
+
+const VALID_KEYS = {
+    UNIVERSITYNAME: "UniversityName",
+    LOCATION: "Location",
+    LOGOURL: "LogoURL",
+    BANNERURL: "BannerURL",
+    DESCRIPTION: "Description",
+    WEBSITEURL: "WebsiteURL",
+};
+/**
+ * Update a university in the database
+ * @param {*} body An object representing the keys and values to be updated.
+ * @throws An error if the keys are rejected.
+ */
+const updateUniversity = async (universityId, body) => {
+    const updates = [];
+    for (const key of Object.keys(body)) {
+        const column = VALID_KEYS?.[key.toUpperCase()];
+        if (column) {
+            updates.push(`${column} = ?`);
+        } else {
+            console.error("Error fulfilling update request:", body);
+            console.error("Invalid key:", key);
+            throw createHttpError(400, "Invalid attempt to update university.");
+        }
+    }
+    const keys = Object.keys(body)
+        .map((key) => `${key} = ?`)
+        .join(", ");
+
+    const [rows] = await db.query(
+        `UPDATE users SET ${keys} WHERE UniversityID = ?`,
+        [...Object.values(body), universityId]
+    );
+
+    if (rows.affectedRows === 0) {
+        throw new Error("User not updated.");
+    }
+
+    return await getUserByFirebaseId(firebaseUid);
+};
+
+module.exports = {
+    searchUniversities,
+    getUniversityById,
+    createUniversity,
+    updateUniversity,
+};
