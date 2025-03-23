@@ -41,6 +41,11 @@ const searchTeams = async (
     return teamQuery[0];
 };
 
+/**
+ * Gets a list of teams from the database
+ * @param {boolean} [approvedOnly=true] Determines if the query should only return teams approved by a University Rep.
+ * @returns The team list
+ */
 const getTeams = async (approvedOnly = true) => {
     let sql = `SELECT * FROM teams`;
     if (approvedOnly) {
