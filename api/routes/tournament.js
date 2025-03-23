@@ -187,16 +187,17 @@ router.get("/searchParticipants", async (req, res, next) => {
     const {
         tournamentID,
         teamID,
+        teamName,
+        teamLeaderID,
+        teamLeaderName,
         round,
         byes,
         status,
         bracketSide,
         nextMatchID,
         universityID,
-        teamName,
-        teamLeaderID,
-        isApproved,
         universityName,
+        isApproved,
         sortBy,
         sortAsDescending,
     } = req.query;
@@ -205,16 +206,17 @@ router.get("/searchParticipants", async (req, res, next) => {
             await TournamentService.searchTournamentParticipants(
                 tournamentID,
                 teamID,
+                teamName,
+                teamLeaderID,
+                teamLeaderName,
                 round,
                 byes,
                 status,
                 bracketSide,
                 nextMatchID,
                 universityID,
-                teamName,
-                teamLeaderID,
-                isApproved,
                 universityName,
+                isApproved,
                 sortBy,
                 sortAsDescending
             );
@@ -307,6 +309,23 @@ router.get("/searchFacilitators", async (req, res, next) => {
         res.status(200).json({ facilitators });
     } catch (error) {
         next(error);
+    }
+});
+
+router.post("/start", async (req, res) => {
+    const { tournamentID } = req.body;
+    if (!tournamentID) {
+        return res.status(400).json({ message: "Invalid request format." });
+    }
+    try {
+        const tournament = await TournamentService.startTournament(
+            tournamentID
+        );
+        res.status(200).json({
+            message: "Tournament started successfully.",
+        });
+    } catch (error) {
+        error.message;
     }
 });
 

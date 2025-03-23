@@ -180,7 +180,8 @@ const updateTournamentParticipant = async (
     byes,
     status,
     bracketSide,
-    nextMatchID
+    nextMatchID,
+    bracketOrder
 ) => {
     try {
         let updates = [];
@@ -199,8 +200,8 @@ const updateTournamentParticipant = async (
             params.push(round);
         }
         if (byes) {
-            updates.push("Status = ?");
-            params.push(status);
+            updates.push("Byes = ?");
+            params.push(byes);
         }
         if (status) {
             updates.push("Status = ?");
@@ -213,6 +214,12 @@ const updateTournamentParticipant = async (
         if (nextMatchID) {
             updates.push("NextMatchID = ?");
             params.push(nextMatchID);
+        } else if (nextMatchID == 0) {
+            updates.push("NextMatchID = NULL");
+        }
+        if (bracketOrder) {
+            updates.push("BracketOrder = ?");
+            params.push(bracketOrder);
         }
 
         if (updates.length === 0) {
@@ -290,12 +297,10 @@ const searchTournamentParticipants = async (
         if (teamLeaderName) {
             searchQuery += " AND users.";
         }
-        // Check for round, ensuring zero is allowed
         if (round) {
             searchQuery += " AND tournament_participants.Round = ?";
             params.push(round);
         }
-        // Check for byes similarly
         if (byes) {
             searchQuery += " AND tournament_participants.Byes = ?";
             params.push(byes);
@@ -333,13 +338,12 @@ const searchTournamentParticipants = async (
             params.push(`%${universityName}%`);
         }
         if (sortBy) {
-            search += " ORDER BY " + sortBy;
+            console.log("Sorting by ", sortBy);
+            searchQuery += " ORDER BY " + sortBy;
         }
         if (sortBy && sortAsDescending) {
-            search += " DESC";
+            searchQuery += " DESC";
         }
-
-        console.log("Tournament Search Query:", searchQuery, params);
         const [rows] = await db.query(searchQuery, params);
         return rows;
     } catch (error) {
@@ -614,18 +618,10 @@ const searchMatches = async (
  */
 const updateMatchResult = async (matchID, winnerID, team1Score, team2Score) => {
     try {
-        // Execute the UPDATE query to update the match results.
         const [result] = await db.query(
             `UPDATE matches SET Score1 = ?, Score2 = ?, WinnerID = ? WHERE MatchID = ?;`,
             [team1Score, team2Score, winnerID, matchID]
         );
-        // Return an object representing the updated match.
-        return {
-            matchID,
-            winnerID,
-            team1Score,
-            team2Score,
-        };
     } catch (error) {
         console.error("Error updating match result:", error);
         throw error;

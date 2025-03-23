@@ -222,16 +222,17 @@ const removeTournamentParticipant = async (tournamentID, teamID) => {
 const searchTournamentParticipants = async (
     tournamentID,
     teamID,
+    teamName,
+    teamLeaderID,
+    teamLeaderName,
     round,
     byes,
     status,
     bracketSide,
     nextMatchID,
     universityID,
-    teamName,
-    teamLeaderID,
-    isApproved,
     universityName,
+    isApproved,
     sortBy,
     sortAsDescending
 ) => {
@@ -239,16 +240,17 @@ const searchTournamentParticipants = async (
         const tournament = await TournamentModel.searchTournamentParticipants(
             tournamentID,
             teamID,
+            teamName,
+            teamLeaderID,
+            teamLeaderName,
             round,
             byes,
             status,
             bracketSide,
             nextMatchID,
             universityID,
-            teamName,
-            teamLeaderID,
-            isApproved,
             universityName,
+            isApproved,
             sortBy,
             sortAsDescending
         );
@@ -265,17 +267,19 @@ const updateTournamentParticipant = async (
     byes,
     status,
     bracketSide,
-    nextMatchID
+    nextMatchID,
+    bracketOrder
 ) => {
     try {
-        const participant = await TournamentModel.searchTournamentParticipants(
+        const participant = await TournamentModel.updateTournamentParticipant(
             tournamentID,
             teamID,
             round,
             byes,
             status,
             bracketSide,
-            nextMatchID
+            nextMatchID,
+            bracketOrder
         );
         return participant;
     } catch (error) {
@@ -337,6 +341,128 @@ const searchTournamentFacilitators = async (
         );
         console.log("Returning search result on service layer");
         return tournament;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const startTournament = async (tournamentID) => {
+    try {
+        tournamentID = validateInteger(tournamentID, "tournamentID");
+        const shuffleParticipants =
+            await TournamentModel.searchTournamentParticipants(
+                tournamentID,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "RAND()"
+            );
+        const rounds = Math.ceil(Math.log2(shuffleParticipants.length));
+        const numParticipants = shuffleParticipants.length;
+        console.log(
+            "Number of participants in this tournament: ",
+            shuffleParticipants.length
+        );
+        console.log("Number of rounds: ", rounds);
+        console.log("Determining left vs right side...");
+        let leftSide, rightSide;
+        if (numParticipants % 4 == 0) {
+            console.log("Remainder 0");
+            leftSide = shuffleParticipants.slice(0, numParticipants / 2);
+            rightSide = shuffleParticipants.slice(numParticipants / 2);
+        } else if (numParticipants % 4 == 1) {
+            console.log("Remainder 1");
+            leftSide = shuffleParticipants.slice(
+                0,
+                Math.ceil(numParticipants / 2)
+            );
+            rightSide = shuffleParticipants.slice(
+                Math.ceil(numParticipants / 2)
+            );
+        } else if (numParticipants % 4 == 2) {
+            console.log("Remainder 2");
+            leftSide = shuffleParticipants.slice(0, numParticipants / 2 + 1);
+            rightSide = shuffleParticipants.slice(numParticipants / 2 + 1);
+        } else {
+            console.log("Remainder 3");
+            leftSide = shuffleParticipants.slice(
+                0,
+                Math.ceil(numParticipants / 2) + 1
+            );
+            rightSide = shuffleParticipants.slice(
+                Math.floor(numParticipants / 2)
+            );
+        }
+        if (rightSide.length + leftSide.length != numParticipants) {
+            throw new Error("Mathing error.");
+        }
+        console.log("Setting left side members...");
+        let bracketOrder = 1;
+        leftSide.forEach((item) => {
+            updateTournamentParticipant(
+                tournamentID,
+                item.TeamID,
+                0,
+                0,
+                "active",
+                "left",
+                null,
+                bracketOrder
+            );
+            bracketOrder++;
+        });
+        bracketOrder = 1;
+        rightSide.forEach((item) => {
+            updateTournamentParticipant(
+                tournamentID,
+                item.TeamID,
+                0,
+                0,
+                "active",
+                "right",
+                null,
+                bracketOrder
+            );
+            bracketOrder++;
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const nextRound = async (tournamentID, bracketSide, round) => {
+    try {
+        const participants = await searchTournamentParticipants(
+            tournamentID,
+            null,
+            null,
+            null,
+            null,
+            round,
+            null,
+            active,
+            bracketSide,
+            null,
+            null,
+            null,
+            true,
+            "BracketOrder"
+        );
+        numParticipants = participants.length;
+        if (numParticipants % 2 == 0) {
+            console.log("Even number of participants");
+        } else {
+            console.log("Odd number of participants");
+        }
     } catch (error) {
         throw error;
     }
@@ -428,7 +554,6 @@ const searchMatches = async (
             ) {
                 sortAsDescending = true;
             }
-            // When matchID is null, build the query using the additional search criteria.
             const match = await TournamentModel.searchMatches(
                 null,
                 tournamentID,
@@ -461,13 +586,77 @@ const updateMatchResult = async (matchID, winnerID, score1, score2) => {
         winnerID = validateInteger(winnerID, "winnerID");
         score1 = validateInteger(score1, "score1");
         score2 = validateInteger(score2, "score2");
-        match = await TournamentModel.updateMatchResult(
+        if (score1 == score2) {
+            throw new Error("There are no ties! Please choose a winner.");
+        }
+        await TournamentModel.updateMatchResult(
             matchID,
             winnerID,
             score1,
             score2
         );
-        return match;
+        match = await searchMatches(matchID);
+        currentRound = searchTournamentParticipants(
+            match.TournamentID,
+            match.Team1ID
+        )[0].Round;
+        if (score1 > score2) {
+            updateTournamentParticipant(
+                match.TournamentID,
+                match.Team1ID,
+                currentRound + 1
+            );
+            updateTournamentParticipant(
+                match.TournamentID,
+                match.Team2ID,
+                null,
+                null,
+                "lost",
+                null,
+                0,
+                null
+            );
+        } else {
+            updateTournamentParticipant(
+                match.TournamentID,
+                match.Team2ID,
+                currentRound + 1
+            );
+            updateTournamentParticipant(
+                match.TournamentID,
+                match.Team1ID,
+                null,
+                null,
+                "lost",
+                null,
+                0,
+                null
+            );
+        }
+        bracketSide = searchTournamentParticipants(
+            match.TournamentID,
+            match.Team1ID
+        )[0].BracketSide;
+        if (
+            searchTournamentParticipants(
+                match.TournamentID,
+                match.winnerID,
+                null,
+                null,
+                null,
+                currentRound,
+                null,
+                "active",
+                bracketSide,
+                null,
+                null,
+                null,
+                true
+            ).length === 0
+        ) {
+            nextRound(match.TournamentID, bracketSide, currentRound + 1);
+        }
+        return searchMatches(matchID);
     } catch (error) {
         throw error;
     }
@@ -484,6 +673,7 @@ module.exports = {
     addTournamentFacilitator,
     removeTournamentFacilitator,
     searchTournamentFacilitators,
+    startTournament,
     createMatch,
     searchMatches,
     updateMatchResult,
