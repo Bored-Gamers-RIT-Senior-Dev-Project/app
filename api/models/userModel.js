@@ -21,13 +21,14 @@ const createUser = async (
     lastName,
     username,
     profileImageUrl = `https://ui-avatars.com/api/?name=${firstName}+${lastName}?background=edca82`,
-    roleId = 1 // Default role for new users is Spectator
+    roleId = 1, // Default role for new users is Spectator
+    universityId
 ) => {
     try {
         const result = await db.query(
             `INSERT INTO
-                users (FirebaseUID, Email, Username, FirstName, LastName, ProfileImageUrl, RoleId)
-                VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                users (FirebaseUID, Email, Username, FirstName, LastName, ProfileImageUrl, RoleId, UniversityId)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 firebaseUID,
                 email,
@@ -36,6 +37,7 @@ const createUser = async (
                 lastName,
                 profileImageUrl,
                 roleId,
+                universityId,
             ]
         );
         if (result[0].affectedRows === 0) {
