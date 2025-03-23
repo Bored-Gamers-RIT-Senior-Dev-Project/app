@@ -46,19 +46,32 @@ const getUniversityById = async (universityId) => {
     return query[0][0];
 };
 
+/**
+ * Create a new university in the database
+ * @param {string} universityName
+ * @param {string} location
+ * @param {string} logoUrl
+ * @param {string} bannerUrl
+ * @param {string} description
+ * @param {string} websiteUrl
+ * @returns tbd
+ */
 const createUniversity = async (
     universityName,
     location = "",
-    logoURL,
+    logoUrl,
     bannerUrl,
     description,
     websiteUrl
 ) => {
-    const insert = await db.query(`
+    const insert = await db.query(
+        `
         INSERT INTO
             universities (UniversityName, Location, LogoURL, BannerURL, Description, WebsiteURL)
             VALUES (?, ?, ?, ?, ?, ?);
-    `);
+    `,
+        [universityName, location, logoUrl, bannerUrl, description, websiteUrl]
+    );
 
     //TODO: figure out a way to get the inserted value here when we don't know any unique values until after it's created :/
 

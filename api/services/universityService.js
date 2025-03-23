@@ -35,16 +35,31 @@ const getUniversityInfo = async (universityId) => {
     return { ...universityInfo, teams };
 };
 
+/**
+ * Gets a list of all universities from the database
+ * @returns A list of all universities, confirmed only.
+ */
 const getUniversities = async () => {
     const universities = await universityModel.searchUniversities("");
     return universities;
 };
 
+/**
+ * Creates a new university
+ * @param {*} uid Requester's user id to validate permissions
+ * @param {*} universityName  The new university name
+ * @param {*} location The location of the new university
+ * @param {*} logoUrl The new university's logo URL
+ * @param {*} bannerUrl The new university's banner URL
+ * @param {*} description Description of the university
+ * @param {*} websiteUrl Link to the university's website
+ * @returns TBD
+ */
 const createUniversity = async (
     uid,
     universityName,
     location,
-    logoURL,
+    logoUrl,
     bannerUrl,
     description,
     websiteUrl
@@ -59,7 +74,7 @@ const createUniversity = async (
     await universityModel.createUniversity(
         universityName,
         location,
-        logoURL,
+        logoUrl,
         bannerUrl,
         description,
         websiteUrl
@@ -70,6 +85,11 @@ const createUniversity = async (
     return {};
 };
 
+/**
+ * Delete a university from the database
+ * @param {*} universityId The university to be deleted
+ * @returns true
+ */
 const deleteUniversity = async (universityId) => {
     //TODO: If we allow this action, we'll need to figure out what business logic we need to reassign or delete teams, users, etc.
     //Delete university in universityModel
@@ -77,6 +97,13 @@ const deleteUniversity = async (universityId) => {
     return true;
 };
 
+/**
+ *
+ * @param {*} uid The uid of the account making the update.
+ * @param {*} universityId The id of the university to update
+ * @param {*} updateBody The updates to be made.
+ * @returns
+ */
 const updateUniversity = async (uid, universityId, updateBody) => {
     //TODO: Confirm that User is an admin or the University Rep.  Otherwise throw 403.
     const user = await userModel.getUserByFirebaseId(uid);
