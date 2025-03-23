@@ -43,7 +43,7 @@ const createUser = async (
         if (result[0].affectedRows === 0) {
             throw new Error("User not created.");
         }
-        return await readUser(firebaseUID);
+        return await getUserByFirebaseId(firebaseUID);
     } catch (error) {
         console.error("Error creating user:", error.message);
         throw error;
@@ -51,12 +51,12 @@ const createUser = async (
 };
 
 /**
- * Retrieve a user from the database by their Firebase UID.
- * @param {string} uid The firebase UID of the user.  Should be validated from a token.
- * @return {Promise<object>} The user object from the database.
- * @throws {Error} If the user is not found.
+ * Retrieve a user from the database, using the column and value specified.
+ * @param {*} column The column to use to match with value.  (TO PREVENT SQL INJECTION, SHOULD ALWAYS BE USED HARD-CODED)
+ * @param {*} value The value of {column} to search for.
+ * @returns A matching user, or null if no user is found.
  */
-const readUser = async (uid) => {
+const getUser = async (column, value) => {
     try {
         const [rows] = await db.query(
             `
@@ -65,9 +65,9 @@ const readUser = async (uid) => {
             LEFT JOIN universities AS uni ON user.UniversityID = uni.UniversityId
             LEFT JOIN teams AS team ON user.TeamID = team.TeamId
             JOIN roles AS role ON user.RoleId = role.RoleId
-            WHERE user.FirebaseUID = ?;
+            WHERE ${column} = ?;
         `,
-            [uid]
+            [value]
         );
         if (rows.length === 0) {
             return null;
@@ -78,6 +78,22 @@ const readUser = async (uid) => {
         throw error;
     }
 };
+
+/**
+ * Retrieve a user from the database by their local userId value.
+ * @param {string} userId The local ID of a user
+ * @return {Promise<object>} The user object from the database.
+ * @throws {Error} If the user is not found.
+ */
+const getUserByUserId = async (userId) => getUser("user.userID", userId);
+
+/**
+ * Retrieve a user from the database by their Firebase UID.
+ * @param {string} uid The firebase UID of the user.  Should be validated from a token.
+ * @return {Promise<object>} The user object from the database.
+ * @throws {Error} If the user is not found.
+ */
+const getUserByFirebaseId = async (uid) => getUser("user.firebaseUID", uid);
 
 const VALID_KEYS = [
     "USERID",
@@ -122,7 +138,31 @@ const updateUser = async (firebaseUid, body) => {
         throw new Error("User not updated.");
     }
 
-    return await readUser(firebaseUid);
+    return await getUserByFirebaseId(firebaseUid);
+};
+
+/**
+ *
+ * @param {number} The userID of the user in the local database
+ * @returns true
+ * @throws 404 HttpError if deletion fails
+ */
+const deleteUser = async (userId) => {
+    //Get the user record from the db.
+    const user = await getUserByUserId(userId);
+    if (!user) {
+        throw createHttpError(404);
+    }
+
+    const result = await db.query(`DELETE FROM users WHERE userID = ?`, [
+        userId,
+    ]);
+
+    if (result[0].affectedRows === 0) {
+        throw createHttpError(404);
+    }
+
+    return user;
 };
 
 /**
@@ -191,4 +231,11 @@ const checkUsername = async (username, strict = false) => {
 
 const getPermissions = async (roleId) => {};
 
-module.exports = { createUser, readUser, updateUser, checkUsername };
+module.exports = {
+    createUser,
+    getUserByUserId,
+    getUserByFirebaseId,
+    updateUser,
+    deleteUser,
+    checkUsername,
+};
