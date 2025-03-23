@@ -15,7 +15,6 @@ const searchTeams = async (
     partial = true,
     approvedOnly = true
 ) => {
-    //TODO create teamModel and move SQL interactions there
     let sql = `
         SELECT 
             t.TeamID AS Id, 
