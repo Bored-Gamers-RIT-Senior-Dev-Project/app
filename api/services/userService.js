@@ -94,10 +94,24 @@ const createUser = async (
         throw createHttpError(403);
     }
     //TODO: Validate and sanitize inputs
-    //TODO: Create user record in Firebase Authentication and get UID
-    //TODO: Create user record in local database using UID from Firebase Authentication
-    //TODO: Return user record from local database
-    return {};
+
+    //Create user record in Firebase Authentication and get UID
+    const createdUser = await Firebase.createUser(email, password);
+
+    //Create user record in local database using UID from Firebase Authentication
+    const userRecord = await User.createUser(
+        createdUser.uid,
+        email,
+        firstName,
+        lastName,
+        username,
+        profileImageUrl,
+        roleId,
+        universityId
+    );
+
+    // Return user record from local database
+    return userRecord;
 };
 
 /**

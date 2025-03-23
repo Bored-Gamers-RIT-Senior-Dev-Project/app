@@ -17,6 +17,26 @@ admin.initializeApp({
     }),
 });
 
+/**
+ * Create a new user in Google Firebase
+ * @param {string} email New User's email address
+ * @param {*} password New user's password
+ * @returns {UserRecord} Google Firebase user record
+ * @throws {Error} If anything goes wrong in the creation of the user.
+ */
+const createUser = async (email, password) => {
+    try {
+        const firebaseUser = await admin.auth().createUser({
+            email,
+            password,
+        });
+        return firebaseUser;
+    } catch (e) {
+        console.error("Error creating user in Firebase: ", e.message);
+        throw e;
+    }
+};
+
 const verifyUser = async (idToken) => {
     try {
         return await admin.auth().verifyIdToken(idToken);
@@ -66,4 +86,9 @@ const authenticationMiddleware = async (req, res, next) => {
     return next();
 };
 
-module.exports = { authenticationMiddleware, deleteUser, verifyUser };
+module.exports = {
+    authenticationMiddleware,
+    createUser,
+    deleteUser,
+    verifyUser,
+};
