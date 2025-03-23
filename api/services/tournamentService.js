@@ -458,10 +458,80 @@ const nextRound = async (tournamentID, bracketSide, round) => {
             "BracketOrder"
         );
         numParticipants = participants.length;
-        if (numParticipants % 2 == 0) {
-            console.log("Even number of participants");
+        if (numParticipants == 1) {
+            console.log(
+                "This is the winner of the ",
+                bracketSide,
+                " of the tournament."
+            );
+        } else if (numParticipants % 2 == 0) {
+            for (let i = 0; i < numParticipants; i += 2) {
+                const team1 = participants[i];
+                const team2 = participants[i + 1];
+                createMatch(
+                    tournamentID,
+                    team1.TeamID,
+                    team2.TeamID,
+                    Date(now.getTime() + 15 * 60 * 1000)
+                );
+            }
         } else {
-            console.log("Odd number of participants");
+            // Figure out who gets a bye based on:
+            //   1.) Number of previous byes
+            //   2.) Registration date
+            const byeTeam = await searchTournamentParticipants(
+                tournamentID,
+                null,
+                null,
+                null,
+                null,
+                round,
+                null,
+                active,
+                bracketSide,
+                null,
+                null,
+                null,
+                true,
+                "Byes, TeamCreatedAt"
+            )[0];
+            updateTournamentParticipant(
+                tournamentID,
+                byeTeam.TeamID,
+                byeTeam.TeamRound + 1,
+                byeTeam.TeamByeCount + 1
+            );
+            const participants = await searchTournamentParticipants(
+                tournamentID,
+                null,
+                null,
+                null,
+                null,
+                round,
+                null,
+                active,
+                bracketSide,
+                null,
+                null,
+                null,
+                true,
+                "BracketOrder"
+            );
+            numParticipants = participants.length;
+            if (numParticipants % 2 == 0) {
+                for (let i = 0; i < numParticipants; i += 2) {
+                    const team1 = participants[i];
+                    const team2 = participants[i + 1];
+                    createMatch(
+                        tournamentID,
+                        team1.TeamID,
+                        team2.TeamID,
+                        Date(now.getTime() + 15 * 60 * 1000)
+                    );
+                }
+            } else {
+                throw new Error("Mathing error when generating next round.");
+            }
         }
     } catch (error) {
         throw error;
