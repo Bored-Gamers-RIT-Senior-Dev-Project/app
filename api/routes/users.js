@@ -14,6 +14,18 @@ router.get("/profile", async (req, res, next) => {
     }
 });
 
+//Gets a list of all users
+router.get("", async (req, res, next) => {
+    const { uid } = req.user;
+    if (!uid) return res.status(401).send();
+    try {
+        const list = await UserService.getUserList(uid);
+        return res.status(200).json(list);
+    } catch (error) {
+        next(error);
+    }
+});
+
 //User sign-in, expects the sender to have authenticated with Firebase
 router.post("/register", async (req, res, next) => {
     const { uid } = req.user;

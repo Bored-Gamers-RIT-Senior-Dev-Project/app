@@ -1,6 +1,20 @@
 const Firebase = require("../config/firebase");
 const User = require("../models/userModel");
-const { createHttpError } = require("http-errors");
+const { createHttpError, HttpError } = require("http-errors");
+
+/**
+ * Gets a list of all users
+ * @param {string} uid Requestor's UID, validated from their request token.
+ * @returns {Promise<List<object>>} A list of all users.
+ * @throws {HttpError} 403 error if the requestor isn't a Super Admin.
+ */
+const getUserList = async (uid) => {
+    const user = await User.getUserByFirebaseId(uid);
+    if ((!User.userHasRole("Super Admin"), user.uid)) {
+        throw createHttpError(403);
+    }
+    return await User.getUserList();
+};
 
 /**
  * An alias for User.getUserByFirebaseId()
@@ -154,6 +168,7 @@ const deleteUser = async (uid, userId) => {
 module.exports = {
     createUser,
     deleteUser,
+    getUserList,
     getUserByFirebaseId,
     getUserByUserId,
     googleSignIn,
