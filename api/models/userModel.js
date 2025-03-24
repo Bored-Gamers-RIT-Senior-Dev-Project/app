@@ -51,6 +51,45 @@ const createUser = async (
 };
 
 /**
+ * Gets a list of all users in the database
+ * @returns User list
+ */
+const getUserList = async () => {
+    try {
+        const [rows] = await db.query(
+            `
+        SELECT user.UserID
+            user.FirstName
+            user.LastName,
+            user.Username,
+            user.Email,
+            user.ProfileImageURL,
+            user.Bio,
+            user.CreatedAt,
+            user.Paid,
+            user.TeamID,
+            team.TeamName,
+            user.RoleID,
+            role.RoleName,
+            user.UniversityID,
+            uni.UniversityName,
+            user.IsValidated
+        FROM users AS user
+            LEFT JOIN universities AS uni ON user.UniversityID = uni.UniversityId
+            LEFT JOIN teams AS team ON user.TeamID = team.TeamId
+            JOIN roles AS role ON user.RoleId = role.RoleId;
+        `
+        );
+        if (rows.length === 0) {
+            return null;
+        }
+    } catch (e) {
+        console.error("Error getting user list: ", e.message);
+        throw e;
+    }
+};
+
+/**
  * Retrieve a user from the database, using the column and value specified.
  * @param {*} column The column to use to match with value.  (TO PREVENT SQL INJECTION, SHOULD ALWAYS BE USED HARD-CODED)
  * @param {*} value The value of {column} to search for.
@@ -60,7 +99,7 @@ const getUser = async (column, value) => {
     try {
         const [rows] = await db.query(
             `
-        SELECT user.*, uni.UniversityName, team.TeamName
+        SELECT user.*, uni.UniversityName, team.TeamName, role.RoleName
             FROM users AS user
             LEFT JOIN universities AS uni ON user.UniversityID = uni.UniversityId
             LEFT JOIN teams AS team ON user.TeamID = team.TeamId
@@ -260,6 +299,7 @@ const userHasRole = async (userId, roleName) => {
 
 module.exports = {
     createUser,
+    getUserList,
     getUserByUserId,
     getUserByFirebaseId,
     updateUser,
