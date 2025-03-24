@@ -73,6 +73,14 @@ const search = async (params) => {
 
 const users = Object.freeze({
     /**
+     * Gets a list of all users that exist in the local database.
+     * @returns {Promise<Array<object>>} Users
+     */
+    getList: async () => {
+        const { data } = await api.get("users");
+        return data;
+    },
+    /**
      * Gets the user profile for the currently logged in user.
      * @returns The user profile for the currently logged in user.
      */

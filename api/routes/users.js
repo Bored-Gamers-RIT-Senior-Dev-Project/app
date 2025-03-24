@@ -4,7 +4,7 @@ const UserService = require("../services/userService");
 
 //Gets a user's profile information
 router.get("/profile", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req.user?.uid;
     if (!uid) return res.status(401).send();
     try {
         const user = await UserService.getUserByFirebaseId(uid);
@@ -16,7 +16,7 @@ router.get("/profile", async (req, res, next) => {
 
 //Gets a list of all users
 router.get("", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req.user?.uid;
     if (!uid) return res.status(401).send();
     try {
         const list = await UserService.getUserList(uid);
@@ -28,7 +28,7 @@ router.get("", async (req, res, next) => {
 
 //User sign-in, expects the sender to have authenticated with Firebase
 router.post("/register", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req.user?.uid;
     const { email, username, firstName, lastName } = req.body;
 
     if (!uid) {
@@ -58,7 +58,7 @@ router.post("/register", async (req, res, next) => {
 //Google sign-in, used to create local records of firebase sign-in
 router.post("/register/google", async (req, res, next) => {
     const { email, displayName, photoURL } = req.body;
-    const { uid } = req.user;
+    const uid = req.user?.uid;
     console.log(req.user);
     console.log(req.body);
     if (!uid) {
@@ -87,7 +87,7 @@ router.post("/register/google", async (req, res, next) => {
  * Requires admin role.
  */
 router.post("", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req.user?.uid;
     if (!uid) return res.status(401).send();
     try {
         //userService create user
@@ -102,7 +102,7 @@ router.post("", async (req, res, next) => {
  * TODO: Separate route to update a user profile accessible only to the user themselves (and possibly University Rep?)
  */
 router.put("/:userId", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req.user?.uid;
     if (!uid) {
         return res.status(401).send();
     }
@@ -121,7 +121,7 @@ router.put("/:userId", async (req, res, next) => {
  * Requires admin role, or matching user ID (?).
  */
 router.delete("/:userId", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req.user?.uid;
     const { userId } = req.params;
     if (!uid) {
         return res.status(401).send();

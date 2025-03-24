@@ -2,19 +2,19 @@ import { createBrowserRouter, redirect } from "react-router";
 import App from "../App";
 import {
     About,
+    AdminDashboard,
     Home,
     NotFound,
+    ReportView,
     Rules,
     Schedule,
     Search,
     TeamsPage,
     University,
+    UserManager,
     UserSettings,
     UserSignIn,
     UserSignUp,
-    ReportView,
-    AdminDashboard,
-    UserManager
 } from "../pages";
 import { UserPreferences } from "../pages/UserPreferences.DEMO";
 import { search, university, users } from "./api";
@@ -111,12 +111,13 @@ const router = createBrowserRouter([
                 element: <ReportView />,
             },
             {
-                path:"/admin",
+                path: "/admin",
                 element: <AdminDashboard />,
             },
             {
-                path:"/admin/users",
+                path: "/admin/users",
                 element: <UserManager />,
+                loader: users.getList,
             },
             {
                 path: "/user_preferences",
