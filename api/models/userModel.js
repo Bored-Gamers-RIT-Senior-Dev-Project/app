@@ -229,7 +229,34 @@ const checkUsername = async (username, strict = false) => {
     return await generateUsername(username, sharedUsernames);
 };
 
-const getPermissions = async (roleId) => {};
+/**
+ *
+ * @param {string|number} userId A unique identifier for the user: either their Firebase UID or UserId (both are checked)
+ * @param {string} roleName The name of the role to check.
+ * @returns {Promise<boolean>} true if the user has the specified role. Otherwise false.
+ */
+const userHasRole = async (userId, roleName) => {
+    try {
+        const [rows] = await db.query(
+            `
+            SELECT true
+            FROM users user
+            JOIN roles role ON user.RoleId = role.RoleId
+            WHERE
+                LOWER(role.RoleName) = LOWER(?)
+                AND (user.UserId = ? OR user.FirebaseUid = ?);
+            `,
+            [roleName, userId, userId]
+        );
+        if (rows.length == 0) {
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.error("Error checking role:", error.message);
+        throw error;
+    }
+};
 
 module.exports = {
     createUser,
@@ -238,4 +265,5 @@ module.exports = {
     updateUser,
     deleteUser,
     checkUsername,
+    userHasRole,
 };
