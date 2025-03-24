@@ -14,8 +14,6 @@
         "@emotion/styled": "^11.14.0",
         "@mui/icons-material": "^6.4.7",
         "@mui/material": "^6.4.7",
-        "@mui/icons-material": "^6.4.6",
-        "@mui/material": "^6.4.5",
         "@mui/x-date-pickers": "^7.28.0",
         "@zxcvbn-ts/core": "^3.0.4",
         "@zxcvbn-ts/language-common": "^3.0.4",
