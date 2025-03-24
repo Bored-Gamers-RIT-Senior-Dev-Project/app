@@ -2,8 +2,8 @@ import { Close as CloseIcon } from "@mui/icons-material";
 import {
     Box,
     Button,
+    Dialog,
     IconButton,
-    Modal,
     TextField,
     Typography,
 } from "@mui/material";
@@ -21,17 +21,10 @@ const AddUniversityModal = () => {
     const closeModal = () => navigate("..");
 
     return (
-        <Modal open={open} onClose={closeModal}>
+        <Dialog open={open} onClose={closeModal}>
             <Box
                 sx={{
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    bgcolor: "white",
-                    borderRadius: 2,
-                    boxShadow: 24,
                     p: 3,
-                    width: 400,
                 }}
             >
                 <Box
@@ -63,7 +56,7 @@ const AddUniversityModal = () => {
                     Add
                 </Button>
             </Box>
-        </Modal>
+        </Dialog>
     );
 };
 
