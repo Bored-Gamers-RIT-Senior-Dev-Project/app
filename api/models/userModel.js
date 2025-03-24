@@ -96,14 +96,12 @@ const getUserList = async () => {
  * @returns A matching user, or null if no user is found.
  */
 const getUser = async (column, value) => {
-    console.log("GetUser: ", column, value);
     try {
         const [rows] = await db.query(
             `${SQL_SELECTOR} WHERE ?? = ?;
         `,
             [column, value]
         );
-        console.log(rows);
         if (rows.length === 0) {
             return null;
         }
