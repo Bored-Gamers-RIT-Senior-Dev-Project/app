@@ -71,6 +71,13 @@ const search = async (params) => {
     return data;
 };
 
+const admin = Object.freeze({
+    getRoles: async () => {
+        const { data } = await api.get("roles");
+        return data;
+    },
+});
+
 const users = Object.freeze({
     /**
      * Gets a list of all users that exist in the local database.
@@ -135,6 +142,15 @@ const university = Object.freeze({
         const { data } = await api.get(`university/${universityId}`);
         return data;
     },
+
+    getList: async () => {
+        const { data } = await api.get(`university`);
+        return data;
+    },
 });
 
-export { search, university, users };
+const combine = (...calls) => {
+    return () => Promise.all(calls);
+};
+
+export { admin, combine, search, university, users };
