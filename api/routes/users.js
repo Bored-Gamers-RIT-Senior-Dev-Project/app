@@ -59,8 +59,6 @@ router.post("/register", async (req, res, next) => {
 router.post("/register/google", async (req, res, next) => {
     const { email, displayName, photoURL } = req.body;
     const uid = req.user?.uid;
-    console.log(req.user);
-    console.log(req.body);
     if (!uid) {
         return res.status(401).send();
     }
