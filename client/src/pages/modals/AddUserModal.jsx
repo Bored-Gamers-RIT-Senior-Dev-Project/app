@@ -2,9 +2,9 @@ import { Close as CloseIcon } from "@mui/icons-material";
 import {
     Box,
     Button,
+    Dialog,
     IconButton,
     MenuItem,
-    Modal,
     Select,
     TextField,
     Typography,
@@ -24,17 +24,10 @@ const AddUserModal = () => {
     const closeModal = () => navigate("..");
 
     return (
-        <Modal open onClose={closeModal}>
+        <Dialog open onClose={closeModal}>
             <Box
                 sx={{
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    bgcolor: "white",
-                    borderRadius: 2,
-                    boxShadow: 24,
-                    p: 3,
-                    width: 400,
+                    padding: 3,
                 }}
             >
                 <Box
@@ -77,7 +70,7 @@ const AddUserModal = () => {
                     Add
                 </Button>
             </Box>
-        </Modal>
+        </Dialog>
     );
 };
 
