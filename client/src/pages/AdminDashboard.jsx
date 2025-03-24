@@ -1,22 +1,23 @@
-import { useState, useCallback, useMemo } from "react";
+import SearchIcon from "@mui/icons-material/Search";
 import {
     Box,
     Button,
     Card,
     CardContent,
-    Typography,
-    TextField,
+    FormControl,
     InputAdornment,
+    InputLabel,
     MenuItem,
     Select,
-    FormControl,
-    InputLabel,
+    TextField,
+    Typography,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
+import { useCallback, useMemo, useState } from "react";
+import PropTypes from "../utils/propTypes";
 // JDOC Was done with the help of my friend @sp5442@g.rit.edu
 
 /**
@@ -68,9 +69,30 @@ const adminItems = [
  * Component for displaying an admin item card.
  * @param {AdminItem} props - Admin item properties.
  */
-const AdminItemCard = ({ title, details, submitted, lastUpdated, status, buttonText }) => (
-    <Card sx={{ mb: 2, p: 2, backgroundColor: "#f0f0f0", boxShadow: 2, borderRadius: "12px" }}>
-        <CardContent sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+const AdminItemCard = ({
+    title,
+    details,
+    submitted,
+    lastUpdated,
+    status,
+    buttonText,
+}) => (
+    <Card
+        sx={{
+            mb: 2,
+            p: 2,
+            backgroundColor: "#f0f0f0",
+            boxShadow: 2,
+            borderRadius: "12px",
+        }}
+    >
+        <CardContent
+            sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+            }}
+        >
             <Box>
                 <Typography variant="h6" fontWeight="bold">
                     {title}
@@ -103,13 +125,19 @@ const AdminDashboard = () => {
      * Handles the search input change.
      * @param {React.ChangeEvent<HTMLInputElement>} e - The event object.
      */
-    const handleSearchChange = useCallback((e) => setSearch(e.target.value), []);
+    const handleSearchChange = useCallback(
+        (e) => setSearch(e.target.value),
+        []
+    );
 
     /**
      * Handles the ticket type selection change.
      * @param {React.ChangeEvent<{ value: unknown }>} e - The event object.
      */
-    const handleTicketTypeChange = useCallback((e) => setTicketType(e.target.value), []);
+    const handleTicketTypeChange = useCallback(
+        (e) => setTicketType(e.target.value),
+        []
+    );
 
     /**
      * Filters admin items based on search, date range, and ticket type.
@@ -119,14 +147,19 @@ const AdminDashboard = () => {
         return adminItems.filter((item) => {
             const submittedDate = dayjs(item.submitted);
             const isWithinDateRange =
-                (!startDate || submittedDate.isAfter(startDate) || submittedDate.isSame(startDate)) &&
-                (!endDate || submittedDate.isBefore(endDate) || submittedDate.isSame(endDate));
+                (!startDate ||
+                    submittedDate.isAfter(startDate) ||
+                    submittedDate.isSame(startDate)) &&
+                (!endDate ||
+                    submittedDate.isBefore(endDate) ||
+                    submittedDate.isSame(endDate));
 
             const matchesSearch =
                 item.title.toLowerCase().includes(search.toLowerCase()) ||
                 item.details.toLowerCase().includes(search.toLowerCase());
 
-            const matchesType = ticketType === "All" || item.title.includes(ticketType);
+            const matchesType =
+                ticketType === "All" || item.title.includes(ticketType);
             return isWithinDateRange && matchesSearch && matchesType;
         });
     }, [search, ticketType, startDate, endDate]);
@@ -153,15 +186,30 @@ const AdminDashboard = () => {
                         flexWrap: "nowrap",
                     }}
                 >
-                    <DatePicker label="Start Date" value={startDate} onChange={setStartDate} />
-                    <DatePicker label="End Date" value={endDate} onChange={setEndDate} />
+                    <DatePicker
+                        label="Start Date"
+                        value={startDate}
+                        onChange={setStartDate}
+                    />
+                    <DatePicker
+                        label="End Date"
+                        value={endDate}
+                        onChange={setEndDate}
+                    />
                     <FormControl sx={{ minWidth: 160 }}>
                         <InputLabel>Ticket Type</InputLabel>
-                        <Select value={ticketType} onChange={handleTicketTypeChange}>
+                        <Select
+                            value={ticketType}
+                            onChange={handleTicketTypeChange}
+                        >
                             <MenuItem value="All">All Types</MenuItem>
                             <MenuItem value="Team Page">Team Page</MenuItem>
-                            <MenuItem value="Reported User">Report User</MenuItem>
-                            <MenuItem value="Support Ticket">Support Ticket</MenuItem>
+                            <MenuItem value="Reported User">
+                                Report User
+                            </MenuItem>
+                            <MenuItem value="Support Ticket">
+                                Support Ticket
+                            </MenuItem>
                         </Select>
                     </FormControl>
                     <TextField
@@ -180,7 +228,9 @@ const AdminDashboard = () => {
                 </Box>
 
                 {filteredItems.length > 0 ? (
-                    filteredItems.map((item, index) => <AdminItemCard key={index} {...item} />)
+                    filteredItems.map((item, index) => (
+                        <AdminItemCard key={index} {...item} />
+                    ))
                 ) : (
                     <Typography textAlign="center" color="textSecondary">
                         No matching tickets found.
@@ -189,6 +239,16 @@ const AdminDashboard = () => {
             </Box>
         </LocalizationProvider>
     );
+};
+
+//Proptypes generated by copilot
+AdminItemCard.propTypes = {
+    title: PropTypes.string.isRequired,
+    details: PropTypes.string.isRequired,
+    submitted: PropTypes.string.isRequired,
+    lastUpdated: PropTypes.string.isRequired,
+    status: PropTypes.string.isRequired,
+    buttonText: PropTypes.string.isRequired,
 };
 
 export { AdminDashboard };
