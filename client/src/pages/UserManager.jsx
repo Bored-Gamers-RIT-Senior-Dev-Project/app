@@ -39,7 +39,6 @@ const ModalContent = ({ open, onClose, modalType }) => {
         <Modal open={open} onClose={onClose}>
             <Box
                 sx={{
-                    position: "absolute",
                     top: "50%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
@@ -113,8 +112,9 @@ const UserManager = () => {
 
     const columnTypes = {
         date: {
-            valueParser: (date) => new Date(date),
-            displayFormatter: (value) => value.toLocaleString(),
+            valueGetter: ({ data }) => (data ? new Date(data.createdAt) : null),
+            valueFormatter: ({ value }) => new Date(value).toLocaleString(),
+            filter: "agDateColumnFilter",
         },
     };
 
@@ -145,7 +145,6 @@ const UserManager = () => {
             field: "createdAt",
             flex: 1,
             sortable: true,
-            filter: true,
             type: "date",
         },
         {
@@ -160,14 +159,14 @@ const UserManager = () => {
             field: "teamName",
             flex: 1,
             sortable: true,
-            filter: true,
+            filter: "agSetColumnFilter",
         },
         {
             headerName: "Role",
             field: "roleName",
             flex: 1,
             sortable: true,
-            filter: true,
+            filter: "agSetColumnFilter",
         },
     ];
 
@@ -175,9 +174,11 @@ const UserManager = () => {
         <Paper
             sx={{
                 width: "100%",
+                height: "80%",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
+                padding: "1em",
             }}
         >
             <Typography variant="h4" mb={2} textAlign="center">
@@ -227,13 +228,15 @@ const UserManager = () => {
                     </MenuItem>
                 </Menu>
             </Box>
-            <Box className="ag-theme-alpine" style={{ width: "1200px" }}>
+            <Box
+                className="ag-theme-alpine"
+                style={{ width: "1200px", height: "100%" }}
+            >
                 <AgGridReact
                     rowData={rowData}
                     columnDefs={columnDefs}
                     columnTypes={columnTypes}
                     pagination
-                    domLayout="autoHeight"
                 />
             </Box>
             <ModalContent
