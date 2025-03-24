@@ -1,4 +1,4 @@
-import { createBrowserRouter, redirect } from "react-router";
+import { redirect } from "react-router";
 import App from "../App";
 import {
     About,
@@ -41,7 +41,7 @@ const makeAction =
             }
         }
     };
-const router = createBrowserRouter([
+const routes = [
     {
         path: "/",
         element: <App />,
@@ -130,6 +130,6 @@ const router = createBrowserRouter([
             },
         ],
     },
-]);
+];
 
-export { router };
+export { routes };
