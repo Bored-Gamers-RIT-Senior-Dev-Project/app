@@ -76,6 +76,10 @@ const admin = Object.freeze({
         const { data } = await api.get("roles");
         return data;
     },
+    getReports: async () => {
+        const { data } = await api.get("reports");
+        return data;
+    },
 });
 
 const users = Object.freeze({

@@ -1,6 +1,6 @@
 const Firebase = require("../config/firebase");
 const User = require("../models/userModel");
-const { createHttpError, HttpError } = require("http-errors");
+const createHttpError = require("http-errors");
 
 /**
  * Gets a list of all users

@@ -110,6 +110,7 @@ const routes = [
             {
                 path: "/admin/reports",
                 element: <ReportView />,
+                loader: admin.getReports,
             },
             {
                 path: "/admin",
