@@ -128,6 +128,7 @@ const routes = [
                                 university.getList(),
                                 admin.getRoles(),
                             ]),
+                        action: makeAction(users.createUser),
                     },
                     {
                         path: "/admin/users/addUniversity",

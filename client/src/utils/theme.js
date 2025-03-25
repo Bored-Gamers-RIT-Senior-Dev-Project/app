@@ -26,9 +26,6 @@ const palette = {
     success: {
         main: Colors.game.darkGreen,
     },
-    error: {
-        main: Colors.game.salmon,
-    },
 };
 
 const theme = responsiveFontSizes(createTheme({ palette }));
