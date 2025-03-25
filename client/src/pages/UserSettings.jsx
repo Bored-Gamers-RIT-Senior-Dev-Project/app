@@ -13,7 +13,8 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { useAuth } from "../hooks/useAuth/index";
 
 const universityList = [
@@ -38,10 +39,16 @@ const UserSettings = () => {
         );
     };
     const { user } = useAuth();
+    const navigate = useNavigate(); //React router useNavigate hook
+    useEffect(() => {
+        if (user === null) {
+            //User is 'undefined' before Firebase inits, 'null' if user is not logged in.
+            navigate("/signin");
+        }
+    }, [user, navigate]);
     if (!user) {
-        console.error(
-            "UserSettings: user is nullish, why are we in user settings?"
-        );
+        console.error(`UserSettings: user is ${user}!`);
+        return;
     }
 
     const emailEncoded = encodeURI(user.email);
