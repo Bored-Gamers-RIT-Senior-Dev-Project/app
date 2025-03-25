@@ -45,7 +45,6 @@ const AddUserModal = () => {
         roles.forEach(({ RoleID, RoleName }) => {
             options[RoleID] = RoleName;
         });
-        console.log(options);
         return options;
     }, [roles]);
 
