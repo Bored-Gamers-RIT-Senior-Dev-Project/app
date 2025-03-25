@@ -18,6 +18,7 @@ import {
 } from "../pages";
 import { AddUniversityModal } from "../pages/modals/AddUniversityModal";
 import { AddUserModal } from "../pages/modals/AddUserModal";
+import { DeleteModal } from "../pages/modals/DeleteModal";
 import { EditUserModal } from "../pages/modals/EditUserModal";
 import { admin, search, university, users } from "./api";
 import { events } from "./events";
@@ -161,6 +162,37 @@ const routes = [
                                 const response = await users.update(
                                     params.userId,
                                     data
+                                );
+                                return response;
+                            } finally {
+                                events.publish("spinner.close");
+                            }
+                        },
+                    },
+                    {
+                        path: "/admin/users/deleteUser/:userId",
+                        element: <DeleteModal />,
+                        loader: async ({ params }) => {
+                            const { userId } = params;
+                            try {
+                                if (isNaN(Number(userId))) {
+                                    const error = new Error("Bad Request");
+                                    error.status = 404;
+                                    throw error;
+                                }
+                                return await users.getUser(userId);
+                            } catch (e) {
+                                if (e.status === 404) {
+                                    return redirect("/notfound");
+                                }
+                                throw e;
+                            }
+                        },
+                        action: async ({ params }) => {
+                            events.publish("spinner.open");
+                            try {
+                                const response = await users.delete(
+                                    params.userId
                                 );
                                 return response;
                             } finally {

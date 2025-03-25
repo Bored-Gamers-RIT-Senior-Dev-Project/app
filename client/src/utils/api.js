@@ -144,6 +144,11 @@ const users = Object.freeze({
         const { data } = await api.get(`users/${userId}`);
         return data;
     },
+
+    delete: async (userId) => {
+        const { data } = await api.delete(`users/${userId}`);
+        return data;
+    },
 });
 
 const university = Object.freeze({

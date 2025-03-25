@@ -1,4 +1,4 @@
-import { Edit, Search as SearchIcon } from "@mui/icons-material";
+import { Delete, Edit, Search as SearchIcon } from "@mui/icons-material";
 import {
     Box,
     Button,
@@ -21,11 +21,13 @@ import propTypes from "../utils/propTypes";
 const ActionsCellRenderer = ({ navigate, data }) => (
     <Box>
         <Tooltip title="Edit User">
-            <IconButton
-                // onClick={() => console.log(data)}
-                onClick={() => navigate(`./editUser/${data.userId}`)}
-            >
+            <IconButton onClick={() => navigate(`./editUser/${data.userId}`)}>
                 <Edit />
+            </IconButton>
+        </Tooltip>
+        <Tooltip title="Delete User">
+            <IconButton onClick={() => navigate(`./deleteUser/${data.userId}`)}>
+                <Delete />
             </IconButton>
         </Tooltip>
     </Box>
