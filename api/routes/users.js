@@ -15,7 +15,7 @@ router.get("/profile", async (req, res, next) => {
 });
 
 //User sign-in, expects the sender to have authenticated with Firebase
-router.post("register", async (req, res, next) => {
+router.post("/register", async (req, res, next) => {
     const { uid } = req.user;
     const { email, username, firstName, lastName } = req.body;
 
