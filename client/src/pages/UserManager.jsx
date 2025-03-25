@@ -101,7 +101,9 @@ const UserManager = () => {
         {
             headerName: "Actions",
             flex: 1,
-            cellRenderer: ActionsCellRenderer,
+            cellRenderer: ({ data }) => (
+                <ActionsCellRenderer data={data} navigate={navigate} />
+            ),
         },
     ];
 
