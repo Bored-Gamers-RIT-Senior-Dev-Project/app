@@ -72,7 +72,7 @@ const getReportOneTotals = async () => {
         ) sub;
     `;
     const [rows] = await db.query(sql);
-    return rows;
+    return rows[0];
 };
 
 module.exports = { getReportOne, getReportOneTotals, getRoleList };
