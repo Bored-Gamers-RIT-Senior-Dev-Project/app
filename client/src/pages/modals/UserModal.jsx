@@ -12,21 +12,13 @@ import {
 } from "@mui/material";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
+import PropTypes from "prop-types";
 import { useMemo, useState } from "react";
-import { useLoaderData, useNavigate } from "react-router";
+import { useLoaderData } from "react-router";
 import { DynamicSelect } from "../../components/DynamicSelect";
-import { usePostSubmit } from "../../hooks/usePostSubmit";
 
-const UserModal = () => {
-    const [formData, setFormData] = useState({
-        firstName: null,
-        lastName: null,
-        email: null,
-        username: null,
-        password: null,
-        universityId: null,
-        roleId: 1,
-    });
+const UserModal = ({ onSubmit, defaults, onClose }) => {
+    const [formData, setFormData] = useState(defaults);
 
     const [errors, setErrors] = useState({
         firstName: null,
@@ -55,10 +47,6 @@ const UserModal = () => {
     const handleFormChange = ({ target }) => {
         setFormData({ ...formData, [target.name]: target.value });
     };
-
-    const navigate = useNavigate();
-    const closeModal = () => navigate("..");
-    const submit = usePostSubmit();
 
     const handleSubmit = () => {
         let pass = true;
@@ -113,7 +101,7 @@ const UserModal = () => {
         const selectedRole = roles.find(
             (role) => `${role.RoleID}` == formData.roleId
         );
-        console.log(selectedRole);
+
         if (
             selectedRole.RoleName.includes("University") &&
             !formData.universityId
@@ -126,12 +114,12 @@ const UserModal = () => {
         setErrors(newErrors);
 
         if (pass) {
-            submit(formData);
+            onSubmit(formData);
         }
     };
 
     return (
-        <Dialog open onClose={closeModal}>
+        <Dialog open onClose={onClose}>
             <Box
                 sx={{
                     width: "25em",
@@ -147,7 +135,7 @@ const UserModal = () => {
                     alignItems="center"
                 >
                     <Typography variant="h6">Add User</Typography>
-                    <IconButton onClick={closeModal}>
+                    <IconButton onClick={onClose}>
                         <CloseIcon />
                     </IconButton>
                 </Box>
@@ -267,6 +255,13 @@ const UserModal = () => {
             </Box>
         </Dialog>
     );
+};
+
+//As usual, propTypes courtesy of Copilot
+UserModal.propTypes = {
+    onSubmit: PropTypes.func.isRequired,
+    defaults: PropTypes.object.isRequired,
+    onClose: PropTypes.func.isRequired,
 };
 
 export { UserModal };
