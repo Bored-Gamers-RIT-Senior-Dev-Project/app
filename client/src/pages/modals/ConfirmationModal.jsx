@@ -26,7 +26,7 @@ const ConfirmationModal = ({ text = "Are You Sure?", onClose, onConfirm }) => {
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                    <Button variant="contained" onClick={onConfirm}>
+                    <Button variant="contained" onClick={() => onConfirm()}>
                         Yes
                     </Button>
                     <Button variant="outlined" onClick={onClose}>

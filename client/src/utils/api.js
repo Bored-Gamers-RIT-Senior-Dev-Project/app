@@ -146,6 +146,7 @@ const users = Object.freeze({
     },
 
     delete: async (userId) => {
+        console.log("Deleting " + userId);
         const { data } = await api.delete(`users/${userId}`);
         return data;
     },

@@ -6,7 +6,6 @@ import PropTypes from "prop-types";
 
 //Component Layout created by chatGPT https://chatgpt.com/canvas/shared/67e2c89cbeb88191b49c51fc7d74c8f8
 const ReportGridOne = ({ data, totals }) => {
-    console.log(data, totals);
     const columnDefs = [
         {
             headerName: "Date Added",

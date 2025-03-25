@@ -196,7 +196,13 @@ const updateUser = async (userId, body) => {
  */
 const deleteUser = async (userId) => {
     //Get the user record from the db.
-    const user = await getUserByUserId(userId);
+    const [userRows] = await db.query(
+        "SELECT FirebaseUID as firebaseID FROM users WHERE UserID = ?",
+        [userId]
+    );
+
+    const user = userRows[0];
+
     if (!user) {
         throw createHttpError(404);
     }
