@@ -129,6 +129,7 @@ const routes = [
                     {
                         path: "/admin/users/addUniversity",
                         element: <AddUniversityModal />,
+                        action: makeAction(university.addUniversity),
                     },
                 ],
                 loader: users.getList,
