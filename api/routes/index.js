@@ -54,4 +54,15 @@ router.get("/roles", async (req, res, next) => {
     }
 });
 
+router.get("/reports", async (req, res, next) => {
+    const uid = req.user?.uid;
+    if (!uid) return res.status(401).send();
+    try {
+        const report = await adminService.generateReports(uid);
+        return res.json(report);
+    } catch (e) {
+        next(e);
+    }
+});
+
 module.exports = router;

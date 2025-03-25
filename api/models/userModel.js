@@ -281,9 +281,9 @@ const userHasRole = async (userId, roleName) => {
     try {
         const [rows] = await db.query(
             `
-            SELECT true
+            SELECT 1
             FROM users user
-            JOIN roles role ON user.RoleId = role.RoleId
+            LEFT JOIN roles role ON user.RoleId = role.RoleId
             WHERE
                 LOWER(role.RoleName) = LOWER(?)
                 AND (user.UserId = ? OR user.FirebaseUid = ?);
