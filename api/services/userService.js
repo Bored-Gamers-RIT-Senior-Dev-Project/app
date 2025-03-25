@@ -114,16 +114,6 @@ const createUser = async (
     roleId,
     universityId
 ) => {
-    console.log(
-        "Adding User: ",
-        firstName,
-        lastName,
-        username,
-        password,
-        email,
-        roleId,
-        universityId
-    );
     const user = await User.getUserByFirebaseId(requestUid);
     if (user.roleName !== "Super Admin") {
         throw createHttpError(403);
@@ -170,7 +160,7 @@ const updateUser = async (uid, userId, body) => {
 };
 
 const deleteUser = async (uid, userId) => {
-    const user = await getUser(uid);
+    const user = await getUserByFirebaseId(uid);
     if (user.roleName !== "Super Admin" /* && user.UserId !== userId */) {
         throw createHttpError(403);
     }
@@ -178,8 +168,12 @@ const deleteUser = async (uid, userId) => {
     // Delete user from local database.  Get the firebase uid from the local database.
     const deletedUser = await User.deleteUser(userId);
 
-    //TODO: Delete user from Firebase Authentication.
-    await Firebase.deleteUser(deletedUser.firebaseUid);
+    if (!deletedUser) {
+        throw createHttpError(500);
+    }
+
+    //Delete user from Firebase Authentication.
+    await Firebase.deleteUser(deletedUser.firebaseID);
 
     return true;
 };
