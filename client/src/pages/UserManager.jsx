@@ -1,12 +1,14 @@
-import { Search as SearchIcon } from "@mui/icons-material";
+import { Edit, Search as SearchIcon } from "@mui/icons-material";
 import {
     Box,
     Button,
+    IconButton,
     InputAdornment,
     Menu,
     MenuItem,
     Paper,
     TextField,
+    Tooltip,
     Typography,
 } from "@mui/material";
 import "ag-grid-community/styles/ag-grid.css";
@@ -14,6 +16,19 @@ import "ag-grid-community/styles/ag-theme-alpine.css";
 import { AgGridReact } from "ag-grid-react";
 import { useState } from "react";
 import { Outlet, useLoaderData, useNavigate } from "react-router";
+
+const ActionsCellRenderer = ({ navigate, data }) => (
+    <Box>
+        <Tooltip title="Edit User">
+            <IconButton
+                // onClick={() => console.log(data)}
+                onClick={() => navigate(`./editUser/${data.userId}`)}
+            >
+                <Edit />
+            </IconButton>
+        </Tooltip>
+    </Box>
+);
 
 const UserManager = () => {
     const [search, setSearch] = useState("");
@@ -31,13 +46,18 @@ const UserManager = () => {
             valueFormatter: ({ value }) => new Date(value).toLocaleString(),
             filter: "agDateColumnFilter",
         },
+        actions: {
+            cellRenderer: ({ data }) => (
+                <ActionsCellRenderer data={data} navigate={navigate} />
+            ),
+        },
     };
 
     const columnDefs = [
         {
             headerName: "ID",
             field: "userId",
-            flex: 1,
+            flex: 0.5,
             sortable: true,
             filter: true,
         },
@@ -82,6 +102,11 @@ const UserManager = () => {
             flex: 1,
             sortable: true,
             filter: "agSetColumnFilter",
+        },
+        {
+            headerName: "Actions",
+            flex: 1,
+            type: "actions",
         },
     ];
 

@@ -18,6 +18,7 @@ import {
 } from "../pages";
 import { AddUniversityModal } from "../pages/modals/AddUniversityModal";
 import { AddUserModal } from "../pages/modals/AddUserModal";
+import { EditUserModal } from "../pages/modals/EditUserModal";
 import { admin, search, university, users } from "./api";
 import { events } from "./events";
 
@@ -128,6 +129,32 @@ const routes = [
                                 university.getList(),
                                 admin.getRoles(),
                             ]),
+                        action: makeAction(users.createUser),
+                    },
+                    {
+                        path: "/admin/users/editUser/:userId",
+                        element: <EditUserModal />,
+                        loader: async ({ params }) => {
+                            const { userId } = params;
+                            try {
+                                if (isNaN(Number(userId))) {
+                                    const error = new Error("Bad Request");
+                                    error.status = 404;
+                                    throw error;
+                                }
+                                return await Promise.all([
+                                    university.getList(),
+                                    admin.getRoles(),
+                                    users.getUser(userId),
+                                ]);
+                            } catch (e) {
+                                if (e.status === 404) {
+                                    return redirect("/notfound");
+                                }
+                                throw e;
+                            }
+                        },
+
                         action: makeAction(users.createUser),
                     },
                     {
