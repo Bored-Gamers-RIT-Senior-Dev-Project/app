@@ -18,7 +18,6 @@ import {
 } from "../pages";
 import { AddUniversityModal } from "../pages/modals/AddUniversityModal";
 import { AddUserModal } from "../pages/modals/AddUserModal";
-import { UserPreferences } from "../pages/UserPreferences.DEMO";
 import { admin, search, university, users } from "./api";
 import { events } from "./events";
 
@@ -137,11 +136,6 @@ const routes = [
                     },
                 ],
                 loader: users.getList,
-            },
-            {
-                path: "/user_preferences",
-                element: <UserPreferences />,
-                action: makeAction(users.update),
             },
             {
                 path: "*",
