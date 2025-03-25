@@ -72,7 +72,6 @@ const createUniversity = async (uid, universityName) => {
         ""
     );
 
-    //TODO: Figure out what to return here.
 
     return universityId;
 };
