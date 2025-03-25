@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const UserService = require("../services/userService");
+const createHttpError = require("http-errors");
 
 //Gets a user's profile information
 router.get("/profile", async (req, res, next) => {
@@ -86,9 +87,33 @@ router.post("/register/google", async (req, res, next) => {
  */
 router.post("", async (req, res, next) => {
     const uid = req.user?.uid;
+    const {
+        email,
+        firstName,
+        lastName,
+        username,
+        password,
+        roleId,
+        universityId,
+    } = req.body;
+
+    if (!email || !password || !username) {
+        return res.status(400).send();
+    }
+
     if (!uid) return res.status(401).send();
     try {
-        //userService create user
+        const user = await UserService.createUser(
+            uid,
+            firstName,
+            lastName,
+            username,
+            password,
+            email,
+            roleId,
+            universityId
+        );
+        return res.json(user);
     } catch (error) {
         next(error);
     }

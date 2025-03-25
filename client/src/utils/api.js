@@ -130,6 +130,11 @@ const users = Object.freeze({
         const { data } = await api.put("users", params);
         return data;
     },
+
+    createUser: async (params) => {
+        const { data } = await api.post("users", params);
+        return data;
+    },
 });
 
 const university = Object.freeze({

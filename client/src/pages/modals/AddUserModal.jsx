@@ -15,6 +15,7 @@ import "ag-grid-community/styles/ag-theme-alpine.css";
 import { useMemo, useState } from "react";
 import { useLoaderData, useNavigate } from "react-router";
 import { DynamicSelect } from "../../components/DynamicSelect";
+import { usePostSubmit } from "../../hooks/usePostSubmit";
 
 const AddUserModal = () => {
     const [formData, setFormData] = useState({
@@ -23,8 +24,18 @@ const AddUserModal = () => {
         email: null,
         username: null,
         password: null,
-        university: null,
-        role: 1,
+        universityId: null,
+        roleId: 1,
+    });
+
+    const [errors, setErrors] = useState({
+        firstName: null,
+        lastName: null,
+        email: null,
+        username: null,
+        password: null,
+        universityId: null,
+        roleId: null,
     });
 
     const [universities, roles] = useLoaderData();
@@ -48,6 +59,77 @@ const AddUserModal = () => {
 
     const navigate = useNavigate();
     const closeModal = () => navigate("..");
+    const submit = usePostSubmit();
+
+    const handleSubmit = () => {
+        let pass = true;
+        const newErrors = {
+            firstName: null,
+            lastName: null,
+            email: null,
+            username: null,
+            password: null,
+            universityId: null,
+            roleId: null,
+        };
+
+        //Form validation courtesy of copilot
+
+        if (!formData.firstName) {
+            newErrors.firstName = "First name is required";
+            pass = false;
+        }
+
+        if (!formData.lastName) {
+            newErrors.lastName = "Last name is required";
+            pass = false;
+        }
+
+        if (!formData.email) {
+            newErrors.email = "Email is required";
+            pass = false;
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            newErrors.email = "Email is invalid";
+            pass = false;
+        }
+
+        if (!formData.username) {
+            newErrors.username = "Username is required";
+            pass = false;
+        }
+
+        if (!formData.password) {
+            newErrors.password = "Password is required";
+            pass = false;
+        } else if (formData.password.length < 6) {
+            newErrors.password = "Password must be at least 6 characters";
+            pass = false;
+        }
+
+        if (!formData.roleId) {
+            newErrors.roleId = "Role is required";
+            pass = false;
+        }
+
+        const selectedRole = roles.find(
+            (role) => `${role.RoleID}` == formData.roleId
+        );
+        console.log(selectedRole);
+        if (
+            selectedRole.RoleName.includes("University") &&
+            !formData.universityId
+        ) {
+            newErrors.universityId =
+                "Assigned University is required for University Personnel";
+            pass = false;
+        }
+
+        setErrors(newErrors);
+
+        if (pass) {
+            submit(formData);
+        }
+    };
 
     return (
         <Dialog open onClose={closeModal}>
@@ -72,7 +154,10 @@ const AddUserModal = () => {
                 </Box>
 
                 <TextField
+                    error={errors.firstName}
+                    helperText={errors.firstName}
                     fullWidth
+                    required
                     label="First Name"
                     value={formData.firstName}
                     name="firstName"
@@ -81,6 +166,9 @@ const AddUserModal = () => {
                 />
 
                 <TextField
+                    error={errors.lastName}
+                    helperText={errors.lastName}
+                    required
                     fullWidth
                     label="Last Name"
                     value={formData.lastName}
@@ -90,6 +178,9 @@ const AddUserModal = () => {
                 />
 
                 <TextField
+                    error={errors.email}
+                    helperText={errors.email}
+                    required
                     fullWidth
                     label="E-Mail"
                     value={formData.email}
@@ -99,6 +190,9 @@ const AddUserModal = () => {
                 />
 
                 <TextField
+                    error={errors.username}
+                    helperText={errors.username}
+                    required
                     fullWidth
                     label="Username"
                     value={formData.username}
@@ -108,6 +202,9 @@ const AddUserModal = () => {
                 />
 
                 <TextField
+                    error={errors.password}
+                    helperText={errors.password}
+                    required
                     fullWidth
                     label="Password"
                     value={formData.password}
@@ -117,28 +214,42 @@ const AddUserModal = () => {
                     onChange={handleFormChange}
                 />
 
-                <FormControl fullWidth>
+                <FormControl
+                    fullWidth
+                    error={errors.roleId}
+                    helperText={errors.roleId}
+                >
                     <InputLabel>Role</InputLabel>
                     <DynamicSelect
+                        error={errors.roleId}
+                        helperText={errors.roleId}
                         fullWidth
                         label="Role"
                         options={roleOptions}
-                        value={formData.role}
+                        value={formData.roleId}
                         onChange={({ target }) => {
-                            setFormData({ ...formData, role: target.value });
+                            setFormData({ ...formData, roleId: target.value });
                         }}
                     />
                 </FormControl>
 
                 <Autocomplete
+                    onEmptied={() =>
+                        setFormData({ ...formData, universityId: null })
+                    }
                     options={universities}
                     getOptionLabel={(option) => option.universityName}
                     getOptionKey={(option) => option.id}
                     name="university"
-                    onChange={handleFormChange}
+                    onChange={(_, newValue) =>
+                        newValue &&
+                        setFormData({ ...formData, universityId: newValue.id })
+                    }
                     renderInput={(params) => (
                         <TextField
                             {...params}
+                            error={errors.universityId}
+                            helperText={errors.universityId}
                             label="University"
                             variant="outlined"
                             fullWidth
@@ -150,6 +261,7 @@ const AddUserModal = () => {
                     variant="contained"
                     fullWidth
                     sx={{ borderRadius: "8px", padding: "10px" }}
+                    onClick={handleSubmit}
                 >
                     Add
                 </Button>

@@ -109,17 +109,25 @@ const createUser = async (
     firstName,
     lastName,
     username,
+    password,
     email,
-    profileImageUrl,
     roleId,
     universityId
 ) => {
-    const user = await getUser(requestUid);
-    if (user.role !== "Super Admin") {
+    console.log(
+        "Adding User: ",
+        firstName,
+        lastName,
+        username,
+        password,
+        email,
+        roleId,
+        universityId
+    );
+    const user = await User.getUserByFirebaseId(requestUid);
+    if (user.roleName !== "Super Admin") {
         throw createHttpError(403);
     }
-    //TODO: Validate and sanitize inputs
-
     //Create user record in Firebase Authentication and get UID
     const createdUser = await Firebase.createUser(email, password);
 
@@ -130,7 +138,7 @@ const createUser = async (
         firstName,
         lastName,
         username,
-        profileImageUrl,
+        undefined,
         roleId,
         universityId
     );
@@ -152,7 +160,7 @@ const updateUser = async (uid, body) => {
 
 const deleteUser = async (uid, userId) => {
     const user = await getUser(uid);
-    if (user.role !== "Super Admin" /* && user.UserId !== userId */) {
+    if (user.roleName !== "Super Admin" /* && user.UserId !== userId */) {
         throw createHttpError(403);
     }
 
