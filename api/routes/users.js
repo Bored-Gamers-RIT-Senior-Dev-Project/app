@@ -138,11 +138,12 @@ router.post("", async (req, res, next) => {
  */
 router.put("/:userId", async (req, res, next) => {
     const uid = req.user?.uid;
+    const { userId } = req.params;
     if (!uid) {
         return res.status(401).send();
     }
     try {
-        const user = await UserService.updateUser(uid, req.body);
+        const user = await UserService.updateUser(uid, userId, req.body);
         res.status(200).json({
             message: "User updated",
         });

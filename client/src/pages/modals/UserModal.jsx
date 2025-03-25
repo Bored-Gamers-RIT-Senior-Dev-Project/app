@@ -13,11 +13,17 @@ import {
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import PropTypes from "prop-types";
-import { useMemo, useState } from "react";
-import { useLoaderData } from "react-router";
+import { useEffect, useMemo, useState } from "react";
+import { useActionData, useLoaderData } from "react-router";
 import { DynamicSelect } from "../../components/DynamicSelect";
 
-const UserModal = ({ onSubmit, defaults, onClose }) => {
+const UserModal = ({
+    label,
+    onSubmit,
+    defaults,
+    onClose,
+    passwordRequired = false,
+}) => {
     const [formData, setFormData] = useState(defaults);
 
     const [errors, setErrors] = useState({
@@ -31,6 +37,7 @@ const UserModal = ({ onSubmit, defaults, onClose }) => {
     });
 
     const [universities, roles] = useLoaderData();
+    const actionData = useActionData();
 
     const roleOptions = useMemo(() => {
         const options = {};
@@ -48,6 +55,9 @@ const UserModal = ({ onSubmit, defaults, onClose }) => {
         setFormData({ ...formData, [target.name]: target.value });
     };
 
+    /**
+     * Validates the form's inputs & submits the form to React ROuter
+     */
     const handleSubmit = () => {
         let pass = true;
         const newErrors = {
@@ -85,10 +95,13 @@ const UserModal = ({ onSubmit, defaults, onClose }) => {
             pass = false;
         }
 
-        if (!formData.password) {
+        if (!formData.password && passwordRequired) {
             newErrors.password = "Password is required";
             pass = false;
-        } else if (formData.password.length < 6) {
+        } else if (
+            formData.password.length > 0 &&
+            formData.password.length < 6
+        ) {
             newErrors.password = "Password must be at least 6 characters";
             pass = false;
         }
@@ -118,6 +131,12 @@ const UserModal = ({ onSubmit, defaults, onClose }) => {
         }
     };
 
+    useEffect(() => {
+        if (actionData) {
+            onClose();
+        }
+    });
+
     return (
         <Dialog open onClose={onClose}>
             <Box
@@ -134,7 +153,7 @@ const UserModal = ({ onSubmit, defaults, onClose }) => {
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                    <Typography variant="h6">Add User</Typography>
+                    <Typography variant="h6">{label} User</Typography>
                     <IconButton onClick={onClose}>
                         <CloseIcon />
                     </IconButton>
@@ -191,7 +210,7 @@ const UserModal = ({ onSubmit, defaults, onClose }) => {
                 <TextField
                     error={errors.password}
                     helperText={errors.password}
-                    required
+                    required={passwordRequired}
                     fullWidth
                     label="Password"
                     value={formData.password}
@@ -250,7 +269,7 @@ const UserModal = ({ onSubmit, defaults, onClose }) => {
                     sx={{ borderRadius: "8px", padding: "10px" }}
                     onClick={handleSubmit}
                 >
-                    Add
+                    {label}
                 </Button>
             </Box>
         </Dialog>
@@ -259,9 +278,11 @@ const UserModal = ({ onSubmit, defaults, onClose }) => {
 
 //As usual, propTypes courtesy of Copilot
 UserModal.propTypes = {
+    label: PropTypes.string.isRequired,
     onSubmit: PropTypes.func.isRequired,
     defaults: PropTypes.object.isRequired,
     onClose: PropTypes.func.isRequired,
+    passwordRequired: PropTypes.bool,
 };
 
 export { UserModal };
