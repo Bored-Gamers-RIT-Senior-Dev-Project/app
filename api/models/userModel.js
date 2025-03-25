@@ -146,7 +146,7 @@ const VALID_KEYS = {
     // "UniversityName",
     // "TeamName",
 };
-const updateUser = async (firebaseUid, body) => {
+const updateUser = async (userId, body) => {
     if (body.username) body.username = await generateUsername(body.username);
     const updates = [];
     let wildCards = [];
@@ -168,6 +168,8 @@ const updateUser = async (firebaseUid, body) => {
             throw createHttpError(400, "Invalid attempt to update user.");
         }
     });
+    if (updates.length == 0) return;
+
     const keys = updates.join(", ");
 
     const [rows] = await db.query(
@@ -176,14 +178,14 @@ const updateUser = async (firebaseUid, body) => {
         SET ${keys} 
         WHERE UserID = ?
         `,
-        [...wildCards, firebaseUid]
+        [...wildCards, userId]
     );
 
     if (rows.affectedRows === 0) {
         throw new Error("User not updated. No rows affected.");
     }
 
-    return await getUserByFirebaseId(firebaseUid);
+    return await getUserByUserId(userId);
 };
 
 /**

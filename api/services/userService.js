@@ -157,6 +157,14 @@ const updateUser = async (uid, userId, body) => {
     if (!User.userHasRole(uid, "Super Admin")) {
         throw createHttpError(403);
     }
+    const targetUser = await User.getUserByUserId(userId);
+    if (body.password) {
+        await Firebase.updatePassword(targetUser.firebaseUid, body.password);
+    }
+    if (targetUser.username == body.username) {
+        delete body.username;
+    }
+
     const user = await User.updateUser(userId, body);
     return user;
 };
