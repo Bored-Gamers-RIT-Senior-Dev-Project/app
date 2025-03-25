@@ -19,7 +19,7 @@ import {
 import { AddUniversityModal } from "../pages/modals/AddUniversityModal";
 import { AddUserModal } from "../pages/modals/AddUserModal";
 import { UserPreferences } from "../pages/UserPreferences.DEMO";
-import { admin, combine, search, university, users } from "./api";
+import { admin, search, university, users } from "./api";
 import { events } from "./events";
 
 /**
@@ -124,7 +124,10 @@ const routes = [
                         path: "/admin/users/addUser",
                         element: <AddUserModal />,
                         loader: () =>
-                            combine(university.getList(), admin.getRoles()),
+                            Promise.all([
+                                university.getList(),
+                                admin.getRoles(),
+                            ]),
                     },
                     {
                         path: "/admin/users/addUniversity",
