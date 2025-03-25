@@ -55,6 +55,15 @@ const deleteUser = async (uid) => {
     }
 };
 
+const updatePassword = async (uid, password) => {
+    try {
+        return await admin.auth().updateUser(uid, { password });
+    } catch (error) {
+        console.error("Error changing Firebase password:", error.message);
+        throw error;
+    }
+};
+
 /**
  * Authentication function retrieves the user's token from the authentication header and verifies it with Firebase.
  * @param {*} req The Express Request Object
@@ -89,6 +98,7 @@ const authenticationMiddleware = async (req, res, next) => {
 module.exports = {
     authenticationMiddleware,
     createUser,
+    updatePassword,
     deleteUser,
     verifyUser,
 };

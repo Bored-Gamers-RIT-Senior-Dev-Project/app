@@ -151,6 +151,9 @@ const updateUser = async (firebaseUid, body) => {
     const updates = [];
     let wildCards = [];
     Object.entries(body).forEach(([key, value]) => {
+        if (key.toLowerCase() == "password") {
+            return;
+        }
         const column = VALID_KEYS?.[key.toUpperCase()];
         if (column) {
             updates.push(`?? = ?`);
@@ -171,7 +174,7 @@ const updateUser = async (firebaseUid, body) => {
         `
         UPDATE users 
         SET ${keys} 
-        WHERE FirebaseUID = ?
+        WHERE UserID = ?
         `,
         [...wildCards, firebaseUid]
     );

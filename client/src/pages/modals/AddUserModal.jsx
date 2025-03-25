@@ -9,17 +9,19 @@ const AddUserModal = () => {
 
     return (
         <UserModal
+            label="Add"
             defaults={{
-                firstName: null,
-                lastName: null,
-                email: null,
-                username: null,
-                password: null,
+                firstName: "",
+                lastName: "",
+                email: "",
+                username: "",
+                password: "",
                 universityId: null,
                 roleId: 1,
             }}
             onSubmit={(data) => submit(data)}
             onClose={close}
+            passwordRequired
         />
     );
 };

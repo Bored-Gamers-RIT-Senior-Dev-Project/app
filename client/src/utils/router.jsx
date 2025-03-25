@@ -154,8 +154,19 @@ const routes = [
                                 throw e;
                             }
                         },
-
-                        action: makeAction(users.createUser),
+                        action: async ({ request, params }) => {
+                            events.publish("spinner.open");
+                            try {
+                                const data = await request.json();
+                                const response = await users.update(
+                                    params.userId,
+                                    data
+                                );
+                                return response;
+                            } finally {
+                                events.publish("spinner.close");
+                            }
+                        },
                     },
                     {
                         path: "/admin/users/addUniversity",

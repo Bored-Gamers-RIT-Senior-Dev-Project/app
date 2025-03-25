@@ -153,8 +153,11 @@ const createUser = async (
  * @param {*} body The information to update.
  * @returns The updated user object.
  */
-const updateUser = async (uid, body) => {
-    const user = await User.updateUser(uid, body);
+const updateUser = async (uid, userId, body) => {
+    if (!User.userHasRole(uid, "Super Admin")) {
+        throw createHttpError(403);
+    }
+    const user = await User.updateUser(userId, body);
     return user;
 };
 
