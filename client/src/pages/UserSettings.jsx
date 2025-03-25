@@ -1,21 +1,28 @@
-import { useState } from "react";
-import {
-    Paper,
-    Typography,
-    TextField,
-    Button,
-    FormControl,
-    FormLabel,
-    FormGroup,
-    FormControlLabel,
-    Checkbox,
-    RadioGroup,
-    Radio,
-    Autocomplete,
-} from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import {
+    Autocomplete,
+    Button,
+    Checkbox,
+    FormControl,
+    FormControlLabel,
+    FormGroup,
+    FormLabel,
+    Paper,
+    Radio,
+    RadioGroup,
+    TextField,
+    Typography,
+} from "@mui/material";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+import { useAuth } from "../hooks/useAuth/index";
 
-const universityList = ["Rochester Institute of Technology", "Harvard University", "MIT", "Stanford University"];
+const universityList = [
+    "Rochester Institute of Technology",
+    "Harvard University",
+    "MIT",
+    "Stanford University",
+];
 
 const UserSettings = () => {
     const [selectedNotifications, setSelectedNotifications] = useState([]);
@@ -26,18 +33,40 @@ const UserSettings = () => {
     const handleNotificationChange = (event) => {
         const value = event.target.name;
         setSelectedNotifications((prev) =>
-            prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
+            prev.includes(value)
+                ? prev.filter((item) => item !== value)
+                : [...prev, value]
         );
     };
+    const { user } = useAuth();
+    const navigate = useNavigate(); //React router useNavigate hook
+    useEffect(() => {
+        if (user === null) {
+            //User is 'undefined' before Firebase inits, 'null' if user is not logged in.
+            navigate("/signin");
+        }
+    }, [user, navigate]);
+    if (!user) {
+        console.error(`UserSettings: user is ${user}!`);
+        return;
+    }
+
+    const emailEncoded = encodeURI(user.email);
 
     return (
         <Paper sx={{ padding: 3, maxWidth: 800, margin: "auto" }}>
-            <Typography variant="h4" textAlign="center">User Settings</Typography>
+            <Typography variant="h4" textAlign="center">
+                User Settings
+            </Typography>
 
             {/* Profile Picture Upload */}
             <FormControl fullWidth sx={{ mt: 3 }}>
                 <FormLabel>Profile Picture</FormLabel>
-                <Button variant="outlined" component="label" startIcon={<CloudUploadIcon />}>
+                <Button
+                    variant="outlined"
+                    component="label"
+                    startIcon={<CloudUploadIcon />}
+                >
                     Upload / Drag & Drop
                     <input type="file" hidden />
                 </Button>
@@ -47,8 +76,18 @@ const UserSettings = () => {
             <FormControl fullWidth sx={{ mt: 3 }}>
                 <FormLabel>Change Password</FormLabel>
                 <TextField label="Email" fullWidth margin="dense" />
-                <TextField label="Old Password" type="password" fullWidth margin="dense" />
-                <TextField label="New Password" type="password" fullWidth margin="dense" />
+                <TextField
+                    label="Old Password"
+                    type="password"
+                    fullWidth
+                    margin="dense"
+                />
+                <TextField
+                    label="New Password"
+                    type="password"
+                    fullWidth
+                    margin="dense"
+                />
             </FormControl>
 
             {/* Notification Preferences */}
@@ -56,10 +95,24 @@ const UserSettings = () => {
                 <FormControl component="fieldset">
                     <FormLabel>Notification Preferences</FormLabel>
                     <FormGroup>
-                        {["Marketing", "Tournament News", "University Updates", "Team Updates", "Event Reminders"].map((option) => (
+                        {[
+                            "Marketing",
+                            "Tournament News",
+                            "University Updates",
+                            "Team Updates",
+                            "Event Reminders",
+                        ].map((option) => (
                             <FormControlLabel
                                 key={option}
-                                control={<Checkbox checked={selectedNotifications.includes(option)} onChange={handleNotificationChange} name={option} />}
+                                control={
+                                    <Checkbox
+                                        checked={selectedNotifications.includes(
+                                            option
+                                        )}
+                                        onChange={handleNotificationChange}
+                                        name={option}
+                                    />
+                                }
                                 label={option}
                             />
                         ))}
@@ -71,10 +124,25 @@ const UserSettings = () => {
             <Paper variant="outlined" sx={{ mt: 3, padding: 2 }}>
                 <FormControl component="fieldset">
                     <FormLabel>I want to:</FormLabel>
-                    <RadioGroup value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
-                        <FormControlLabel value="Follow" control={<Radio />} label="Follow the Tournament" />
-                        <FormControlLabel value="Participate" control={<Radio />} label="Participate" />
-                        <FormControlLabel value="Represent" control={<Radio />} label="Represent a University" />
+                    <RadioGroup
+                        value={selectedRole}
+                        onChange={(e) => setSelectedRole(e.target.value)}
+                    >
+                        <FormControlLabel
+                            value="Follow"
+                            control={<Radio />}
+                            label="Follow the Tournament"
+                        />
+                        <FormControlLabel
+                            value="Participate"
+                            control={<Radio />}
+                            label="Participate"
+                        />
+                        <FormControlLabel
+                            value="Represent"
+                            control={<Radio />}
+                            label="Represent a University"
+                        />
                     </RadioGroup>
                 </FormControl>
             </Paper>
@@ -85,8 +153,12 @@ const UserSettings = () => {
                 <Autocomplete
                     options={universityList}
                     value={selectedUniversity}
-                    onChange={(event, newValue) => setSelectedUniversity(newValue)}
-                    renderInput={(params) => <TextField {...params} label="Select your University" />}
+                    onChange={(event, newValue) =>
+                        setSelectedUniversity(newValue)
+                    }
+                    renderInput={(params) => (
+                        <TextField {...params} label="Select your University" />
+                    )}
                 />
             </FormControl>
 
@@ -94,13 +166,34 @@ const UserSettings = () => {
             <Paper variant="outlined" sx={{ mt: 3, padding: 2 }}>
                 <FormControl component="fieldset">
                     <FormLabel>Team</FormLabel>
-                    <RadioGroup value={selectedTeamOption} onChange={(e) => setSelectedTeamOption(e.target.value)}>
-                        <FormControlLabel value="Start" control={<Radio />} label="Start a New Team" />
-                        <FormControlLabel value="Join" control={<Radio />} label="Join an Existing Team" />
-                        <FormControlLabel value="Later" control={<Radio />} label="I'll do this later" />
+                    <RadioGroup
+                        value={selectedTeamOption}
+                        onChange={(e) => setSelectedTeamOption(e.target.value)}
+                    >
+                        <FormControlLabel
+                            value="Start"
+                            control={<Radio />}
+                            label="Start a New Team"
+                        />
+                        <FormControlLabel
+                            value="Join"
+                            control={<Radio />}
+                            label="Join an Existing Team"
+                        />
+                        <FormControlLabel
+                            value="Later"
+                            control={<Radio />}
+                            label="I'll do this later"
+                        />
                     </RadioGroup>
-                    {selectedTeamOption === "Join" || selectedTeamOption === "Start" ? (
-                        <TextField label="Enter Team Name" fullWidth margin="dense" sx={{ mt: 2 }} />
+                    {selectedTeamOption === "Join" ||
+                    selectedTeamOption === "Start" ? (
+                        <TextField
+                            label="Enter Team Name"
+                            fullWidth
+                            margin="dense"
+                            sx={{ mt: 2 }}
+                        />
                     ) : null}
                 </FormControl>
             </Paper>
@@ -108,11 +201,21 @@ const UserSettings = () => {
             {/* Payment Section (Placeholder) */}
             <Paper variant="outlined" sx={{ mt: 3, padding: 2 }}>
                 <Typography variant="h6">Payment Portal</Typography>
-                <Typography variant="body2">(Payment integration will be added here.)</Typography>
+                <Button
+                    href={`https://buy.stripe.com/test_8wMaETffobOKgmc7ss?prefilled_email=${emailEncoded}`}
+                    target="_blank"
+                >
+                    Click here to pay registration fee with Stripe
+                </Button>
             </Paper>
 
             {/* Save Changes Button */}
-            <Button variant="contained" color="primary" fullWidth sx={{ mt: 3 }}>
+            <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{ mt: 3 }}
+            >
                 Save Changes
             </Button>
         </Paper>
