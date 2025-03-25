@@ -139,6 +139,11 @@ const users = Object.freeze({
         const { data } = await api.post("users", params);
         return data;
     },
+
+    getUser: async (userId) => {
+        const { data } = await api.get(`users/${userId}`);
+        return data;
+    },
 });
 
 const university = Object.freeze({
