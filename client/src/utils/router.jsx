@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router";
 import App from "../App";
-import { BracketTree, Home, NotFound, Search, UserSignIn } from "../pages";
+import { GetBracket, Home, NotFound, Search, UserSignIn } from "../pages";
 import { handleSignIn, sendTest } from "./api";
 import { events } from "./events";
 
@@ -26,7 +26,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "/bracket",
-                element: <BracketTree />,
+                element: <GetBracket />,
             },
             {
                 path: "/signin",
