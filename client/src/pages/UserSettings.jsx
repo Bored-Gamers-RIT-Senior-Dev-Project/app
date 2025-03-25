@@ -40,10 +40,11 @@ const UserSettings = () => {
     const { user } = useAuth();
     if (!user) {
         console.error(
-            "UserSettings: user is null, why are we in user settings?"
+            "UserSettings: user is nullish, why are we in user settings?"
         );
     }
-    console.log(user);
+
+    const emailEncoded = encodeURI(user.email);
 
     return (
         <Paper sx={{ padding: 3, maxWidth: 800, margin: "auto" }}>
@@ -193,8 +194,10 @@ const UserSettings = () => {
             {/* Payment Section (Placeholder) */}
             <Paper variant="outlined" sx={{ mt: 3, padding: 2 }}>
                 <Typography variant="h6">Payment Portal</Typography>
-                <Button href={"Actual link here!!"}>
-                    {/*TODO; Fix link */}
+                <Button
+                    href={`https://buy.stripe.com/test_8wMaETffobOKgmc7ss?prefilled_email=${emailEncoded}`}
+                    target="_blank"
+                >
                     Click here to pay registration fee with Stripe
                 </Button>
             </Paper>
