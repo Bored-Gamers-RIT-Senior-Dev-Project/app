@@ -55,34 +55,26 @@ const getUniversities = async () => {
  * @param {*} websiteUrl Link to the university's website
  * @returns TBD
  */
-const createUniversity = async (
-    uid,
-    universityName,
-    location,
-    logoUrl,
-    bannerUrl,
-    description,
-    websiteUrl
-) => {
+const createUniversity = async (uid, universityName) => {
     //Check uid role and throw 403 if not admin. (Only administrators can create universities)
     const user = await userModel.getUserByFirebaseId(uid);
-    if (user?.role !== "Super Admin") {
+    if (user?.roleName !== "Super Admin") {
         throw createHttpError(403);
     }
 
     //Create university in database.
-    await universityModel.createUniversity(
+    const universityId = await universityModel.createUniversity(
         universityName,
-        location,
-        logoUrl,
-        bannerUrl,
-        description,
-        websiteUrl
+        "",
+        "",
+        "",
+        "",
+        ""
     );
 
     //TODO: Figure out what to return here.
 
-    return {};
+    return universityId;
 };
 
 /**

@@ -147,6 +147,16 @@ const university = Object.freeze({
         const { data } = await api.get(`university`);
         return data;
     },
+    /**
+     * Create a new university in the database
+     * @param {object} params The request body
+     * @param {string} params.universityName The name of the university to create.
+     * @returns Post data
+     */
+    addUniversity: async (params) => {
+        const { data } = await api.post("university", params);
+        return data;
+    },
 });
 
 const combine = (...calls) => {
