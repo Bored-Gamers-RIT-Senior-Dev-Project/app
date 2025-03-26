@@ -1,12 +1,11 @@
-// Chatgpt helped me write function in this file and its the async function
-import { Google } from "@mui/icons-material";
+// Chatgpt helped me write function in this file and its the async functionW
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useActionData, useNavigate } from "react-router";
+import { GoogleSignIn } from "../components/GoogleSignIn";
 import { useAuth } from "../hooks/useAuth";
-import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
-import { signInWithEmail, signInWithGoogle } from "../utils/firebase/auth";
+import { signInWithEmail } from "../utils/firebase/auth";
 import { ErrorData, MessageData } from "../utils/messageData";
 
 const handleErrors = (error) => {
@@ -24,7 +23,7 @@ const UserSignIn = () => {
     const [signInData, setSignInData] = useState({ email: "", password: "" });
     const actionData = useActionData();
     const { user, setUser } = useAuth();
-    const submit = usePostSubmit();
+
     const navigate = useNavigate();
 
     const handleSignInChange = (e) => {
@@ -37,25 +36,6 @@ const UserSignIn = () => {
         try {
             await signInWithEmail(signInData.email, signInData.password); //Authentication updates for preexisting users handled in AuthProvider.
         } catch (error) {
-            handleErrors(error);
-            events.publish("spinner.close");
-        }
-    };
-
-    const handleGoogleSignIn = async () => {
-        events.publish("spinner.open");
-        try {
-            const signIn = await signInWithGoogle();
-            if (signIn.additionalUserInfo.isNewUser) {
-                const { displayName, photoURL, email } = signIn.user;
-                submit({
-                    displayName,
-                    photoURL,
-                    email,
-                });
-            }
-        } catch (error) {
-            //TODO: If the user is new and an error took place in the API, we need to handle that case and erase the user from Firebase.
             handleErrors(error);
             events.publish("spinner.close");
         }
@@ -130,15 +110,7 @@ const UserSignIn = () => {
                     Sign In
                 </Button>
             </form>
-            <Button
-                variant="contained"
-                color="secondary"
-                fullWidth
-                onClick={handleGoogleSignIn}
-                startIcon={<Google />}
-            >
-                Sign in with Google
-            </Button>
+            <GoogleSignIn />
             {/*TODO: "Forgot Password/Forgot Username" link*/}
             {/* TODO: Sign up link should look more like a link rather than plaintext  */}
             <Typography
