@@ -1,6 +1,5 @@
 import { Close as CloseIcon } from "@mui/icons-material";
 import {
-    Autocomplete,
     Box,
     Button,
     Dialog,
@@ -16,6 +15,7 @@ import PropTypes from "prop-types";
 import { useEffect, useMemo, useState } from "react";
 import { useActionData, useLoaderData } from "react-router";
 import { DynamicSelect } from "../../components/DynamicSelect";
+import { UniversitySelect } from "../../components/UniversitySelect";
 
 const UserModal = ({
     label,
@@ -239,28 +239,17 @@ const UserModal = ({
                     />
                 </FormControl>
 
-                <Autocomplete
+                <UniversitySelect
                     onEmptied={() =>
                         setFormData({ ...formData, universityId: null })
                     }
-                    options={universities}
-                    getOptionLabel={(option) => option.universityName}
-                    getOptionKey={(option) => option.id}
-                    name="university"
+                    universities={universities}
                     onChange={(_, newValue) =>
                         newValue &&
                         setFormData({ ...formData, universityId: newValue.id })
                     }
-                    renderInput={(params) => (
-                        <TextField
-                            {...params}
-                            error={errors.universityId}
-                            helperText={errors.universityId}
-                            label="University"
-                            variant="outlined"
-                            fullWidth
-                        />
-                    )}
+                    error={errors.universityId}
+                    helperText={errors.universityId}
                 />
 
                 <Button

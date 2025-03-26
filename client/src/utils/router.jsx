@@ -16,6 +16,7 @@ import {
     UserSignIn,
     UserSignUp,
 } from "../pages";
+import { JoinTeamPage } from "../pages/JoinTeamPage";
 import { AddUniversityModal } from "../pages/modals/AddUniversityModal";
 import { AddUserModal } from "../pages/modals/AddUserModal";
 import { DeleteModal } from "../pages/modals/DeleteModal";
@@ -108,6 +109,11 @@ const routes = [
             {
                 path: "/schedule",
                 element: <Schedule />,
+            },
+            {
+                path: "/join",
+                element: <JoinTeamPage />,
+                loader: university.getList,
             },
             {
                 path: "/admin/reports",
