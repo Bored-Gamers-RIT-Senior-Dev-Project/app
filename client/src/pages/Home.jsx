@@ -109,7 +109,11 @@ const Home = () => {
                         size="large"
                         fullWidth
                         sx={{ fontSize: "1.25em" }}
-                        onClick={() => navigate("/signin")}
+                        onClick={() =>
+                            navigate("/signup", {
+                                state: { redirect: "/join" },
+                            })
+                        }
                     >
                         Join the competition and find out!
                     </Button>
