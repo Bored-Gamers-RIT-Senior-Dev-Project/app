@@ -1,5 +1,6 @@
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import {
+    Box,
     Button,
     IconButton,
     InputAdornment,
@@ -8,7 +9,7 @@ import {
     Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { GoogleSignIn } from "../components/GoogleSignIn";
 import { PasswordStrength } from "../components/PasswordStrength";
 import { useAuth } from "../hooks/useAuth";
@@ -42,6 +43,7 @@ const handleFirebaseSignUpError = (error) => {
 };
 
 const UserSignUp = () => {
+    const { state } = useLocation();
     const { user } = useAuth();
     const [signUpData, setSignUpData] = useState({
         email: "",
@@ -101,9 +103,9 @@ const UserSignUp = () => {
 
     useEffect(() => {
         if (user) {
-            navigate("/");
+            navigate(state?.redirect ?? "/");
         }
-    }, [user, navigate]);
+    }, [user, navigate, state]);
 
     return (
         <Paper elevation={6} sx={{ p: 4, maxWidth: 600 }}>
@@ -196,6 +198,21 @@ const UserSignUp = () => {
                     Sign Up
                 </Button>
             </form>
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}
+            >
+                <Box
+                    sx={{ flexGrow: 1, borderBottom: "1px solid black", mx: 1 }}
+                />
+                <Typography>OR</Typography>
+                <Box
+                    sx={{ flexGrow: 1, borderBottom: "1px solid black", mx: 1 }}
+                />
+            </Box>
             <GoogleSignIn />
             {/* TODO: Sign in link should look more like a link rather than plaintext  */}
             <Typography
