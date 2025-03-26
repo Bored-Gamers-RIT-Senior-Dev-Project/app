@@ -1,5 +1,6 @@
 import {
     Box,
+    Button,
     Divider,
     Drawer,
     List,
@@ -150,6 +151,18 @@ const NavDrawer = ({ open, setOpen, desktop }) => {
                     ))}
                 </List>
             </Box>
+            {user && user.roleId == 1 && (
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    size="large"
+                    sx={{ marginX: "2em" }}
+                >
+                    Join The
+                    <br />
+                    Competition!
+                </Button>
+            )}
         </Drawer>
     );
 };
