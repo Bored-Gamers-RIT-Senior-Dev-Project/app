@@ -11,11 +11,12 @@ import {
 } from "@mui/material";
 import PropTypes from "prop-types";
 import { useDeferredValue, useEffect, useState } from "react";
-import { useActionData, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
+import { GoogleSignIn } from "../components/GoogleSignIn";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
 import { signUpWithEmail } from "../utils/firebase/auth";
-import { ErrorData, MessageData, Severity } from "../utils/messageData";
+import { ErrorData, Severity } from "../utils/messageData";
 
 // From https://zxcvbn-ts.github.io/zxcvbn/guide/framework-examples/#react:
 import { zxcvbnAsync, zxcvbnOptions } from "@zxcvbn-ts/core";
@@ -26,7 +27,6 @@ import * as zxcvbnCommonPackage from "@zxcvbn-ts/language-common";
 import * as zxcvbnEnPackage from "@zxcvbn-ts/language-en";
 import { translations } from "@zxcvbn-ts/language-en";
 import { useAuth } from "../hooks/useAuth";
-
 /**
  * Handle a sign up error from Firebase
  * @param {*} error the error
@@ -47,8 +47,8 @@ const handleFirebaseSignUpError = (error) => {
         errorCodeLookup[error.code] ??
         new ErrorData("An unexpected error occurred");
 
-    events.publish("message", errorData);
-    console.error("Sign-in error:", error);
+    errorData.send();
+    console.error("Sign-in error:", errorData);
 };
 
 // From https://zxcvbn-ts.github.io/zxcvbn/guide/framework-examples/#react
@@ -166,7 +166,7 @@ PasswordStrength.propTypes = {
 };
 
 const UserSignUp = () => {
-    const { user, setUser } = useAuth();
+    const { user } = useAuth();
     const [signUpData, setSignUpData] = useState({
         email: "",
         username: "",
@@ -177,7 +177,6 @@ const UserSignUp = () => {
     });
     const [showPassword, setShowPassword] = useState(false);
     const submit = usePostSubmit();
-    const actionData = useActionData();
     const navigate = useNavigate();
 
     const handleSignUpChange = (e) => {
@@ -223,17 +222,6 @@ const UserSignUp = () => {
             events.publish("spinner.close");
         }
     };
-
-    useEffect(() => {
-        if (actionData) {
-            events.publish("spinner.close");
-            events.publish(
-                "message",
-                new MessageData(undefined, actionData.message)
-            );
-            setUser(actionData.user);
-        }
-    }, [actionData, navigate, setUser]);
 
     useEffect(() => {
         if (user) {
@@ -292,21 +280,23 @@ const UserSignUp = () => {
                     fullWidth
                     required
                     margin="normal"
-                    InputProps={{
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <IconButton
-                                    onClick={togglePasswordVisibility}
-                                    edge="end"
-                                >
-                                    {showPassword ? (
-                                        <VisibilityOff />
-                                    ) : (
-                                        <Visibility />
-                                    )}
-                                </IconButton>
-                            </InputAdornment>
-                        ),
+                    slotProps={{
+                        input: {
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        onClick={togglePasswordVisibility}
+                                        edge="end"
+                                    >
+                                        {showPassword ? (
+                                            <VisibilityOff />
+                                        ) : (
+                                            <Visibility />
+                                        )}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        },
                     }}
                 />
                 <TextField
@@ -330,6 +320,7 @@ const UserSignUp = () => {
                     Sign Up
                 </Button>
             </form>
+            <GoogleSignIn />
             {/* TODO: Sign in link should look more like a link rather than plaintext  */}
             <Typography
                 sx={{ mt: 2, textAlign: "center", cursor: "pointer" }}
