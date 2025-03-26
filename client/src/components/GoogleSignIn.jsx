@@ -1,7 +1,7 @@
 import { Google } from "@mui/icons-material";
 import { Button } from "@mui/material";
 import { useEffect } from "react";
-import { useActionData, useNavigate } from "react-router";
+import { useActionData } from "react-router";
 import { useAuth } from "../hooks/useAuth";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
@@ -21,8 +21,6 @@ const GoogleSignIn = () => {
                 new ErrorData("An unexpected error occurred").send();
         }
     };
-
-    const navigate = useNavigate();
     const submit = usePostSubmit();
     const actionData = useActionData();
 
@@ -45,7 +43,6 @@ const GoogleSignIn = () => {
                 );
             }
         } catch (error) {
-            //TODO: If the user is new and an error took place in the API, we need to handle that case and erase the user from Firebase.
             handleGoogleSignInErrors(error);
         } finally {
             events.publish("spinner.close");
@@ -54,11 +51,10 @@ const GoogleSignIn = () => {
 
     useEffect(() => {
         if (actionData) {
-            events.publish("spinner.close");
             new MessageData(undefined, actionData.message).send();
             setUser(actionData.user);
         }
-    }, [actionData, navigate, setUser]);
+    }, [actionData, setUser]);
 
     return (
         <Button
