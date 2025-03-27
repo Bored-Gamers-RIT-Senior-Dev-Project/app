@@ -1,6 +1,5 @@
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import {
-    Autocomplete,
     Button,
     Checkbox,
     FormControl,
@@ -8,8 +7,6 @@ import {
     FormGroup,
     FormLabel,
     Paper,
-    Radio,
-    RadioGroup,
     TextField,
     Typography,
 } from "@mui/material";
@@ -117,84 +114,6 @@ const UserSettings = () => {
                             />
                         ))}
                     </FormGroup>
-                </FormControl>
-            </Paper>
-
-            {/* Role Selection */}
-            <Paper variant="outlined" sx={{ mt: 3, padding: 2 }}>
-                <FormControl component="fieldset">
-                    <FormLabel>I want to:</FormLabel>
-                    <RadioGroup
-                        value={selectedRole}
-                        onChange={(e) => setSelectedRole(e.target.value)}
-                    >
-                        <FormControlLabel
-                            value="Follow"
-                            control={<Radio />}
-                            label="Follow the Tournament"
-                        />
-                        <FormControlLabel
-                            value="Participate"
-                            control={<Radio />}
-                            label="Participate"
-                        />
-                        <FormControlLabel
-                            value="Represent"
-                            control={<Radio />}
-                            label="Represent a University"
-                        />
-                    </RadioGroup>
-                </FormControl>
-            </Paper>
-
-            {/* University Selection */}
-            <FormControl fullWidth sx={{ mt: 3 }}>
-                <FormLabel>University</FormLabel>
-                <Autocomplete
-                    options={universityList}
-                    value={selectedUniversity}
-                    onChange={(event, newValue) =>
-                        setSelectedUniversity(newValue)
-                    }
-                    renderInput={(params) => (
-                        <TextField {...params} label="Select your University" />
-                    )}
-                />
-            </FormControl>
-
-            {/* Team Selection */}
-            <Paper variant="outlined" sx={{ mt: 3, padding: 2 }}>
-                <FormControl component="fieldset">
-                    <FormLabel>Team</FormLabel>
-                    <RadioGroup
-                        value={selectedTeamOption}
-                        onChange={(e) => setSelectedTeamOption(e.target.value)}
-                    >
-                        <FormControlLabel
-                            value="Start"
-                            control={<Radio />}
-                            label="Start a New Team"
-                        />
-                        <FormControlLabel
-                            value="Join"
-                            control={<Radio />}
-                            label="Join an Existing Team"
-                        />
-                        <FormControlLabel
-                            value="Later"
-                            control={<Radio />}
-                            label="I'll do this later"
-                        />
-                    </RadioGroup>
-                    {selectedTeamOption === "Join" ||
-                    selectedTeamOption === "Start" ? (
-                        <TextField
-                            label="Enter Team Name"
-                            fullWidth
-                            margin="dense"
-                            sx={{ mt: 2 }}
-                        />
-                    ) : null}
                 </FormControl>
             </Paper>
 
