@@ -12,6 +12,7 @@ const cors = require("cors");
 const index = require("./routes");
 const users = require("./routes/users");
 const university = require("./routes/university");
+const teams = require("./routes/teams");
 const createError = require("http-errors");
 
 //Initialize Express
@@ -30,6 +31,7 @@ app.use(authenticationMiddleware);
 app.use("/api", index);
 app.use("/api/users", users);
 app.use("/api/university", university);
+app.use("/api/teams", teams);
 
 //404 any routes not defined above
 app.use((_req, _res, next) => {

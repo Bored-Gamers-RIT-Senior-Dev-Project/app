@@ -47,10 +47,28 @@ const searchTeams = async (
  * @returns The team list
  */
 const getTeams = async (approvedOnly = true) => {
-    let sql = `SELECT * FROM teams`;
-    if (approvedOnly) {
-        sql += ` WHERE approvedOnly = true`;
-    }
+    let sql = `SELECT 
+    t.TeamID AS id,
+    t.TeamName AS teamName,
+    t.ProfileImageURL AS profileImageUrl,
+    t.UniversityID AS universityId,
+    u.UniversityName AS universityName,
+    t.Description AS description,
+    t.CreatedAt AS createdAt,
+    COUNT(DISTINCT teamMember.UserID) AS members,
+    CONCAT(captain.FirstName, ' ', captain.LastName) AS captainName,
+    captain.Email AS captainEmail
+FROM
+    teams t
+        JOIN
+    users captain ON captain.UserID = t.TeamLeaderID
+        JOIN
+    users teamMember ON teamMember.TeamID = t.TeamId
+        JOIN
+    universities u ON t.UniversityID = u.UniversityID
+    ${approvedOnly ? "WHERE t.IsApproved" : null}
+    GROUP BY t.TeamID
+`;
 
     const query = await db.query(sql);
     return query[0];
