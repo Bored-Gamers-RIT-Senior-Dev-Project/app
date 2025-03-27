@@ -109,11 +109,8 @@ const teams = Object.freeze({
      * @returns Confirmation that the team has been created.
      */
     create: async ({ universityId, teamName }) => {
-        console.log(
-            `Creating new team for university #${universityId} named ${teamName}.`
-        );
-        // const { data } = await api.post(`teams`, { teamName, universityId });
-        // return data;
+        const { data } = await api.post(`teams`, { teamName, universityId });
+        return data;
     },
     /**
      * When successful, causes the current user to join the specified team.
