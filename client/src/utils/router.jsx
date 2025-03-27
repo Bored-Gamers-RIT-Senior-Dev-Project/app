@@ -1,4 +1,4 @@
-import { redirect } from "react-router";
+import { Navigate, redirect } from "react-router";
 import App from "../App";
 import {
     About,
@@ -71,7 +71,7 @@ const routes = [
                 loader: () => search({ value: "" }),
             },
             {
-                path: "/teamspage",
+                path: "/teams/:teamId",
                 element: <TeamsPage />,
             },
             {
@@ -120,7 +120,7 @@ const routes = [
                     {
                         path: "/join/newTeam",
                         action: makeAction(teams.create),
-                        element: null, //This child route solely exists to hold an action for useSubmit().  No extra element
+                        element: <Navigate to="/join" />,
                     },
                 ],
             },
