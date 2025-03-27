@@ -1,10 +1,7 @@
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import {
     Button,
-    Checkbox,
     FormControl,
-    FormControlLabel,
-    FormGroup,
     FormLabel,
     Paper,
     TextField,
@@ -86,36 +83,6 @@ const UserSettings = () => {
                     margin="dense"
                 />
             </FormControl>
-
-            {/* Notification Preferences */}
-            <Paper variant="outlined" sx={{ mt: 3, padding: 2 }}>
-                <FormControl component="fieldset">
-                    <FormLabel>Notification Preferences</FormLabel>
-                    <FormGroup>
-                        {[
-                            "Marketing",
-                            "Tournament News",
-                            "University Updates",
-                            "Team Updates",
-                            "Event Reminders",
-                        ].map((option) => (
-                            <FormControlLabel
-                                key={option}
-                                control={
-                                    <Checkbox
-                                        checked={selectedNotifications.includes(
-                                            option
-                                        )}
-                                        onChange={handleNotificationChange}
-                                        name={option}
-                                    />
-                                }
-                                label={option}
-                            />
-                        ))}
-                    </FormGroup>
-                </FormControl>
-            </Paper>
 
             {/* Payment Section (Placeholder) */}
             <Paper variant="outlined" sx={{ mt: 3, padding: 2 }}>
