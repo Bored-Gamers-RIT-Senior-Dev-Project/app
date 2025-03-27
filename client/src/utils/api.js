@@ -117,11 +117,11 @@ const teams = Object.freeze({
     },
     /**
      * When successful, causes the current user to join the specified team.
-     * @param {number} id Team ID to join.
+     * @param {number} teamId Team ID to join.
      * @returns Confirmation of action result
      */
-    join: async (id) => {
-        const { data } = await api.put(`teams/${id}/join`);
+    join: async ({ teamId }) => {
+        const { data } = await api.put(`teams/${teamId}/join`);
         return data;
     },
 });
