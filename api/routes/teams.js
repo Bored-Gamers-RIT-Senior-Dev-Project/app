@@ -8,8 +8,8 @@ const router = express.Router();
  */
 router.get("", async (req, res, next) => {
     const { showUnapproved = false, university = null } = req.query;
-    const { uid = null } = req.user;
-    console.log("Showunapproved is:", showUnapproved);
+    const uid = req.user?.uid;
+
     try {
         const teamList = await teamService.getTeams(
             uid,
@@ -45,7 +45,7 @@ router.get("/:teamId", async (req, res, next) => {
 router.post("", async (req, res, next) => {
     const { teamName, universityId } = req.body;
 
-    const { uid } = req.user;
+    const uid = req?.user?.uid;
     if (!uid) return res.status(401).send();
 
     try {
@@ -61,7 +61,7 @@ router.post("", async (req, res, next) => {
  * Requires []
  */
 router.put("/:teamId/assign", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req?.user?.uid;
     const { teamId } = req.params;
     const { userId } = req.body;
     if (!uid) return res.status(401).send();
@@ -79,7 +79,7 @@ router.put("/:teamId/assign", async (req, res, next) => {
  * Requires [Spectator role]
  */
 router.put("/:teamId/join", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req?.user?.uid;
     const { teamId } = req.params;
     if (!uid) return res.status(401).send();
 
@@ -96,7 +96,7 @@ router.put("/:teamId/join", async (req, res, next) => {
  * Requires [Admin Role] or [University Rep role and matching team/player university ID] or [Team Captain role and matching teamID] or [Matching User ID]
  */
 router.put("/:teamId/remove", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req?.user?.uid;
     const { teamId } = req.params;
     const { userId } = req.body;
     if (!uid) return res.status(401).send();
@@ -114,7 +114,7 @@ router.put("/:teamId/remove", async (req, res, next) => {
  * Requires [Admin Role] or [University Rep role and matching university ID]
  */
 router.put("/:teamId", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req?.user?.uid;
     if (!uid) return res.status(401).send();
 
     const { teamId } = req.params;
@@ -133,7 +133,7 @@ router.put("/:teamId", async (req, res, next) => {
  * Requires [Team Captain role and matching teamID]
  */
 router.post("/:teamId/update", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req?.user?.uid;
     if (!uid) return res.status(401).send();
 
     const { teamId } = req.params;
@@ -153,7 +153,7 @@ router.post("/:teamId/update", async (req, res, next) => {
  * @param {number} req.params.id The ID of the team to approve.
  */
 router.put("/approve", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req?.user?.uid;
     if (!uid) return res.status(401).send();
 
     try {
