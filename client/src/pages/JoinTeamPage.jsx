@@ -1,4 +1,4 @@
-import { Box, Grid2 as Grid, Paper, Typography } from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
 import { useState } from "react";
 import { useLoaderData } from "react-router";
 import { TeamList } from "../components/TeamList";
@@ -24,21 +24,16 @@ const JoinTeamPage = () => {
                 <Typography variant="h6" textAlign="center">
                     Select Your College to View Available Teams
                 </Typography>
-                <Grid container spacing={1}>
-                    <Grid size={12}>
-                        <Box sx={{ maxWidth: "700px", margin: "auto" }}>
-                            <UniversitySelect
-                                universities={universities}
-                                label="Select your College"
-                                onChange={(_, newValue) =>
-                                    newValue && selectUniversity(newValue.id)
-                                }
-                                onEmptied={() => selectUniversity(null)}
-                            />
-                        </Box>
-                    </Grid>
-                    <Grid size={12}></Grid>
-                </Grid>
+                <Box sx={{ maxWidth: "700px", margin: "auto" }}>
+                    <UniversitySelect
+                        universities={universities}
+                        label="Select your College"
+                        onChange={(_, newValue) =>
+                            newValue && selectUniversity(newValue.id)
+                        }
+                        onEmptied={() => selectUniversity(null)}
+                    />
+                </Box>
             </Paper>
             {selectedUniversity && (
                 <TeamList university={selectedUniversity} teams={teams} />
