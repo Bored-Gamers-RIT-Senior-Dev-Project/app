@@ -1,4 +1,5 @@
 import axios from "axios";
+import { events } from "./events";
 import { getIdToken } from "./firebase/auth";
 
 const API_URL = "http://localhost:3000/api";
@@ -110,6 +111,7 @@ const teams = Object.freeze({
      */
     create: async ({ universityId, teamName }) => {
         const { data } = await api.post(`teams`, { teamName, universityId });
+        events.publish("refreshAuth"); //Refresh the user profile to load the user's team data.
         return data;
     },
     /**
@@ -119,6 +121,7 @@ const teams = Object.freeze({
      */
     join: async ({ teamId }) => {
         const { data } = await api.put(`teams/${teamId}/join`);
+        events.publish("refreshAuth"); //Refresh the user profile to load the user's team data.
         return data;
     },
 });
