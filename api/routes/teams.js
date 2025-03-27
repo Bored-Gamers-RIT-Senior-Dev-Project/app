@@ -7,11 +7,15 @@ const router = express.Router();
  * @param {boolean} req.query.showUnapproved Whether to show unapproved teams. Defaults to false.
  */
 router.get("", async (req, res, next) => {
-    const { showUnapproved = false } = req.query;
+    const { showUnapproved = false, university = null } = req.query;
     const { uid = null } = req.user;
-
+    console.log("Showunapproved is:", showUnapproved);
     try {
-        const teamList = await teamService.getTeams(uid, showUnapproved);
+        const teamList = await teamService.getTeams(
+            uid,
+            university,
+            showUnapproved
+        );
         return res.status(200).json(teamList);
     } catch (error) {
         return next(error);
