@@ -85,6 +85,28 @@ TeamElement.propTypes = {
 const CreateTeamElement = ({ onSubmit }) => {
     const [error, setError] = useState("");
     const [newTeamName, setNewTeamName] = useState("");
+
+    const validateTeamName = () => {
+        //I wrote the regex and changed it, but I basically told copilot to give me a check for the regex provided and it
+        const regex = /^[^\w ]/;
+        if (newTeamName.trim().length < 1) {
+            setError("Team name cannot be empty.");
+        }
+        if (regex.test(newTeamName)) {
+            setError(
+                "Team name can only include letters, numbers, and spaces."
+            );
+            return false;
+        }
+        return true;
+    };
+
+    const handleButtonClick = () => {
+        if (validateTeamName()) {
+            onSubmit(newTeamName);
+        }
+    };
+
     return (
         <Grid size={{ xs: 12, md: 6 }}>
             <Card
@@ -116,10 +138,7 @@ const CreateTeamElement = ({ onSubmit }) => {
                         justifyContent: "flex-end",
                     }}
                 >
-                    <Button
-                        variant="contained"
-                        onClick={() => onSubmit(newTeamName)}
-                    >
+                    <Button variant="contained" onClick={handleButtonClick}>
                         Create Team
                     </Button>
                 </CardActions>
