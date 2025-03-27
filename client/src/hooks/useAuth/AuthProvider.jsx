@@ -21,8 +21,12 @@ const AuthProvider = ({ children }) => {
         });
     }, []);
 
+    const forceRefresh = async () => {
+        users.getProfile().then(setUser);
+    };
+
     return (
-        <AuthContext.Provider value={{ user, setUser }}>
+        <AuthContext.Provider value={{ user, setUser, forceRefresh }}>
             {children}
         </AuthContext.Provider>
     );
