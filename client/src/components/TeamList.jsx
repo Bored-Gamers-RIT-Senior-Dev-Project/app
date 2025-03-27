@@ -162,7 +162,7 @@ const TeamList = ({ university, teams }) => {
     const handleFormNewTeam = (newTeamName) => {
         submit(
             { universityId: university, teamName: newTeamName },
-            { action: "newTeam", relative: true }
+            { action: "newTeam", relative: true, navigate: false }
         );
     };
 
