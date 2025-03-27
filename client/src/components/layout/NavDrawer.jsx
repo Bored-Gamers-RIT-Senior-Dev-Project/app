@@ -157,6 +157,7 @@ const NavDrawer = ({ open, setOpen, desktop }) => {
                     color="secondary"
                     size="large"
                     sx={{ marginX: "2em" }}
+                    onClick={() => navigate("/join")}
                 >
                     Join The
                     <br />
