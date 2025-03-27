@@ -14,62 +14,6 @@ import { usePostSubmit } from "../hooks/usePostSubmit";
 import propTypes from "../utils/propTypes";
 import { Colors } from "../utils/theme";
 
-const TeamList = ({ university, teams }) => {
-    const submit = usePostSubmit();
-    const [newTeamName, setNewTeamName] = useState("");
-    const [error, setError] = useState("");
-
-    const handleFormNewTeam = () => {
-        submit(
-            { universityId: university, teamName: newTeamName },
-            { action: "/join/newTeam" }
-        );
-    };
-
-    const filteredTeams = useMemo(
-        () => teams.filter((team) => team.universityId == university),
-        [teams, university]
-    );
-
-    return (
-        <Grid container spacing={2}>
-            <Grid size={{ xs: 12, md: 6 }}>
-                <Card sx={{ height: "100%" }}>
-                    <CardHeader
-                        title="New Team"
-                        subheader="Create a new team and invite your friends!"
-                    />
-                    <CardContent>
-                        <TextField
-                            fullWidth
-                            label="Team name"
-                            value={newTeamName}
-                            onChange={(event) => {
-                                setError(null);
-                                setNewTeamName(event.target.value);
-                            }}
-                            error={error}
-                            helperText={error}
-                        />
-                    </CardContent>
-                    <CardActions sx={{ justifyContent: "flex-end" }}>
-                        <Button variant="contained" onClick={handleFormNewTeam}>
-                            Create Team
-                        </Button>
-                    </CardActions>
-                </Card>
-            </Grid>
-            {filteredTeams.map((team) => (
-                <TeamElement key={team.id} team={team} />
-            ))}
-        </Grid>
-    );
-};
-TeamList.propTypes = {
-    university: propTypes.number,
-    teams: propTypes.array.isRequired,
-};
-
 const getChipColor = (count) => {
     switch (count) {
         case 0:
@@ -87,7 +31,7 @@ const getChipColor = (count) => {
     }
 };
 
-const TeamElement = ({ team }) => {
+const TeamElement = ({ team, onSubmit }) => {
     return (
         <Grid size={{ xs: 12, md: 6 }}>
             <Card
@@ -100,8 +44,9 @@ const TeamElement = ({ team }) => {
                 <CardHeader
                     avatar={
                         <Avatar
+                            alt={team.teamName}
                             src={team.profileImageUrl}
-                            sx={{ height: "2em", width: "2em" }}
+                            sx={{ height: "3em", width: "3em" }}
                         />
                     }
                     action={
@@ -116,11 +61,15 @@ const TeamElement = ({ team }) => {
                     title={team.teamName}
                     subheader={`Captain: ${team.captainName}`}
                 />
-                <CardContent sx={{ flexGrow: "1" }}>
+                <CardContent sx={{ flexGrow: 1 }}>
                     {team.description}
                 </CardContent>
                 <CardActions sx={{ justifyContent: "flex-end" }}>
-                    <Button variant="contained" disabled={team.members >= 7}>
+                    <Button
+                        variant="contained"
+                        disabled={team.members >= 7}
+                        onClick={() => onSubmit(team.id)}
+                    >
                         Join
                     </Button>
                 </CardActions>
@@ -130,6 +79,102 @@ const TeamElement = ({ team }) => {
 };
 TeamElement.propTypes = {
     team: propTypes.object.isRequired,
+    onSubmit: propTypes.func.isRequired,
+};
+
+const CreateTeamElement = ({ onSubmit }) => {
+    const [error, setError] = useState("");
+    const [newTeamName, setNewTeamName] = useState("");
+    return (
+        <Grid size={{ xs: 12, md: 6 }}>
+            <Card
+                sx={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                }}
+            >
+                <CardHeader
+                    title="New Team"
+                    subheader="Create a new team and invite your friends!"
+                />
+                <CardContent sx={{ flexGrow: "1" }}>
+                    <TextField
+                        fullWidth
+                        label="Team name"
+                        value={newTeamName}
+                        onChange={(event) => {
+                            setError(null);
+                            setNewTeamName(event.target.value);
+                        }}
+                        error={error}
+                        helperText={error}
+                    />
+                </CardContent>
+                <CardActions
+                    sx={{
+                        justifyContent: "flex-end",
+                    }}
+                >
+                    <Button
+                        variant="contained"
+                        onClick={() => onSubmit(newTeamName)}
+                    >
+                        Create Team
+                    </Button>
+                </CardActions>
+            </Card>
+        </Grid>
+    );
+};
+
+CreateTeamElement.propTypes = {
+    onSubmit: propTypes.func.isRequired,
+};
+
+const TeamList = ({ university, teams }) => {
+    const submit = usePostSubmit();
+
+    /**
+     * Handles what happens when the user clicks the "Create team" button and the content of the Team Name field is valid
+     * @param {string} newTeamName Contents of the Team name field
+     */
+    const handleFormNewTeam = (newTeamName) => {
+        submit(
+            { universityId: university, teamName: newTeamName },
+            { action: "/join/newTeam" }
+        );
+    };
+
+    /**
+     * Handle what happens when the user clicks "join" on a team item
+     * @param {number} teamId The ID of the team the user clicked to join
+     */
+    const handleJoinTeam = (teamId) => {
+        submit({ teamId });
+    };
+
+    const filteredTeams = useMemo(
+        () => teams.filter((team) => team.universityId == university),
+        [teams, university]
+    );
+
+    return (
+        <Grid container spacing={2}>
+            <CreateTeamElement onSubmit={handleFormNewTeam} />
+            {filteredTeams.map((team) => (
+                <TeamElement
+                    key={team.id}
+                    team={team}
+                    onSubmit={handleJoinTeam}
+                />
+            ))}
+        </Grid>
+    );
+};
+TeamList.propTypes = {
+    university: propTypes.number,
+    teams: propTypes.array.isRequired,
 };
 
 export { TeamList };
