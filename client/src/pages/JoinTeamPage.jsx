@@ -1,12 +1,22 @@
 import { Box, Paper, Typography } from "@mui/material";
-import { useState } from "react";
-import { useLoaderData } from "react-router";
+import { useEffect, useState } from "react";
+import { useLoaderData, useNavigate } from "react-router";
 import { TeamList } from "../components/TeamList";
 import { UniversitySelect } from "../components/UniversitySelect";
+import { useAuth } from "../hooks/useAuth";
 
 const JoinTeamPage = () => {
+    const { user } = useAuth(true);
     const [selectedUniversity, selectUniversity] = useState(null);
     const [universities, teams] = useLoaderData();
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (user?.teamId) {
+            navigate(`/team/${user?.teamId}`);
+        } else if (user?.roleName !== "Spectator") {
+            navigate("/");
+        }
+    });
 
     return (
         <Box
