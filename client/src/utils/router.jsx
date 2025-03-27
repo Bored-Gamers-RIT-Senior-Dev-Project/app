@@ -21,7 +21,7 @@ import { AddUniversityModal } from "../pages/modals/AddUniversityModal";
 import { AddUserModal } from "../pages/modals/AddUserModal";
 import { DeleteModal } from "../pages/modals/DeleteModal";
 import { EditUserModal } from "../pages/modals/EditUserModal";
-import { admin, search, university, users } from "./api";
+import { admin, search, teams, university, users } from "./api";
 import { events } from "./events";
 
 /**
@@ -113,7 +113,16 @@ const routes = [
             {
                 path: "/join",
                 element: <JoinTeamPage />,
-                loader: university.getList,
+                loader: () =>
+                    Promise.all([university.getList(), teams.getList(true)]),
+                action: makeAction(teams.join),
+                children: [
+                    {
+                        path: "/join/newTeam",
+                        action: makeAction(teams.create),
+                        element: null, //This child route solely exists to hold an action for useSubmit().  No extra element
+                    },
+                ],
             },
             {
                 path: "/admin/reports",
