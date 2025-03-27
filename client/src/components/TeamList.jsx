@@ -91,6 +91,7 @@ const CreateTeamElement = ({ onSubmit }) => {
         const regex = /^[^\w ]/;
         if (newTeamName.trim().length < 1) {
             setError("Team name cannot be empty.");
+            return false;
         }
         if (regex.test(newTeamName)) {
             setError(
@@ -161,7 +162,7 @@ const TeamList = ({ university, teams }) => {
     const handleFormNewTeam = (newTeamName) => {
         submit(
             { universityId: university, teamName: newTeamName },
-            { action: "/join/newTeam" }
+            { action: "newTeam", relative: true }
         );
     };
 
