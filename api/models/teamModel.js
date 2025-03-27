@@ -95,11 +95,28 @@ const getTeamsByUniversityId = async (universityId, approvedOnly = true) => {
 };
 
 const getTeamById = async (teamId, showUnapproved, showPendingChanges) => {
-    const sql = `SELECT * FROM teams WHERE TeamID = ?`;
-    if (!showUnapproved) {
-        sql += " AND IsApproved = true";
-    }
-    //TODO: Logic to handle showPendingChanges once we've established how pending changes are stored.
+    const sql = `SELECT 
+    t.TeamID AS id,
+    t.TeamName AS teamName,
+    t.ProfileImageURL AS profileImageUrl,
+    t.UniversityID AS universityId,
+    u.UniversityName AS universityName,
+    t.Description AS description,
+    t.CreatedAt AS createdAt,
+    COUNT(DISTINCT teamMember.UserID) AS members,
+    CONCAT(captain.FirstName, ' ', captain.LastName) AS captainName,
+    captain.Email AS captainEmail
+FROM
+    teams t
+        JOIN
+    users captain ON captain.UserID = t.TeamLeaderID
+        JOIN
+    users teamMember ON teamMember.TeamID = t.TeamId
+        JOIN
+    universities u ON t.UniversityID = u.UniversityID
+WHERE
+    t.TeamId = ?
+    ${showUnapproved ? "" : " AND t.IsApproved = true"}`;
     const result = await db.query(sql, [teamId]);
     if (result[0].length === 0) {
         return null;
@@ -107,7 +124,18 @@ const getTeamById = async (teamId, showUnapproved, showPendingChanges) => {
     return result[0][0];
 };
 
+const createTeam = async (universityId, teamName, userId) => {
+    const sql = `INSERT INTO teams (UniversityId, TeamName, TeamLeaderID) VALUES (?, ?, ?)`;
+    const [resultSetHeader] = await db.query(sql, [
+        universityId,
+        teamName,
+        userId,
+    ]);
+    return resultSetHeader.insertId;
+};
+
 module.exports = {
+    createTeam,
     getTeams,
     getTeamById,
     searchTeams,

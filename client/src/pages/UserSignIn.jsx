@@ -1,7 +1,7 @@
 // Chatgpt helped me write function in this file and its the async functionW
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useActionData, useNavigate } from "react-router";
+import { useActionData, useLocation, useNavigate } from "react-router";
 import { GoogleSignIn } from "../components/GoogleSignIn";
 import { useAuth } from "../hooks/useAuth";
 import { events } from "../utils/events";
@@ -22,6 +22,7 @@ const handleErrors = (error) => {
 const UserSignIn = () => {
     const [signInData, setSignInData] = useState({ email: "", password: "" });
     const actionData = useActionData();
+    const { state } = useLocation();
     const { user, setUser } = useAuth();
 
     const navigate = useNavigate();
@@ -59,9 +60,9 @@ const UserSignIn = () => {
     useEffect(() => {
         events.publish("spinner.close");
         if (user) {
-            navigate("/");
+            navigate(state?.redirect ? state.redirect : "/");
         }
-    }, [user, navigate]);
+    }, [state, user, navigate]);
 
     return (
         <Box
@@ -115,7 +116,7 @@ const UserSignIn = () => {
             {/* TODO: Sign up link should look more like a link rather than plaintext  */}
             <Typography
                 sx={{ mt: 2, textAlign: "center", cursor: "pointer" }}
-                onClick={() => navigate("/signup")}
+                onClick={() => navigate("/signup", { state })}
             >
                 No account? Sign Up
             </Typography>

@@ -49,7 +49,7 @@ router.post("", async (req, res, next) => {
     if (!uid) return res.status(401).send();
 
     try {
-        //const team = await teamService.createTeam(uid, teamName, profileImageUrl, universityId);
+        const team = await teamService.createTeam(uid, universityId, teamName);
         return res.status(201).json({});
     } catch (error) {
         return next(error);
@@ -76,16 +76,15 @@ router.put("/:teamId/assign", async (req, res, next) => {
 
 /**
  * Join a team
- * Requires []
+ * Requires [Spectator role]
  */
 router.put("/:teamId/join", async (req, res, next) => {
     const { uid } = req.user;
     const { teamId } = req.params;
-    const { userId } = req.body;
     if (!uid) return res.status(401).send();
 
     try {
-        //const team = await teamService.addUserToTeam(uid, teamId, userId);
+        const team = await teamService.joinTeam(uid, teamId);
         return res.status(200).json({});
     } catch (error) {
         return next(error);
