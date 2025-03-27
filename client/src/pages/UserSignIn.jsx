@@ -10,8 +10,11 @@ import { ErrorData, MessageData } from "../utils/messageData";
 
 const handleErrors = (error) => {
     switch (error.message) {
+        case "Firebase: Error (auth/invalid-credential).":
+            new ErrorData("Invalid username or password.").send();
+            break;
         default:
-            console.error("Sign-in error:", error);
+            console.error("Sign-in error:", error.message);
             events.publish(
                 "message",
                 new ErrorData("An unexpected error occurred")
