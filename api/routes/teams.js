@@ -1,4 +1,5 @@
 const express = require("express");
+const teamService = require("../services/teamService");
 const router = express.Router();
 
 /**
@@ -10,8 +11,8 @@ router.get("", async (req, res, next) => {
     const { uid = null } = req.user;
 
     try {
-        //const teamList = await teamService.getTeams(uid, showUnapproved);
-        return res.status(200).json([]);
+        const teamList = await teamService.getTeams(uid, showUnapproved);
+        return res.status(200).json(teamList);
     } catch (error) {
         return next(error);
     }
@@ -38,7 +39,7 @@ router.get("/:teamId", async (req, res, next) => {
  * Create a new team.
  */
 router.post("", async (req, res, next) => {
-    const { teamName, profileImageUrl, universityId } = req.body;
+    const { teamName, universityId } = req.body;
 
     const { uid } = req.user;
     if (!uid) return res.status(401).send();
@@ -56,6 +57,24 @@ router.post("", async (req, res, next) => {
  * Requires []
  */
 router.put("/:teamId/assign", async (req, res, next) => {
+    const { uid } = req.user;
+    const { teamId } = req.params;
+    const { userId } = req.body;
+    if (!uid) return res.status(401).send();
+
+    try {
+        //const team = await teamService.addUserToTeam(uid, teamId, userId);
+        return res.status(200).json({});
+    } catch (error) {
+        return next(error);
+    }
+});
+
+/**
+ * Join a team
+ * Requires []
+ */
+router.put("/:teamId/join", async (req, res, next) => {
     const { uid } = req.user;
     const { teamId } = req.params;
     const { userId } = req.body;
@@ -141,3 +160,5 @@ router.put("/approve", async (req, res, next) => {
         return next(error);
     }
 });
+
+module.exports = router;
