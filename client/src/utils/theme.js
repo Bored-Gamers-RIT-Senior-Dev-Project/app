@@ -30,4 +30,4 @@ const palette = {
 
 const theme = responsiveFontSizes(createTheme({ palette }));
 
-export { theme };
+export { Colors, theme };
