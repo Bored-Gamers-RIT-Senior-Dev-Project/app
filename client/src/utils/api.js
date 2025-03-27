@@ -82,6 +82,50 @@ const admin = Object.freeze({
     },
 });
 
+const teams = Object.freeze({
+    /**
+     * Gets a list of existing teams.
+     * @returns {Promise<Array<object>>}
+     */
+    getList: async (getUnapproved = false) => {
+        let uri = "teams";
+        if (getUnapproved) uri += "?showUnapproved";
+        const { data } = await api.get(uri);
+        return data;
+    },
+    /**
+     * Gets information on a certain team (team page)
+     * @param {number} params.id TeamID to
+     * @returns The team information
+     */
+    getInfo: async ({ id }) => {
+        const { data } = await api.get(`teams/${id}`);
+        return data;
+    },
+    /**
+     * Create a new team, captained by the currently signed in user
+     * @param {number} params.universityId The university hosting the team.
+     * @param {string} params.teamName The name of the team being created.
+     * @returns Confirmation that the team has been created.
+     */
+    create: async ({ universityId, teamName }) => {
+        console.log(
+            `Creating new team for university #${universityId} named ${teamName}.`
+        );
+        // const { data } = await api.post(`teams`, { teamName, universityId });
+        // return data;
+    },
+    /**
+     * When successful, causes the current user to join the specified team.
+     * @param {number} id Team ID to join.
+     * @returns Confirmation of action result
+     */
+    join: async (id) => {
+        const { data } = await api.put(`teams/${id}/join`);
+        return data;
+    },
+});
+
 const users = Object.freeze({
     /**
      * Gets a list of all users that exist in the local database.
@@ -183,4 +227,4 @@ const combine = (...calls) => {
     return () => Promise.all(calls);
 };
 
-export { admin, combine, search, university, users };
+export { admin, combine, search, teams, university, users };
