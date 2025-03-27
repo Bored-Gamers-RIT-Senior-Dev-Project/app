@@ -38,7 +38,7 @@ class MessageData {
 /**
  * @class ErrorData a convenience for representing the data needed for an error
  */
-class ErrorData {
+class ErrorData extends MessageData {
     /**
      * Create a new ErrorData
      * @param {string} message The user-facing message for this error
@@ -46,8 +46,7 @@ class ErrorData {
      * @param {more} [more] Add more arbitrary keys to this object
      */
     constructor(message, severity = Severity.ERROR, more) {
-        const messageData = new MessageData(undefined, message, severity, more);
-        Object.assign(this, messageData);
+        super(undefined, message, severity, more);
     }
 }
 
