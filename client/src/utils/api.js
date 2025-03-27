@@ -89,7 +89,7 @@ const teams = Object.freeze({
      */
     getList: async (getUnapproved = false) => {
         let uri = "teams";
-        if (getUnapproved) uri += "?showUnapproved";
+        if (getUnapproved) uri += "?showUnapproved=true";
         const { data } = await api.get(uri);
         return data;
     },

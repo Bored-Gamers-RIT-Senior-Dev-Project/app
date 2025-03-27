@@ -66,7 +66,7 @@ FROM
     users teamMember ON teamMember.TeamID = t.TeamId
         JOIN
     universities u ON t.UniversityID = u.UniversityID
-    ${approvedOnly ? "WHERE t.IsApproved" : null}
+    ${approvedOnly ? " WHERE t.IsApproved = true" : ""}
     GROUP BY t.TeamID
 `;
 
