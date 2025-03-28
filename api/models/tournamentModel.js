@@ -429,7 +429,8 @@ const updateTournamentDetails = async (
     tournamentName,
     startDate,
     endDate,
-    status
+    status,
+    location
 ) => {
     try {
         let updates = [];
@@ -450,6 +451,10 @@ const updateTournamentDetails = async (
         if (status) {
             updates.push("Status = ?");
             params.push(status);
+        }
+        if (location) {
+            updates.push("Location = ?");
+            params.push(location);
         }
 
         if (updates.length === 0) {
