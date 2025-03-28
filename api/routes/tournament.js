@@ -74,10 +74,10 @@ router.get("/search", async (req, res, next) => {
 });
 
 /**
- * POST /updateDetails
+ * PUT /updateDetails
  * Update tournament details.
  */
-router.post("/updateDetails", async (req, res, next) => {
+router.put("/updateDetails", async (req, res, next) => {
     const { tournamentID, tournamentName, startDate, endDate, location } =
         req.body;
     if (!tournamentID) {
@@ -102,10 +102,10 @@ router.post("/updateDetails", async (req, res, next) => {
 });
 
 /**
- * POST /start
+ * PUT /start
  * Start a tournament.
  */
-router.post("/start", async (req, res, next) => {
+router.put("/start", async (req, res, next) => {
     const { tournamentID } = req.body;
     if (!tournamentID) {
         return res.status(400).json({ message: "Invalid request format." });
@@ -168,10 +168,10 @@ router.get("/getBracket", async (req, res, next) => {
 });
 
 /**
- * POST /cancel
+ * PUT /cancel
  * Cancel a tournament.
  */
-router.post("/cancel", async (req, res, next) => {
+router.put("/cancel", async (req, res, next) => {
     const { tournamentID } = req.body;
     if (!tournamentID) {
         return res.status(400).json({ message: "Invalid request format." });
@@ -195,10 +195,10 @@ router.post("/cancel", async (req, res, next) => {
 });
 
 /**
- * POST /delete
+ * DELETE /delete
  * Delete a tournament.
  */
-router.post("/delete", async (req, res, next) => {
+router.delete("/delete", async (req, res, next) => {
     // TODO: Implement tournament deletion logic.
 });
 
@@ -255,10 +255,10 @@ router.post("/removeTeam", async (req, res) => {
 });
 
 /**
- * POST /disqualifyTeam
+ * PUT /disqualifyTeam
  * Disqualify a team from a tournament.
  */
-router.post("/disqualifyTeam", async (req, res) => {
+router.put("/disqualifyTeam", async (req, res) => {
     const { tournamentID, teamID } = req.body;
     if (!tournamentID || !teamID) {
         return res.status(400).json({ message: "Invalid request format." });
@@ -453,10 +453,10 @@ router.get("/searchMatches", async (req, res, next) => {
 });
 
 /**
- * POST /setMatchResult
+ * PUT /setMatchResult
  * Set the result of a match.
  */
-router.post("/setMatchResult", async (req, res, next) => {
+router.put("/setMatchResult", async (req, res, next) => {
     const { matchID, winnerID, score1, score2 } = req.body;
     if (!matchID || !winnerID) {
         return res.status(400).json({ message: "Invalid request format." });
