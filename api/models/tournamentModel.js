@@ -527,7 +527,8 @@ const searchMatches = async (
     before,
     after,
     sortBy,
-    sortAsDescending
+    sortAsDescending,
+    winnerID
 ) => {
     try {
         if (matchID) {
@@ -591,6 +592,10 @@ const searchMatches = async (
             }
             if (bracketSide) {
                 search += " AND participant1.BracketSide = ?";
+                params.push(bracketSide);
+            }
+            if (bracketSide) {
+                search += " AND match. = ?";
                 params.push(bracketSide);
             }
             if (sortBy) {

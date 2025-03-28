@@ -130,42 +130,12 @@ router.put("/start", async (req, res, next) => {
  */
 router.get("/getBracket", async (req, res, next) => {
     const { tournamentID } = req.query;
+    if (!tournamentID) {
+        return res.status(400).json({ message: "Invalid request." });
+    }
     try {
-        const participants =
-            await TournamentService.searchTournamentParticipants(tournamentID);
-        const numTeams = participants.length;
-        if (numTeams === 0) {
-            return res
-                .status(404)
-                .json({ error: "No teams found in the tournament" });
-        }
-        const leftBracket = await TournamentService.searchMatches(
-            null,
-            tournamentID,
-            "left",
-            null,
-            null,
-            null,
-            "participant1.BracketOrder",
-            null
-        );
-        const rightBracket = await TournamentService.searchMatches(
-            null,
-            tournamentID,
-            "right",
-            null,
-            null,
-            null,
-            "participant1.BracketOrder",
-            null
-        );
-        if (!leftBracket.length && !rightBracket.length) {
-            return res.status(404).json({ error: "Please start tournament" });
-        }
-        return res.status(200).json({
-            TournamentID: tournamentID,
-            Bracket: [{ leftBracket, rightBracket }],
-        });
+        const bracket = TournamentService.getTournamentBracket(tournamentID);
+        return res.status(200).json(bracket);
     } catch (error) {
         next(error);
     }

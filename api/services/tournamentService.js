@@ -164,6 +164,50 @@ const searchTournaments = async (
     }
 };
 
+const getTournamentBracket = async (tournamentID) => {
+    try {
+        const bracket = [];
+        const participants =
+            await TournamentService.searchTournamentParticipants(tournamentID);
+        const numTeams = participants.length;
+        const rounds = Math.ceil(Math.log2(numTeams));
+        if (numTeams === 0) {
+            return res
+                .status(404)
+                .json({ error: "No teams found in the tournament" });
+        }
+        for (let i = 0; i < rounds; i++) {
+            const leftBracket = await TournamentService.searchMatches(
+                null,
+                tournamentID,
+                "left",
+                null,
+                null,
+                null,
+                "participant1.BracketOrder",
+                null
+            );
+            const rightBracket = await TournamentService.searchMatches(
+                null,
+                tournamentID,
+                "right",
+                null,
+                null,
+                null,
+                "participant1.BracketOrder",
+                null
+            );
+        }
+        return res.status(200).json({
+            TournamentID: tournamentID,
+            Bracket: [{ leftBracket, rightBracket }],
+        });
+        return bracket;
+    } catch (error) {
+        throw error;
+    }
+};
+
 /**
  * Updates the tournament state in the database.
  */
@@ -621,7 +665,8 @@ const searchMatches = async (
     before,
     after,
     sortBy,
-    sortAsDescending
+    sortAsDescending,
+    winnerID
 ) => {
     try {
         // If matchID is provided, use it exclusively for the search.
@@ -656,7 +701,8 @@ const searchMatches = async (
                 before,
                 after,
                 sortBy,
-                sortAsDescending
+                sortAsDescending,
+                winnerID
             );
             return match;
         }
