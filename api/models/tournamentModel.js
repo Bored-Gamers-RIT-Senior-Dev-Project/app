@@ -528,7 +528,7 @@ const searchMatches = async (
     after,
     sortBy,
     sortAsDescending,
-    winnerID
+    round
 ) => {
     try {
         if (matchID) {
@@ -559,7 +559,7 @@ const searchMatches = async (
                 team2.TeamName,
                 matches.Score2,
                 CASE 
-                WHEN matches.WinnerID IS NOT NULL THEN participant1.Round
+                WHEN matches.WinnerID IS NULL THEN participant1.Round
                 ELSE 
                     CASE 
                     WHEN matches.WinnerID = matches.Team1ID THEN participant2.Round
@@ -594,9 +594,9 @@ const searchMatches = async (
                 search += " AND participant1.BracketSide = ?";
                 params.push(bracketSide);
             }
-            if (bracketSide) {
-                search += " AND match. = ?";
-                params.push(bracketSide);
+            if (round) {
+                search += " AND matches.MatchRound = ?";
+                params.push(round);
             }
             if (sortBy) {
                 search += " ORDER BY " + sortBy;

@@ -170,14 +170,16 @@ const getTournamentBracket = async (tournamentID) => {
         const participants =
             await TournamentService.searchTournamentParticipants(tournamentID);
         const numTeams = participants.length;
-        const rounds = Math.ceil(Math.log2(numTeams));
         if (numTeams === 0) {
             return res
                 .status(404)
                 .json({ error: "No teams found in the tournament" });
         }
-        for (let i = 0; i < rounds; i++) {
-            const leftBracket = await TournamentService.searchMatches(
+
+        const rounds = Math.ceil(Math.log2(numTeams));
+
+        for (let i = 1; i <= rounds; i++) {
+            const leftMatches = await TournamentService.searchMatches(
                 null,
                 tournamentID,
                 "left",
@@ -185,9 +187,11 @@ const getTournamentBracket = async (tournamentID) => {
                 null,
                 null,
                 "participant1.BracketOrder",
-                null
+                null,
+                i
             );
-            const rightBracket = await TournamentService.searchMatches(
+
+            const rightMatches = await TournamentService.searchMatches(
                 null,
                 tournamentID,
                 "right",
@@ -195,16 +199,23 @@ const getTournamentBracket = async (tournamentID) => {
                 null,
                 null,
                 "participant1.BracketOrder",
-                null
+                null,
+                i
             );
+
+            bracket.push(...leftMatches, ...rightMatches);
         }
+
+        const tournament = await TournamentService.searchTournament(
+            tournamentID
+        );
+
         return res.status(200).json({
-            TournamentID: tournamentID,
-            Bracket: [{ leftBracket, rightBracket }],
+            tournament,
+            bracket,
         });
-        return bracket;
     } catch (error) {
-        throw error;
+        return res.status(500).json({ error: error.message });
     }
 };
 
