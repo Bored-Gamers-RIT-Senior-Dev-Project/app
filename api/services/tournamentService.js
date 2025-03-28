@@ -33,6 +33,7 @@ const validateInteger = (value, fieldName) => {
 
 /**
  * Creates a new tournament in the database with the status of "Upcoming".
+ * @param {string} uid - FirebaseUID of the user.
  * @param {string} tournamentName - Name of the tournament.
  * @param {string} startDate - Start date of the tournament in YYYY-MM-DD format.
  * @param {string} endDate - End date of the tournament in YYYY-MM-DD format. If not provided, defaults to endDate.
@@ -41,14 +42,24 @@ const validateInteger = (value, fieldName) => {
  * @throws {Error} Throws an error with status 401 if the user's role is unauthorized.
  */
 const createTournament = async (
+    uid,
     tournamentName,
     startDate,
     endDate = null,
     location
 ) => {
     try {
-        // TODO: Validate user's role by their Firebase UID
-        // If no end date provided, assume the tournament only lasts a day.
+        const user = await userModel.getUserByFirebaseId(uid);
+        if (
+            user.role !== "Super Admin" &&
+            user.role !== "Aardvark Games Employee"
+        ) {
+            throw createHttpError(403);
+        }
+
+        //TODO: Validate and sanitize updateBody to prevent SQL injection or other attacks/errors.
+
+        // If no end date provided, default the end date to the start date.
         if (endDate === null) {
             finalEndDate = startDate;
         } else {
