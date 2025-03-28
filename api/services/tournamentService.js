@@ -433,7 +433,7 @@ const startTournament = async (uid, tournamentID) => {
             updateTournamentParticipant(
                 tournamentID,
                 item.TeamID,
-                0,
+                1,
                 0,
                 "active",
                 "left",
@@ -447,7 +447,7 @@ const startTournament = async (uid, tournamentID) => {
             updateTournamentParticipant(
                 tournamentID,
                 item.TeamID,
-                0,
+                1,
                 0,
                 "active",
                 "right",
@@ -456,6 +456,8 @@ const startTournament = async (uid, tournamentID) => {
             );
             bracketOrder++;
         });
+        nextRound(tournamentID, "left", 1);
+        nextRound(tournamentID, "right", 1);
     } catch (error) {
         throw error;
     }
