@@ -8,8 +8,10 @@ const TournamentService = require("../services/tournamentService");
  */
 router.post("/create", async (req, res, next) => {
     const { tournamentName, startDate, endDate, location } = req.body;
-    if (!tournamentName || !startDate || !endDate || !location) {
-        return res.status(400).json({ message: "Invalid request format." });
+    if (!tournamentName || !startDate || !location) {
+        return res
+            .status(400)
+            .json({ message: "Invalid request format or parameter(s)." });
     }
     try {
         const tournament = await TournamentService.createTournament(
@@ -19,11 +21,11 @@ router.post("/create", async (req, res, next) => {
             location
         );
         return res.status(201).json({
-            message: "Tournament created successfully",
+            message: "Tournament created successfully.",
             tournament,
         });
     } catch (error) {
-        next(error);
+        next(new Error("Unable to create tournament."));
     }
 });
 
