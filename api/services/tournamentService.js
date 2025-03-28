@@ -357,9 +357,20 @@ const searchTournamentFacilitators = async (
     }
 };
 
-const startTournament = async (tournamentID) => {
+const startTournament = async (uid, tournamentID) => {
     try {
         tournamentID = validateInteger(tournamentID, "tournamentID");
+        const user = await userModel.getUserByFirebaseId(uid);
+        if (
+            user.role !== "Super Admin" &&
+            user.role !== "Aardvark Games Employee" &&
+            (user.role !== "Tournament Facilitator" ||
+                searchTournamentFacilitators(tournamentID, user.userID)
+                    .length === 0)
+        ) {
+            throw createHttpError(403);
+        }
+
         const shuffleParticipants =
             await TournamentModel.searchTournamentParticipants(
                 tournamentID,
@@ -369,7 +380,7 @@ const startTournament = async (tournamentID) => {
                 null,
                 null,
                 null,
-                null,
+                "active",
                 null,
                 null,
                 null,
