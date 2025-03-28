@@ -47,7 +47,7 @@ const searchTeams = async (
  * @returns The team list
  */
 const getTeams = async (approvedOnly = true) => {
-    let sql = `SELECT 
+    const sql = `SELECT 
     t.TeamID AS id,
     t.TeamName AS teamName,
     t.ProfileImageURL AS profileImageUrl,
