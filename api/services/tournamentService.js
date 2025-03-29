@@ -17,6 +17,7 @@ const safeDecode = (value) => {
  * Validates that a given value is an integer.
  * @param {number} value - The value to validate.
  * @param {string} fieldName - The name of the field (used in the error message).
+ * @returns {number} The validated integer.
  * @throws {Error} Throws an error with status 400 if the value is not an integer.
  */
 const validateInteger = (value, fieldName) => {
@@ -36,10 +37,10 @@ const validateInteger = (value, fieldName) => {
  * @param {string} uid - FirebaseUID of the user.
  * @param {string} tournamentName - Name of the tournament.
  * @param {string} startDate - Start date of the tournament in YYYY-MM-DD format.
- * @param {string} endDate - End date of the tournament in YYYY-MM-DD format. If not provided, defaults to endDate.
- * @param {string} location - The location of the tournament (likely an address or university name).
- * @returns {Promise<object>} Returns a promise that resolves to the created tournament record.
- * @throws {Error} Throws an error with status 401 if the user's role is unauthorized.
+ * @param {string} endDate - End date of the tournament in YYYY-MM-DD format. If not provided, defaults to startDate.
+ * @param {string} location - The location of the tournament.
+ * @returns {Promise<object>} Returns the created tournament record.
+ * @throws {Error} Throws an error with status 403 if the user is unauthorized.
  */
 const createTournament = async (
     uid,
@@ -57,14 +58,8 @@ const createTournament = async (
             throw createHttpError(403);
         }
 
-        //TODO: Validate and sanitize updateBody to prevent SQL injection or other attacks/errors.
-
         // If no end date provided, default the end date to the start date.
-        if (endDate === null) {
-            finalEndDate = startDate;
-        } else {
-            finalEndDate = endDate;
-        }
+        let finalEndDate = endDate === null ? startDate : endDate;
         const tournament = await TournamentModel.createTournament(
             tournamentName,
             startDate,
@@ -80,25 +75,20 @@ const createTournament = async (
 
 /**
  * Searches tournaments in the database based on provided parameters.
- * If tournamentID is specified (not null), all other search parameters are ignored and the function
- * returns a single tournament record. If tournamentID is provided but is not a valid integer, an error
- * with a 400 status is thrown. If tournamentID is null, the function searches based on the other criteria
- * @param {number|string|null} tournamentID - Tournament ID. Solely used for search if value is provided.
+ * @param {number|string|null} tournamentID - Tournament ID. If provided, search is based solely on this ID.
  * @param {string|null} tournamentName - Name of the tournament.
- * @param {string|null} startDate Start date of the tournament in YYYY-MM-DD format. Returns tournaments starting on this date.
- * @param {string|null} endDate End date of the tournament in YYYY-MM-DD format. Returns tournaments ending on this date.
- * @param {string|null} startsBefore - Start date of the tournament in YYYY-MM-DD format. Returns tournaments starting on or before this date.
- * @param {string|null} startsAfter - Start date of the tournament in YYYY-MM-DD format. Returns tournaments starting on or after this date.
- * @param {string|null} endsBefore - End date of the tournament in YYYY-MM-DD format. Returns tournaments ending on or before this date.
- * @param {string|null} endsAfter - End date of the tournament in YYYY-MM-DD format. Returns tournaments ending on or after this date.
+ * @param {string|null} startDate - Start date of the tournament in YYYY-MM-DD format.
+ * @param {string|null} endDate - End date of the tournament in YYYY-MM-DD format.
+ * @param {string|null} startsBefore - Returns tournaments starting on or before this date.
+ * @param {string|null} startsAfter - Returns tournaments starting on or after this date.
+ * @param {string|null} endsBefore - Returns tournaments ending on or before this date.
+ * @param {string|null} endsAfter - Returns tournaments ending on or after this date.
  * @param {string|null} status - Tournament status.
- * @param {string|null} location - Location of the tournament (address or university name).
+ * @param {string|null} location - Tournament location.
  * @param {string|null} sortBy - Field to sort the results by.
- * @param {string|boolean|null} sortAsDescending - If true, sorts the results by DESCENDING. Defaults to ASCENDING.
- * @returns {Promise<object|object[]|null>}
- *          If tournamentID is specified, returns a single tournament object or null if not found.
- *          Otherwise, returns an array of tournament objects that match the criteria, or null if none are found.
- * @throws {Error} Throws an error if tournamentID is provided and is not a valid integer, or if the query fails.
+ * @param {string|boolean|null} sortAsDescending - If true, sorts results in descending order.
+ * @returns {Promise<object|object[]|null>} Returns a tournament record or an array of tournaments.
+ * @throws {Error} Throws an error if validation fails or the query fails.
  */
 const searchTournaments = async (
     tournamentID = null,
@@ -115,7 +105,6 @@ const searchTournaments = async (
     sortAsDescending = false
 ) => {
     try {
-        // If tournamentID is provided, use it exclusively for the search.
         if (tournamentID !== null) {
             tournamentID = validateInteger(tournamentID, "tournamentID");
             const tournament = await TournamentModel.searchTournaments(
@@ -134,7 +123,6 @@ const searchTournaments = async (
             );
             return tournament;
         } else {
-            // TODO: There's probably a cleaner way to covert string to boolean
             if (
                 sortAsDescending === "true" ||
                 sortAsDescending === "True" ||
@@ -142,7 +130,6 @@ const searchTournaments = async (
             ) {
                 sortAsDescending = true;
             }
-            // When tournamentID is null, build search query based on other criteria.
             const tournament = await TournamentModel.searchTournaments(
                 null,
                 safeDecode(tournamentName),
@@ -164,6 +151,12 @@ const searchTournaments = async (
     }
 };
 
+/**
+ * Retrieves the tournament bracket including tournament details and match-ups.
+ * @param {number} tournamentID - ID of the tournament.
+ * @returns {Promise<object>} Returns an object containing tournament details and the bracket.
+ * @throws {Error} Throws an error if the tournament or participants are not found.
+ */
 const getTournamentBracket = async (tournamentID) => {
     try {
         const bracket = [];
@@ -220,7 +213,15 @@ const getTournamentBracket = async (tournamentID) => {
 };
 
 /**
- * Updates the tournament state in the database.
+ * Updates the tournament details.
+ * @param {number|string|null} tournamentID - ID of the tournament.
+ * @param {string|null} tournamentName - New tournament name.
+ * @param {string|null} startDate - New start date in YYYY-MM-DD format.
+ * @param {string|null} endDate - New end date in YYYY-MM-DD format.
+ * @param {string|null} status - New tournament status.
+ * @param {string|null} location - New tournament location.
+ * @returns {Promise<object|object[]|null>} Returns the updated tournament record.
+ * @throws {Error} Throws an error if validation fails or the update fails.
  */
 const updateTournamentDetails = async (
     tournamentID = null,
@@ -241,7 +242,6 @@ const updateTournamentDetails = async (
             status,
             location
         );
-        // Return using existing SELECT in search to verify updated information
         const tournament = searchTournaments(tournamentID);
         return tournament;
     } catch (error) {
@@ -249,6 +249,13 @@ const updateTournamentDetails = async (
     }
 };
 
+/**
+ * Adds a participant to a tournament.
+ * @param {number|string} tournamentID - ID of the tournament.
+ * @param {number|string} teamID - ID of the team.
+ * @returns {Promise<void>}
+ * @throws {Error} Throws an error if the team is already registered or the addition fails.
+ */
 const addTournamentParticipant = async (tournamentID, teamID) => {
     try {
         tournamentID = validateInteger(tournamentID, "tournamentID");
@@ -267,6 +274,13 @@ const addTournamentParticipant = async (tournamentID, teamID) => {
     }
 };
 
+/**
+ * Removes a participant from a tournament.
+ * @param {number|string} tournamentID - ID of the tournament.
+ * @param {number|string} teamID - ID of the team.
+ * @returns {Promise<void>}
+ * @throws {Error} Throws an error if the participant is not found or removal fails.
+ */
 const removeTournamentParticipant = async (tournamentID, teamID) => {
     try {
         tournamentID = validateInteger(tournamentID, "tournamentID");
@@ -285,6 +299,26 @@ const removeTournamentParticipant = async (tournamentID, teamID) => {
     }
 };
 
+/**
+ * Searches for tournament participants based on provided criteria.
+ * @param {number|null} tournamentID - ID of the tournament.
+ * @param {number|null} teamID - ID of the team.
+ * @param {string|null} teamName - Name of the team.
+ * @param {number|null} teamLeaderID - ID of the team leader.
+ * @param {string|null} teamLeaderName - Name of the team leader.
+ * @param {number|null} round - Round number.
+ * @param {number|null} byes - Number of byes.
+ * @param {string|null} status - Participant status.
+ * @param {string|null} bracketSide - Bracket side ("left" or "right").
+ * @param {number|null} nextMatchID - ID of the next match.
+ * @param {number|null} universityID - ID of the university.
+ * @param {string|null} universityName - Name of the university.
+ * @param {boolean|null} isApproved - Approval status.
+ * @param {string|null} sortBy - Field to sort by.
+ * @param {boolean} sortAsDescending - If true, sorts in descending order.
+ * @returns {Promise<object[]|null>} Returns an array of participant records or null.
+ * @throws {Error} Throws an error if the search fails.
+ */
 const searchTournamentParticipants = async (
     tournamentID,
     teamID,
@@ -326,6 +360,19 @@ const searchTournamentParticipants = async (
     }
 };
 
+/**
+ * Updates a tournament participant's details.
+ * @param {number|string} tournamentID - ID of the tournament.
+ * @param {number|string} teamID - ID of the team.
+ * @param {number} round - New round number.
+ * @param {number} byes - New bye count.
+ * @param {string} status - New participant status.
+ * @param {string} bracketSide - New bracket side ("left" or "right").
+ * @param {number|null} nextMatchID - ID of the next match or null.
+ * @param {number} bracketOrder - New order in the bracket.
+ * @returns {Promise<object>} Returns the updated participant record.
+ * @throws {Error} Throws an error if the update fails.
+ */
 const updateTournamentParticipant = async (
     tournamentID,
     teamID,
@@ -353,6 +400,13 @@ const updateTournamentParticipant = async (
     }
 };
 
+/**
+ * Adds a facilitator to a tournament.
+ * @param {number|string} tournamentID - ID of the tournament.
+ * @param {number|string} userID - ID of the facilitator.
+ * @returns {Promise<void>}
+ * @throws {Error} Throws an error if the facilitator already exists or if the operation fails.
+ */
 const addTournamentFacilitator = async (tournamentID, userID) => {
     try {
         tournamentID = validateInteger(tournamentID, "tournamentID");
@@ -371,6 +425,13 @@ const addTournamentFacilitator = async (tournamentID, userID) => {
     }
 };
 
+/**
+ * Removes a facilitator from a tournament.
+ * @param {number|string} tournamentID - ID of the tournament.
+ * @param {number|string} userID - ID of the facilitator.
+ * @returns {Promise<void>}
+ * @throws {Error} Throws an error if the facilitator is not found or if the removal fails.
+ */
 const removeTournamentFacilitator = async (tournamentID, userID) => {
     try {
         tournamentID = validateInteger(tournamentID, "tournamentID");
@@ -389,6 +450,16 @@ const removeTournamentFacilitator = async (tournamentID, userID) => {
     }
 };
 
+/**
+ * Searches for tournament facilitators based on provided criteria.
+ * @param {number|null} tournamentID - ID of the tournament.
+ * @param {number|null} userID - ID of the facilitator.
+ * @param {string|null} name - Facilitator's name.
+ * @param {string|null} email - Facilitator's email.
+ * @param {number|null} universityID - University ID.
+ * @returns {Promise<object[]|null>} Returns an array of facilitator records or null.
+ * @throws {Error} Throws an error if the search fails.
+ */
 const searchTournamentFacilitators = async (
     tournamentID,
     userID,
@@ -412,6 +483,14 @@ const searchTournamentFacilitators = async (
     }
 };
 
+/**
+ * Starts a tournament by shuffling participants, assigning bracket sides,
+ * and scheduling the first round of matches.
+ * @param {string} uid - FirebaseUID of the user initiating the tournament start.
+ * @param {number|string} tournamentID - ID of the tournament.
+ * @returns {Promise<void>}
+ * @throws {Error} Throws an error if the user is unauthorized or if the tournament cannot be started.
+ */
 const startTournament = async (uid, tournamentID) => {
     try {
         tournamentID = validateInteger(tournamentID, "tournamentID");
@@ -518,6 +597,14 @@ const startTournament = async (uid, tournamentID) => {
     }
 };
 
+/**
+ * Schedules the next round of matches for a given bracket side.
+ * @param {number|string} tournamentID - ID of the tournament.
+ * @param {string} bracketSide - Bracket side ("left" or "right").
+ * @param {number} round - The current round number.
+ * @returns {Promise<void>}
+ * @throws {Error} Throws an error if match scheduling fails.
+ */
 const nextRound = async (tournamentID, bracketSide, round) => {
     try {
         const participants = await searchTournamentParticipants(
@@ -528,7 +615,7 @@ const nextRound = async (tournamentID, bracketSide, round) => {
             null,
             round,
             null,
-            active,
+            "active",
             bracketSide,
             null,
             null,
@@ -536,14 +623,14 @@ const nextRound = async (tournamentID, bracketSide, round) => {
             true,
             "BracketOrder"
         );
-        numParticipants = participants.length;
-        if (numParticipants == 1) {
+        let numParticipants = participants.length;
+        if (numParticipants === 1) {
             console.log(
                 "This is the winner of the ",
                 bracketSide,
                 " of the tournament."
             );
-        } else if (numParticipants % 2 == 0) {
+        } else if (numParticipants % 2 === 0) {
             for (let i = 0; i < numParticipants; i += 2) {
                 const team1 = participants[i];
                 const team2 = participants[i + 1];
@@ -555,24 +642,23 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                 );
             }
         } else {
-            // Figure out who gets a bye based on:
-            //   1.) Number of previous byes
-            //   2.) Registration date
-            const byeTeam = await searchTournamentParticipants(
-                tournamentID,
-                null,
-                null,
-                null,
-                null,
-                round,
-                null,
-                active,
-                bracketSide,
-                null,
-                null,
-                null,
-                true,
-                "Byes, TeamCreatedAt"
+            const byeTeam = (
+                await searchTournamentParticipants(
+                    tournamentID,
+                    null,
+                    null,
+                    null,
+                    null,
+                    round,
+                    null,
+                    "active",
+                    bracketSide,
+                    null,
+                    null,
+                    null,
+                    true,
+                    "Byes, TeamCreatedAt"
+                )
             )[0];
             updateTournamentParticipant(
                 tournamentID,
@@ -580,7 +666,7 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                 byeTeam.TeamRound + 1,
                 byeTeam.TeamByeCount + 1
             );
-            const participants = await searchTournamentParticipants(
+            const updatedParticipants = await searchTournamentParticipants(
                 tournamentID,
                 null,
                 null,
@@ -588,7 +674,7 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                 null,
                 round,
                 null,
-                active,
+                "active",
                 bracketSide,
                 null,
                 null,
@@ -596,11 +682,11 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                 true,
                 "BracketOrder"
             );
-            numParticipants = participants.length;
-            if (numParticipants % 2 == 0) {
+            numParticipants = updatedParticipants.length;
+            if (numParticipants % 2 === 0) {
                 for (let i = 0; i < numParticipants; i += 2) {
-                    const team1 = participants[i];
-                    const team2 = participants[i + 1];
+                    const team1 = updatedParticipants[i];
+                    const team2 = updatedParticipants[i + 1];
                     createMatch(
                         tournamentID,
                         team1.TeamID,
@@ -622,29 +708,23 @@ const nextRound = async (tournamentID, bracketSide, round) => {
  * @param {number|string} tournamentID - The tournament ID.
  * @param {number|string} team1ID - Team 1 ID.
  * @param {number|string} team2ID - Team 2 ID.
- * @param {string} matchTime - The match time as an ISO 8601 string ("2025-02-17T00:00:00Z").
- * @returns {Promise<object>} Returns a promise that resolves to the created match record.
- * @throws {Error} Throws an error with status 400 if any of the IDs are not valid integers, or if the match cannot be created.
+ * @param {string} matchTime - The match time as an ISO 8601 string (e.g., "2025-02-17T00:00:00Z").
+ * @returns {Promise<object>} Returns the created match record.
+ * @throws {Error} Throws an error if the match cannot be created.
  */
 const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
     try {
         tournamentID = validateInteger(tournamentID, "tournamentID");
         team1ID = validateInteger(team1ID, "team1ID");
         team2ID = validateInteger(team2ID, "team2ID");
-        // Convert matchTime from an ISO 8601 string to MySQL DATETIME format ("YYYY-MM-DD HH:MM:SS").
         const formattedMatchTime = new Date(matchTime)
-            .toISOString() // Converts to "2025-02-17T00:00:00.000Z"
-            .slice(0, 19) // Trims to "2025-02-17T00:00:00"
-            .replace("T", " "); // Replaces the "T" with a space
-        // TODO:
-        // - Validate that the tournamentID exists.
-        // - Validate matchTime
-        // - Validate that matchTime is greater than the tournament's StartTime.
-        // - Validate that team1ID and team2ID are associated with teams in the tournament.
+            .toISOString()
+            .slice(0, 19)
+            .replace("T", " ");
         const match = await TournamentModel.createMatch(
-            tournamentIDInt,
-            team1IDInt,
-            team2IDInt,
+            tournamentID,
+            team1ID,
+            team2ID,
             formattedMatchTime
         );
         return match;
@@ -655,18 +735,18 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
 
 /**
  * Searches for tournament matches based on provided criteria.
- * If matchID is specified (not null), this function validates it and uses it exclusively
- * to search for a specific match. If matchID is null, it searches based on the other criteria.
- * @param {number|string|null} matchID - ID for the match. When provided, other criteria are ignored.
+ * If matchID is specified, the search is performed solely based on matchID.
+ * @param {number|string|null} matchID - ID for the match.
  * @param {number|string|null} tournamentID - ID for the tournament.
- * @param {number|string|null} teamID - ID for a team. This will search for matches where the team is either team1 or team2.
- * @param {string|null} before - The latest date/time (inclusive) to search for matches, formatted as YYYY-MM-DD OR YYYY-MM-DD HH:mm:ss.
- * @param {string|null} after - The earliest date/time (inclusive) to search for matches, formatted as YYYY-MM-DD YYYY-MM-DD HH:mm:ss.
- * @param {string|null} sortBy - Field to sort the results by.
- * @param {string|boolean|null} sortAsDescending - If true, sorts the results by DESCENDING.
- * @returns {Promise<object|object[]|null>} Returns a single match object if matchID is provided, an array of match objects
- *                                          if searching by other criteria, or null if no match is found.
- * @throws {Error} Throws an error with status 400 if matchID is provided and is not a valid integer.
+ * @param {string|null} bracketSide - Bracket side filter.
+ * @param {number|string|null} teamID - ID for a team.
+ * @param {string|null} before - Latest datetime (inclusive) for matches ("YYYY-MM-DD HH:mm:ss").
+ * @param {string|null} after - Earliest datetime (inclusive) for matches ("YYYY-MM-DD HH:mm:ss").
+ * @param {string|null} sortBy - Field to sort by.
+ * @param {string|boolean|null} sortAsDescending - If true, sorts in descending order.
+ * @param {number|string|null} winnerID - Winner ID filter.
+ * @returns {Promise<object|object[]|null>} Returns a match record if matchID is provided, an array of matches if searching by criteria, or null if not found.
+ * @throws {Error} Throws an error if validation fails or the search query fails.
  */
 const searchMatches = async (
     matchID,
@@ -680,11 +760,9 @@ const searchMatches = async (
     winnerID
 ) => {
     try {
-        // If matchID is provided, use it exclusively for the search.
         if (matchID) {
-            // Convert the matchID to a number for validation.
             matchID = validateInteger(matchID, "matchID");
-            match = await TournamentModel.searchMatches(
+            const match = await TournamentModel.searchMatches(
                 matchID,
                 null,
                 null,
@@ -696,7 +774,6 @@ const searchMatches = async (
             );
             return match;
         } else {
-            // TODO: There's probably a better way to check if the param is set to true
             if (
                 sortAsDescending === "true" ||
                 sortAsDescending === "True" ||
@@ -723,13 +800,13 @@ const searchMatches = async (
 };
 
 /**
- * Updates the match result in the database based on matchID
- * @param {number|string} matchID - ID for the match to update.
+ * Updates the match result in the database based on matchID.
+ * @param {number|string} matchID - ID of the match to update.
  * @param {number|string} winnerID - ID for the winning team.
  * @param {number|string} score1 - Score for team one.
  * @param {number|string} score2 - Score for team two.
- * @returns {Promise<object>} Returns a promise that resolves to an object containing the updated match result.
- * @throws {Error} Throws an error with status 400 if any of the IDs or scores are not valid integers.
+ * @returns {Promise<object>} Returns the updated match result.
+ * @throws {Error} Throws an error if any parameter validation fails or the update fails.
  */
 const updateMatchResult = async (matchID, winnerID, score1, score2) => {
     try {
@@ -746,8 +823,8 @@ const updateMatchResult = async (matchID, winnerID, score1, score2) => {
             score1,
             score2
         );
-        match = await searchMatches(matchID);
-        currentRound = searchTournamentParticipants(
+        const match = await searchMatches(matchID);
+        const currentRound = searchTournamentParticipants(
             match.TournamentID,
             match.Team1ID
         )[0].Round;
@@ -784,7 +861,7 @@ const updateMatchResult = async (matchID, winnerID, score1, score2) => {
                 null
             );
         }
-        bracketSide = searchTournamentParticipants(
+        const bracketSide = searchTournamentParticipants(
             match.TournamentID,
             match.Team1ID
         )[0].BracketSide;
