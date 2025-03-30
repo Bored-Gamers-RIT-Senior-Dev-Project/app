@@ -27,13 +27,16 @@ const SQL_SELECTOR = `SELECT
             LEFT JOIN teams AS team ON user.TeamID = team.TeamId
             JOIN roles AS role ON user.RoleId = role.RoleId`;
 
+const validIdentifiers = new Set(["UserID", "FirebaseUID"]);
 /**
  * Validates if an identifier is "UserID" or "FirebaseUID"
  * @param {string} identifier
+ * @returns true if ValidIdentifiers contains the identifier
+ * @throws A 400 "Bad Identifier" error if the identifier isn't found.
  */
 const validateIdentifier = (identifier) => {
-    if (["UserID", "FirebaseUID"].includes(identifier)) {
-        return;
+    if (validIdentifiers.has(identifier)) {
+        return true;
     }
     console.error("Bad Identifier - ", identifier);
     throw createHttpError(400, "Bad Identifier");
