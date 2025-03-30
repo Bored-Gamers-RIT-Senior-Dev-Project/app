@@ -205,7 +205,9 @@ router.post("/addTeam", async (req, res, next) => {
             teams,
         });
     } catch (error) {
-        if (error.message === "Team already exists for this tournament.") {
+        if (
+            error.message === "Team is already registered for this tournament."
+        ) {
             return res.status(409).json({ error: error.message });
         }
         return res.status(500).json({ error: "An unexpected error occurred." });
