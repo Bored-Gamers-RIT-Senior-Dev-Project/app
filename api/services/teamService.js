@@ -64,7 +64,11 @@ const joinTeam = async (uid, teamId) => {
         throw createError(400, "Team is at max capacity."); //Team has 7 or more members.  (This is blocked on the front-end, but might happen if data is outdated)
     }
     await addUserToTeam(uid, teamId, team.universityId);
-    await userModel.grantRole(uid, "Student/Player", "FirebaseUID");
+    await userModel.grantRole(
+        uid,
+        "Student/Player",
+        userModel.UserIds.FIREBASE
+    );
 
     return true;
 };
@@ -89,7 +93,7 @@ const createTeam = async (uid, universityId, teamName) => {
         user.userId
     );
     await addUserToTeam(uid, teamId, universityId);
-    await userModel.grantRole(uid, "Team Captain", "FirebaseUID");
+    await userModel.grantRole(uid, "Team Captain", userModel.UserIds.FIREBASE);
     return teamId;
 };
 
@@ -106,7 +110,7 @@ const addUserToTeam = async (uid, teamId, universityId) => {
             teamId,
             universityId,
         },
-        "FirebaseUID"
+        userModel.UserIds.FIREBASE
     );
 };
 
