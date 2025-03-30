@@ -34,7 +34,6 @@ const validateInteger = (value, fieldName) => {
 
 /**
  * Creates a new tournament in the database with the status of "Upcoming".
- * @param {string} uid - FirebaseUID of the user.
  * @param {string} tournamentName - Name of the tournament.
  * @param {string} startDate - Start date of the tournament in YYYY-MM-DD format.
  * @param {string} endDate - End date of the tournament in YYYY-MM-DD format. If not provided, defaults to startDate.
@@ -43,21 +42,12 @@ const validateInteger = (value, fieldName) => {
  * @throws {Error} Throws an error with status 403 if the user is unauthorized.
  */
 const createTournament = async (
-    uid,
     tournamentName,
     startDate,
     endDate = null,
     location
 ) => {
     try {
-        const user = await userModel.getUserByFirebaseId(uid);
-        if (
-            user.role !== "Super Admin" &&
-            user.role !== "Aardvark Games Employee"
-        ) {
-            throw createHttpError(403);
-        }
-
         // If no end date provided, default the end date to the start date.
         let finalEndDate = endDate === null ? startDate : endDate;
         const tournament = await TournamentModel.createTournament(
@@ -677,25 +667,13 @@ const searchTournamentFacilitators = async (
 /**
  * Starts a tournament by shuffling participants, assigning bracket sides,
  * and scheduling the first round of matches.
- * @param {string} uid - FirebaseUID of the user initiating the tournament start.
  * @param {number|string} tournamentID - ID of the tournament.
  * @returns {Promise<void>}
  * @throws {Error} Throws an error if the user is unauthorized or if the tournament cannot be started.
  */
-const startTournament = async (uid, tournamentID) => {
+const startTournament = async (tournamentID) => {
     try {
         tournamentID = validateInteger(tournamentID, "tournamentID");
-        const user = await userModel.getUserByFirebaseId(uid);
-        if (
-            user.role !== "Super Admin" &&
-            user.role !== "Aardvark Games Employee" &&
-            (user.role !== "Tournament Facilitator" ||
-                searchTournamentFacilitators(tournamentID, user.userID)
-                    .length === 0)
-        ) {
-            throw createHttpError(403);
-        }
-
         const shuffleParticipants =
             await TournamentModel.searchTournamentParticipants(
                 tournamentID,

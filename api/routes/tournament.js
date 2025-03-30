@@ -7,7 +7,6 @@ const TournamentService = require("../services/tournamentService");
  * Create a new tournament.
  */
 router.post("/create", async (req, res, next) => {
-    const uid = req.user?.uid;
     const { tournamentName, startDate, endDate, location } = req.body;
     if (!tournamentName || !startDate || !location) {
         return res
@@ -16,7 +15,6 @@ router.post("/create", async (req, res, next) => {
     }
     try {
         const tournament = await TournamentService.createTournament(
-            uid,
             tournamentName,
             startDate,
             endDate,
@@ -27,7 +25,7 @@ router.post("/create", async (req, res, next) => {
             tournament,
         });
     } catch (error) {
-        next(new Error("Unable to create tournament."));
+        next(error);
     }
 });
 
