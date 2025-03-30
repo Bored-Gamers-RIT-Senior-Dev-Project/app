@@ -12,6 +12,7 @@ const cors = require("cors");
 const index = require("./routes");
 const users = require("./routes/users");
 const university = require("./routes/university");
+const tournament = require("./routes/tournament");
 const createError = require("http-errors");
 
 //Initialize Express
