@@ -153,8 +153,30 @@ const getTournamentBracket = async (tournamentID) => {
         const participants = await searchTournamentParticipants(tournamentID);
         const numTeams = participants.length;
 
-        if (numTeams === 0) {
-            throw new Error("No teams found in the tournament");
+        if (numTeams < 2) {
+            bracket.push({
+                title: "Round 1",
+                seeds: [
+                    {
+                        MatchID: "TBD-ONLY-0",
+                        TournamentID: tournamentID,
+                        MatchTime: null,
+                        Team1ID: null,
+                        Team1Name: "TBD",
+                        Score1: null,
+                        Team2ID: null,
+                        Team2Name: "TBD",
+                        WinnerID: null,
+                        Score2: null,
+                        BracketSide: "final",
+                        BracketOrder: 0,
+                        MatchRound: 1,
+                    },
+                ],
+            });
+
+            const tournament = await searchTournaments(tournamentID);
+            return [tournament, bracket];
         }
 
         const rounds = Math.ceil(Math.log2(numTeams));
