@@ -549,13 +549,35 @@ const updateTournamentDetails = async (
 };
 
 const deleteTournament = async (tournamentID) => {
+    const conn = await db.getConnection(); // assuming you're using a pool
     try {
-        await db.query(`DELETE FROM tournaments WHERE TournamentID = ?`, [
+        await conn.beginTransaction();
+
+        // Delete dependent rows in other tables
+        await conn.query(
+            `DELETE FROM tournament_participants WHERE TournamentID = ?`,
+            [tournamentID]
+        );
+        await conn.query(`DELETE FROM matches WHERE TournamentID = ?`, [
             tournamentID,
         ]);
+        await conn.query(
+            `DELETE FROM tournament_facilitators WHERE TournamentID = ?`,
+            [tournamentID]
+        );
+
+        // Delete the tournament
+        await conn.query(`DELETE FROM tournaments WHERE TournamentID = ?`, [
+            tournamentID,
+        ]);
+
+        await conn.commit();
     } catch (error) {
+        await conn.rollback();
         console.error("Error deleting tournament:", error);
         throw error;
+    } finally {
+        conn.release();
     }
 };
 
