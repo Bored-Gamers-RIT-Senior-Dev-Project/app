@@ -3,6 +3,31 @@ const db = require("../config/db");
 const { makeObjectCamelCase } = require("../utils");
 
 /**
+ * Defines the default "select" format that should be used for database queries retrieving users.
+ */
+const SQL_SELECTOR = `SELECT
+            user.UserID AS userId,
+            user.FirstName AS firstName,
+            user.LastName AS lastName,
+            user.Username AS username,
+            user.Email AS email,
+            user.ProfileImageURL AS profileImageUrl,
+            user.Bio AS bio,
+            user.CreatedAt AS createdAt,
+            user.Paid AS paid,
+            user.TeamID AS teamId,
+            team.TeamName AS teamName,
+            user.RoleID AS roleId,
+            role.RoleName AS roleName,
+            user.UniversityID AS universityID,
+            uni.UniversityName AS universityName,
+            user.IsValidated AS isValidated
+        FROM users AS user
+            LEFT JOIN universities AS uni ON user.UniversityID = uni.UniversityId
+            LEFT JOIN teams AS team ON user.TeamID = team.TeamId
+            JOIN roles AS role ON user.RoleId = role.RoleId`;
+
+/**
  * Creates a user in the database.
  * @param {string} firebaseUID The firebase UID of the user.  Should be validated from a token.
  * @param {string} email The email of the user.
@@ -51,23 +76,31 @@ const createUser = async (
 };
 
 /**
+ * Gets a list of all users in the database
+ * @returns {Promise<Array<Object>>} User list
+ */
+const getUserList = async () => {
+    try {
+        const [rows] = await db.query(SQL_SELECTOR);
+        return rows;
+    } catch (e) {
+        console.error("Error getting user list: ", e.message);
+        throw e;
+    }
+};
+
+/**
  * Retrieve a user from the database, using the column and value specified.
- * @param {*} column The column to use to match with value.  (TO PREVENT SQL INJECTION, SHOULD ALWAYS BE USED HARD-CODED)
- * @param {*} value The value of {column} to search for.
+ * @param {string} column The column to use to match with value.  (TO PREVENT SQL INJECTION, SHOULD ALWAYS BE USED HARD-CODED)
+ * @param {string|number} value The value of {column} to search for.
  * @returns A matching user, or null if no user is found.
  */
 const getUser = async (column, value) => {
     try {
         const [rows] = await db.query(
-            `
-        SELECT user.*, uni.UniversityName, team.TeamName
-            FROM users AS user
-            LEFT JOIN universities AS uni ON user.UniversityID = uni.UniversityId
-            LEFT JOIN teams AS team ON user.TeamID = team.TeamId
-            JOIN roles AS role ON user.RoleId = role.RoleId
-            WHERE ${column} = ?;
+            `${SQL_SELECTOR} WHERE ?? = ?;
         `,
-            [value]
+            [column, value]
         );
         if (rows.length === 0) {
             return null;
@@ -95,50 +128,64 @@ const getUserByUserId = async (userId) => getUser("user.userID", userId);
  */
 const getUserByFirebaseId = async (uid) => getUser("user.firebaseUID", uid);
 
-const VALID_KEYS = [
-    "USERID",
-    "FIRSTNAME",
-    "LASTNAME",
-    "USERNAME",
-    "EMAIL",
-    "FIREBASEUID",
-    "PROFILEIMAGEURL",
-    "BIO",
-    "CREATEDAT",
-    "PAID",
-    "TEAMID",
-    "ROLEID",
-    "UNIVERSITYID",
-    "ISVALIDATED",
-    "UNIVERSITYNAME",
-    "TEAMNAME",
-];
-const updateUser = async (firebaseUid, body) => {
+const VALID_KEYS = {
+    USERID: "UserID",
+    FIRSTNAME: "FirstName",
+    LASTNAME: "LastName",
+    USERNAME: "Username",
+    EMAIL: "Email",
+    FIREBASEUID: "FirebaseUID",
+    ProfileImageURL: "ProfileImageURL",
+    BIO: "Bio",
+    CreatedAt: "CreatedAt",
+    PAID: "Paid",
+    TEAMID: "TeamId",
+    ROLEID: "RoleId",
+    UNIVERSITYID: "UniversityID",
+    ISVALIDATED: "IsValidated",
+    // "UniversityName",
+    // "TeamName",
+};
+const updateUser = async (userId, body) => {
     if (body.username) body.username = await generateUsername(body.username);
     const updates = [];
-    for (const key of Object.keys(body)) {
-        if (VALID_KEYS.includes(key.toUpperCase())) {
-            updates.push(`${key} = ?`);
+    let wildCards = [];
+    Object.entries(body).forEach(([key, value]) => {
+        if (key.toLowerCase() == "password") {
+            return;
+        }
+        const column = VALID_KEYS?.[key.toUpperCase()];
+        if (column) {
+            updates.push(`?? = ?`);
+            wildCards = wildCards.concat([column, value]);
         } else {
-            console.error("Error fulfilling update request:", body);
-            console.error("Invalid key:", key);
+            console.error(
+                "Error fulfilling update request:",
+                body,
+                "Invalid key:",
+                key
+            );
             throw createHttpError(400, "Invalid attempt to update user.");
         }
-    }
-    const keys = Object.keys(body)
-        .map((key) => `${key} = ?`)
-        .join(", ");
+    });
+    if (updates.length == 0) return;
+
+    const keys = updates.join(", ");
 
     const [rows] = await db.query(
-        `UPDATE users SET ${keys} WHERE FirebaseUID = ?`,
-        [...Object.values(body), firebaseUid]
+        `
+        UPDATE users 
+        SET ${keys} 
+        WHERE UserID = ?
+        `,
+        [...wildCards, userId]
     );
 
     if (rows.affectedRows === 0) {
-        throw new Error("User not updated.");
+        throw new Error("User not updated. No rows affected.");
     }
 
-    return await getUserByFirebaseId(firebaseUid);
+    return await getUserByUserId(userId);
 };
 
 /**
@@ -149,7 +196,13 @@ const updateUser = async (firebaseUid, body) => {
  */
 const deleteUser = async (userId) => {
     //Get the user record from the db.
-    const user = await getUserByUserId(userId);
+    const [userRows] = await db.query(
+        "SELECT FirebaseUID as firebaseID FROM users WHERE UserID = ?",
+        [userId]
+    );
+
+    const user = userRows[0];
+
     if (!user) {
         throw createHttpError(404);
     }
@@ -229,13 +282,42 @@ const checkUsername = async (username, strict = false) => {
     return await generateUsername(username, sharedUsernames);
 };
 
-const getPermissions = async (roleId) => {};
+/**
+ *
+ * @param {string|number} userId A unique identifier for the user: either their Firebase UID or UserId (both are checked)
+ * @param {string} roleName The name of the role to check.
+ * @returns {Promise<boolean>} true if the user has the specified role. Otherwise false.
+ */
+const userHasRole = async (userId, roleName) => {
+    try {
+        const [rows] = await db.query(
+            `
+            SELECT 1
+            FROM users user
+            LEFT JOIN roles role ON user.RoleId = role.RoleId
+            WHERE
+                LOWER(role.RoleName) = LOWER(?)
+                AND (user.UserId = ? OR user.FirebaseUid = ?);
+            `,
+            [roleName, userId, userId]
+        );
+        if (rows.length == 0) {
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.error("Error checking role:", error.message);
+        throw error;
+    }
+};
 
 module.exports = {
     createUser,
+    getUserList,
     getUserByUserId,
     getUserByFirebaseId,
     updateUser,
     deleteUser,
     checkUsername,
+    userHasRole,
 };
