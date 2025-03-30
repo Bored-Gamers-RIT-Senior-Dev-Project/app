@@ -140,13 +140,11 @@ const getUserByUserId = async (userId) => getUser("user.UserID", userId);
  */
 const getUserByFirebaseId = async (uid) => getUser("user.FirebaseUID", uid);
 
-const VALID_KEYS = {
-    USERID: "UserID",
+const VALID_KEYS = Object.freeze({
     FIRSTNAME: "FirstName",
     LASTNAME: "LastName",
     USERNAME: "Username",
     EMAIL: "Email",
-    FIREBASEUID: "FirebaseUID",
     ProfileImageURL: "ProfileImageURL",
     BIO: "Bio",
     CreatedAt: "CreatedAt",
@@ -155,9 +153,7 @@ const VALID_KEYS = {
     ROLEID: "RoleId",
     UNIVERSITYID: "UniversityID",
     ISVALIDATED: "IsValidated",
-    // "UniversityName",
-    // "TeamName",
-};
+});
 /**
  * Updates user entry
  * @param {number|string} userId  Id of the user to update
@@ -280,9 +276,9 @@ const generateUsername = async (username, sharedUsernames = null) => {
             console.error(
                 `Error reserving username ${username}.  An unreasonable number of usernames were found with that prefix.`
             );
-        throw new Error(
-            "Error reserving a username based on the information provided."
-        );
+            throw new Error(
+                "Error reserving a username based on the information provided."
+            );
         }
     }
     return `${username}-${i}`;
