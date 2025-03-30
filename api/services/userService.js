@@ -120,6 +120,8 @@ const createUser = async (
     //Create user record in Firebase Authentication and get UID
     const createdUser = await Firebase.createUser(email, password);
 
+    username = await User.checkUsername(username);
+
     //Create user record in local database using UID from Firebase Authentication
     const userRecord = await User.createUser(
         createdUser.uid,
