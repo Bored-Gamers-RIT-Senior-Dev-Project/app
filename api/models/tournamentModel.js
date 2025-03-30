@@ -551,6 +551,17 @@ const updateTournamentDetails = async (
     }
 };
 
+const deleteTournament = async (tournamentID) => {
+    try {
+        await db.query(`DELETE FROM tournaments WHERE TournamentID = ?`, [
+            tournamentID,
+        ]);
+    } catch (error) {
+        console.error("Error deleting tournament:", error);
+        throw error;
+    }
+};
+
 /**
  * Creates a match record for the tournament in the database.
  * @param {number} tournamentID - The tournament ID.
@@ -717,6 +728,7 @@ module.exports = {
     createTournament,
     searchTournaments,
     updateTournamentDetails,
+    deleteTournament,
     addTournamentParticipant,
     removeTournamentParticipant,
     updateTournamentParticipant,

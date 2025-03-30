@@ -173,7 +173,18 @@ router.put("/cancel", async (req, res, next) => {
  * Delete a tournament.
  */
 router.delete("/delete", async (req, res, next) => {
-    // TODO: Implement tournament deletion logic.
+    const { tournamentID } = req.body;
+    if (!tournamentID) {
+        return res.status(400).json({ message: "Invalid request format." });
+    }
+    try {
+        await TournamentService.deleteTournament(tournamentID);
+        return res.status(200).json({
+            message: "Tournament deleted successfully.",
+        });
+    } catch (error) {
+        next(error);
+    }
 });
 
 /**

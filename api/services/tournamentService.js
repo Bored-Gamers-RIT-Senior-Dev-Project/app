@@ -250,6 +250,22 @@ const updateTournamentDetails = async (
 };
 
 /**
+ * Delete a tournament.
+ * @param {number|string|null} tournamentID - ID of the tournament to delete.
+ * @returns {Promise<void>}
+ * @throws {Error} Throws an error if tournament deletion fails.
+ */
+const deleteTournament = async (tournamentID = null) => {
+    try {
+        const tournamentIDnum = Number(tournamentID);
+        validateInteger(tournamentIDnum, "tournamentID");
+        await TournamentModel.deleteTournament(tournamentID);
+    } catch (error) {
+        throw error;
+    }
+};
+
+/**
  * Adds a participant to a tournament.
  * @param {number|string} tournamentID - ID of the tournament.
  * @param {number|string} teamID - ID of the team.
@@ -894,6 +910,7 @@ module.exports = {
     createTournament,
     searchTournaments,
     updateTournamentDetails,
+    deleteTournament,
     addTournamentParticipant,
     removeTournamentParticipant,
     searchTournamentParticipants,
