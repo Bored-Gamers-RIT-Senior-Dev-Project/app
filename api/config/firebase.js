@@ -17,6 +17,26 @@ admin.initializeApp({
     }),
 });
 
+/**
+ * Create a new user in Google Firebase
+ * @param {string} email New User's email address
+ * @param {*} password New user's password
+ * @returns {UserRecord} Google Firebase user record
+ * @throws {Error} If anything goes wrong in the creation of the user.
+ */
+const createUser = async (email, password) => {
+    try {
+        const firebaseUser = await admin.auth().createUser({
+            email,
+            password,
+        });
+        return firebaseUser;
+    } catch (e) {
+        console.error("Error creating user in Firebase: ", e.message);
+        throw e;
+    }
+};
+
 const verifyUser = async (idToken) => {
     try {
         return await admin.auth().verifyIdToken(idToken);
@@ -35,4 +55,50 @@ const deleteUser = async (uid) => {
     }
 };
 
-module.exports = { deleteUser, verifyUser };
+const updatePassword = async (uid, password) => {
+    try {
+        return await admin.auth().updateUser(uid, { password });
+    } catch (error) {
+        console.error("Error changing Firebase password:", error.message);
+        throw error;
+    }
+};
+
+/**
+ * Authentication function retrieves the user's token from the authentication header and verifies it with Firebase.
+ * @param {*} req The Express Request Object
+ * @param {*} res The Express Response Object
+ * @param {*} next The Express next() function to pass the request to the next function in the chain.
+ * @returns next() [on authentication failed] or res.status(401).send() [If authentication failed]
+ */
+const authenticationMiddleware = async (req, res, next) => {
+    //Retrieve authorization header from the request headers.
+    const { authorization } = req.headers;
+
+    //If the request included an authorization header, grab the firebase information and verify it.
+    if (authorization) {
+        try {
+            //Grab the token (sent in format "Bearer <token>") and verify it with Firebase.
+            const token = authorization.split(" ")[1];
+            const user = await verifyUser(token);
+
+            //Add the user to the request object so that it can be accessed in our endpoint functions.
+            req.user = user;
+        } catch (error) {
+            //If there's an error validating, log it and return an unauthorized warning
+            console.error("Request failed token validation: ", error);
+            return res.status(401).send();
+        }
+    }
+
+    //Pass the request to the next function in the chain.
+    return next();
+};
+
+module.exports = {
+    authenticationMiddleware,
+    createUser,
+    updatePassword,
+    deleteUser,
+    verifyUser,
+};
