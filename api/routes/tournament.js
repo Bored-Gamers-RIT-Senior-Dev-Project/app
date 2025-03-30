@@ -134,8 +134,9 @@ router.get("/getBracket", async (req, res, next) => {
         return res.status(400).json({ message: "Invalid request." });
     }
     try {
-        const bracket = TournamentService.getTournamentBracket(tournamentID);
-        return res.status(200).json(bracket);
+        const [tournament, bracket] =
+            await TournamentService.getTournamentBracket(tournamentID);
+        return res.status(200).json({ tournament, bracket });
     } catch (error) {
         next(error);
     }
