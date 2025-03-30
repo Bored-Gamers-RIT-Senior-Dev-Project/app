@@ -3,14 +3,15 @@
 "use strict";
 
 //Require Middleware
+const { authenticationMiddleware } = require("./config/firebase");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const cors = require("cors");
 
 // Require Routes
+const index = require("./routes");
 const users = require("./routes/users");
-const tournament = require("./routes/tournament");
-const test = require("./routes/test");
+const university = require("./routes/university");
 const createError = require("http-errors");
 
 //Initialize Express
@@ -23,11 +24,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cors()); // Enable CORS
+app.use(authenticationMiddleware);
 
 // Routes
+app.use("/api", index);
 app.use("/api/users", users);
-app.use("/api/tournament", tournament);
-app.use("/api", test);
+app.use("/api/university", university);
 
 //404 any routes not defined above
 app.use((_req, _res, next) => {
@@ -37,17 +39,17 @@ app.use((_req, _res, next) => {
 // Error Handler
 app.use((err, req, res, _next) => {
     //Only provide error in development
-    const error = req.app.get("env") === "development" ? err : null;
+    const error = req.app.get("env") === "development" ? err : {};
 
     // set locals, only providing error in development
 
     res.locals.message = err.message;
-    res.locals.error = error || {};
+    res.locals.error = error;
 
     // Send an error message
     res.status(err.status || 500).json({
-        message: err.message, // https://stackoverzflow.com/a/32836884
-        error: error,
+        message: err.message, // https://stackoverflow.com/a/32836884
+        error,
     });
 });
 
