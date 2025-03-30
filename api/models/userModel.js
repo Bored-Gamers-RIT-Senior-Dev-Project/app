@@ -27,20 +27,17 @@ const SQL_SELECTOR = `SELECT
             LEFT JOIN teams AS team ON user.TeamID = team.TeamId
             JOIN roles AS role ON user.RoleId = role.RoleId`;
 
-const validIdentifiers = new Set(["UserID", "FirebaseUID"]);
 /**
- * Validates if an identifier is "UserID" or "FirebaseUID"
- * @param {string} identifier
- * @returns true if ValidIdentifiers contains the identifier
- * @throws A 400 "Bad Identifier" error if the identifier isn't found.
+ *@typedef {"FirebaseUID"|"UserID"} UserIdentifier
  */
-const validateIdentifier = (identifier) => {
-    if (validIdentifiers.has(identifier)) {
-        return true;
-    }
-    console.error("Bad Identifier - ", identifier);
-    throw createHttpError(400, "Bad Identifier");
-};
+/**
+ * @readonly
+ * @enum {UserIdentifier}
+ */
+const UserIds = Object.freeze({
+    FIREBASE: "FirebaseUID",
+    LOCAL: "UserID",
+});
 
 /**
  * Creates a user in the database.
@@ -165,11 +162,10 @@ const VALID_KEYS = {
  * Updates user entry
  * @param {number|string} userId  Id of the user to update
  * @param {object} body
- * @param {"UserID"|"FirebaseUID"|undefined} identifier Determines if DB should check
+ * @param {UserIdentifier|undefined} identifier Determines if DB should check
  * @returns
  */
-const updateUser = async (userId, body, identifier = "UserID") => {
-    validateIdentifier(identifier);
+const updateUser = async (userId, body, identifier = UserIds.LOCAL) => {
     if (body.username) body.username = await generateUsername(body.username);
     const updates = [];
     let wildCards = [];
@@ -199,9 +195,9 @@ const updateUser = async (userId, body, identifier = "UserID") => {
         `
         UPDATE users 
         SET ${keys} 
-        WHERE ${identifier} = ?
+        WHERE ?? = ?
         `,
-        [...wildCards, userId]
+        [...wildCards, identifier, userId]
     );
 
     if (rows.affectedRows === 0) {
@@ -311,11 +307,10 @@ const checkUsername = async (username, strict = false) => {
  *
  * @param {string|number} userId A unique identifier for the user
  * @param {string} roleName The name of the role to check.
- * @param {"UserID"|"FirebaseUID"|undefined} identifier what column is used to identify the user
+ * @param {UserIdentifier|undefined} identifier what column is used to identify the user
  * @returns {Promise<boolean>} true if the user has the specified role. Otherwise false.
  */
-const userHasRole = async (userId, roleName, identifier = "FirebaseUID") => {
-    validateIdentifier(identifier);
+const userHasRole = async (userId, roleName, identifier = UserIds.FIREBASE) => {
     try {
         const [rows] = await db.query(
             `
@@ -324,9 +319,9 @@ const userHasRole = async (userId, roleName, identifier = "FirebaseUID") => {
             LEFT JOIN roles role ON user.RoleId = role.RoleId
             WHERE
                 LOWER(role.RoleName) = LOWER(?)
-                AND user.${identifier} = ?;
+                AND ?? = ?;
             `,
-            [roleName, userId]
+            [roleName, `user.${identifier}`, userId]
         );
         if (rows.length == 0) {
             return false;
@@ -342,12 +337,10 @@ const userHasRole = async (userId, roleName, identifier = "FirebaseUID") => {
  *
  * @param {number|string} userId User's ID: Either numeric Primary Key from the Local Database or UID from Firebase.
  * @param {string} roleName The Name of the role to grant.
- * @param {"UserID"|"FirebaseUID"} identifier The ID to check
+ * @param {UserIdentifier} identifier The ID to check
  * @returns {Promise<boolean>} Resolves to true if the role is successfully granted.
  */
-const grantRole = async (userId, roleName, identifier = "UserID") => {
-    validateIdentifier(identifier);
-
+const grantRole = async (userId, roleName, identifier = UserIds.LOCAL) => {
     // Check if the roleName exists in the Roles table
     const [roleRows] = await db.query(
         `SELECT RoleID FROM roles WHERE RoleName = ?`,
@@ -362,12 +355,13 @@ const grantRole = async (userId, roleName, identifier = "UserID") => {
     // Proceed with updating the user's role
     const sql = `UPDATE users
         SET RoleID = ?
-        WHERE ${identifier} = ?;`;
-    await db.query(sql, [roleRows[0].RoleID, userId]);
+        WHERE ?? = ?;`;
+    await db.query(sql, [roleRows[0].RoleID, identifier, userId]);
     return true;
 };
 
 module.exports = {
+    UserIds,
     createUser,
     getUserList,
     getUserByUserId,
