@@ -255,7 +255,7 @@ const getSharedUsernames = async (username) => {
             [username + "%"]
         );
         //Return those rows.
-        return rows.map((row) => row.Username);
+        return rows.map((row) => row.Username.toLowerCase());
     } catch (error) {
         console.error("Error checking username:", error.message);
         throw error;
@@ -272,7 +272,7 @@ const generateUsername = async (username, sharedUsernames = null) => {
     if (!sharedUsernames) sharedUsernames = await getSharedUsernames(username);
 
     // If the username is not taken, return it
-    if (!sharedUsernames.includes(username)) {
+    if (!sharedUsernames.includes(username.toLowerCase())) {
         return username;
     }
 
@@ -280,13 +280,14 @@ const generateUsername = async (username, sharedUsernames = null) => {
     let i = 1;
     while (sharedUsernames.includes(`${username}-${i}`)) {
         i++;
-        if (i > 100)
+        if (i > 100) {
             console.error(
                 `Error reserving username ${username}.  An unreasonable number of usernames were found with that prefix.`
             );
         throw new Error(
             "Error reserving a username based on the information provided."
         );
+        }
     }
     return `${username}-${i}`;
 };
