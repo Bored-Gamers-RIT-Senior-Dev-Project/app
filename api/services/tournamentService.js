@@ -380,10 +380,37 @@ const getTournamentBracket = async (tournamentID) => {
             previousLeftCount = currentLeftCount;
             previousRightCount = currentRightCount;
 
-            previousLeftWinners = leftMatches.filter((m) => m.WinnerID != null);
-            previousRightWinners = rightMatches.filter(
-                (m) => m.WinnerID != null
+            const isBye = (match) =>
+                match.Team1ID !== null &&
+                match.Team1ID === match.Team2ID &&
+                match.WinnerID === match.Team1ID;
+
+            previousLeftWinners = leftMatches.filter(
+                (m) => m.WinnerID != null || isBye(m)
             );
+            previousRightWinners = rightMatches.filter(
+                (m) => m.WinnerID != null || isBye(m)
+            );
+
+            const formatByeMatches = (matches) => {
+                return matches.map((match) => {
+                    if (
+                        match.Team1ID !== null &&
+                        match.Team1ID === match.Team2ID &&
+                        match.WinnerID === match.Team1ID
+                    ) {
+                        return {
+                            ...match,
+                            Team2ID: null,
+                            Team2Name: "BYE",
+                        };
+                    }
+                    return match;
+                });
+            };
+
+            leftMatches = formatByeMatches(leftMatches);
+            rightMatches = formatByeMatches(rightMatches);
 
             bracket.push({
                 title: `Round ${i}`,
@@ -494,7 +521,7 @@ const removeTournamentParticipant = async (tournamentID, teamID) => {
                 teamID
             );
         if (!existingParticipant || existingParticipant.length === 0) {
-            throw new Error("Participant not found in this tournament.");
+            throw new Error("Team not found in this tournament.");
         }
         await TournamentModel.removeTournamentParticipant(tournamentID, teamID);
     } catch (error) {
@@ -696,6 +723,8 @@ const searchTournamentFacilitators = async (
 const startTournament = async (tournamentID) => {
     try {
         tournamentID = validateInteger(tournamentID, "tournamentID");
+        console.log("Starting tournament: ", tournamentID);
+        console.log("Shuffling teams... ");
         const shuffleParticipants =
             await TournamentModel.searchTournamentParticipants(
                 tournamentID,
@@ -715,19 +744,16 @@ const startTournament = async (tournamentID) => {
             );
         const rounds = Math.ceil(Math.log2(shuffleParticipants.length));
         const numParticipants = shuffleParticipants.length;
-        console.log(
-            "Number of participants in this tournament: ",
-            shuffleParticipants.length
-        );
+        console.log("Number of participants: ", shuffleParticipants.length);
         console.log("Number of rounds: ", rounds);
-        console.log("Determining left vs right side...");
+        console.log("Determining left vs right side for teams...");
         let leftSide, rightSide;
         if (numParticipants % 4 == 0) {
-            console.log("Remainder 0");
+            console.log("Divisible by 4");
             leftSide = shuffleParticipants.slice(0, numParticipants / 2);
             rightSide = shuffleParticipants.slice(numParticipants / 2);
         } else if (numParticipants % 4 == 1) {
-            console.log("Remainder 1");
+            console.log("Divisible by 4, remainder 1");
             leftSide = shuffleParticipants.slice(
                 0,
                 Math.ceil(numParticipants / 2)
@@ -736,11 +762,11 @@ const startTournament = async (tournamentID) => {
                 Math.ceil(numParticipants / 2)
             );
         } else if (numParticipants % 4 == 2) {
-            console.log("Remainder 2");
+            console.log("Divisible by 4, remainder 2");
             leftSide = shuffleParticipants.slice(0, numParticipants / 2 + 1);
             rightSide = shuffleParticipants.slice(numParticipants / 2 + 1);
         } else {
-            console.log("Remainder 3");
+            console.log("Divisible by 4, remainder 3");
             leftSide = shuffleParticipants.slice(
                 0,
                 Math.ceil(numParticipants / 2) + 1
@@ -749,6 +775,8 @@ const startTournament = async (tournamentID) => {
                 Math.floor(numParticipants / 2)
             );
         }
+        console.log("Number of left side teams: ", leftSide.length);
+        console.log("Number of right side teams: ", rightSide.length);
         if (rightSide.length + leftSide.length != numParticipants) {
             throw new Error("Mathing error.");
         }
@@ -781,8 +809,53 @@ const startTournament = async (tournamentID) => {
             );
             bracketOrder++;
         });
-        nextRound(tournamentID, "left", 1);
-        nextRound(tournamentID, "right", 1);
+        const participants = await searchTournamentParticipants(
+            tournamentID,
+            null,
+            null,
+            null,
+            null,
+            1,
+            null,
+            "active",
+            "left",
+            null,
+            null,
+            null,
+            null,
+            "BracketOrder"
+        );
+
+        console.log(
+            "The left side of the tournament has",
+            participants.length,
+            "teams"
+        );
+
+        const participantsright = await searchTournamentParticipants(
+            tournamentID,
+            null,
+            null,
+            null,
+            null,
+            1,
+            null,
+            "active",
+            "right",
+            null,
+            null,
+            null,
+            null,
+            "BracketOrder"
+        );
+
+        console.log(
+            "The right side of the tournament has",
+            participantsright.length,
+            "teams"
+        );
+        //nextRound(tournamentID, "left", 1);
+        //nextRound(tournamentID, "right", 1);
     } catch (error) {
         throw error;
     }
@@ -798,6 +871,13 @@ const startTournament = async (tournamentID) => {
  */
 const nextRound = async (tournamentID, bracketSide, round) => {
     try {
+        console.log(
+            "Proceeding with round: ",
+            round,
+            " on the ",
+            bracketSide,
+            " of the tournament."
+        );
         const participants = await searchTournamentParticipants(
             tournamentID,
             null,
@@ -811,20 +891,44 @@ const nextRound = async (tournamentID, bracketSide, round) => {
             null,
             null,
             null,
-            true,
+            null,
             "BracketOrder"
         );
+
         let numParticipants = participants.length;
+        console.log(
+            "This tournament has",
+            numParticipants,
+            "teams active on the",
+            bracketSide,
+            "side in round",
+            round
+        );
         if (numParticipants === 1) {
-            console.log(
-                "This is the winner of the ",
-                bracketSide,
-                " of the tournament."
+            const team = participants[0];
+            const now = new Date();
+            await createMatch(
+                tournamentID,
+                team.TeamID,
+                team.TeamID,
+                Date(now.getTime() + 15 * 60 * 1000)
             );
+            await updateTournamentParticipant(
+                tournamentID,
+                team.TeamID,
+                team.Round + 1,
+                team.Byes + 1,
+                "active",
+                team.BracketSide,
+                null,
+                0
+            );
+            return;
         } else if (numParticipants % 2 === 0) {
             for (let i = 0; i < numParticipants; i += 2) {
                 const team1 = participants[i];
                 const team2 = participants[i + 1];
+                const now = new Date();
                 createMatch(
                     tournamentID,
                     team1.TeamID,
@@ -855,7 +959,10 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                 tournamentID,
                 byeTeam.TeamID,
                 byeTeam.TeamRound + 1,
-                byeTeam.TeamByeCount + 1
+                byeTeam.TeamByeCount + 1,
+                null,
+                null,
+                0
             );
             const updatedParticipants = await searchTournamentParticipants(
                 tournamentID,
@@ -878,6 +985,7 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                 for (let i = 0; i < numParticipants; i += 2) {
                     const team1 = updatedParticipants[i];
                     const team2 = updatedParticipants[i + 1];
+                    const now = new Date();
                     createMatch(
                         tournamentID,
                         team1.TeamID,
@@ -953,16 +1061,7 @@ const searchMatches = async (
     try {
         if (matchID) {
             matchID = validateInteger(matchID, "matchID");
-            const match = await TournamentModel.searchMatches(
-                matchID,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
-            );
+            const match = await TournamentModel.searchMatches(matchID);
             return match;
         } else {
             if (

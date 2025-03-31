@@ -215,28 +215,33 @@ router.post("/addTeam", async (req, res, next) => {
 });
 
 /**
- * POST /removeTeam
+ * DELETE /removeTeam
  * Remove a team from a tournament.
  */
-router.post("/removeTeam", async (req, res) => {
+router.delete("/removeTeam", async (req, res, next) => {
     const { tournamentID, teamID } = req.body;
     if (!tournamentID || !teamID) {
         return res.status(400).json({ message: "Invalid request format." });
     }
     try {
-        const teams = await TournamentService.removeTournamentParticipant(
+        console.log(
+            "In router. team to delete is ",
+            teamID,
+            " from tournament ",
+            tournamentID
+        );
+        await TournamentService.removeTournamentParticipant(
             tournamentID,
             teamID
         );
         return res.status(201).json({
             message: "Team removed from tournament successfully",
-            teams,
         });
     } catch (error) {
         if (error.message === "Team not found in this tournament.") {
             return res.status(200).json({ error: error.message });
         }
-        return res.status(500).json({ error: "An unexpected error occurred." });
+        next(error);
     }
 });
 
@@ -410,6 +415,7 @@ router.get("/searchMatches", async (req, res, next) => {
     const {
         matchID,
         tournamentID,
+        bracketSide,
         teamID,
         before,
         after,
@@ -420,6 +426,7 @@ router.get("/searchMatches", async (req, res, next) => {
         const matches = await TournamentService.searchMatches(
             matchID,
             tournamentID,
+            bracketSide,
             teamID,
             before,
             after,

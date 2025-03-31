@@ -174,6 +174,12 @@ const addTournamentParticipant = async (tournamentID, teamID) => {
  */
 const removeTournamentParticipant = async (tournamentID, teamID) => {
     try {
+        console.log(
+            "Deleting team ",
+            teamID,
+            " from tournament ",
+            tournamentID
+        );
         await db.query(
             `DELETE FROM tournament_participants WHERE TournamentID = ? AND TeamID = ?`,
             [tournamentID, teamID]
@@ -235,11 +241,11 @@ const updateTournamentParticipant = async (
             updates.push("BracketSide = ?");
             params.push(bracketSide);
         }
-        if (nextMatchID) {
-            updates.push("NextMatchID = ?");
-            params.push(nextMatchID);
-        } else if (nextMatchID == 0) {
+        if (nextMatchID == 0) {
             updates.push("NextMatchID = NULL");
+            params.push(nextMatchID);
+        } else if (nextMatchID) {
+            updates.push("NextMatchID = ?");
         }
         if (bracketOrder) {
             updates.push("BracketOrder = ?");
@@ -691,7 +697,7 @@ const searchMatches = async (
             `;
 
             const params = [];
-
+            console.log("tournamentID is set to: ", tournamentID);
             if (tournamentID) {
                 search += " AND sub.TournamentID = ?";
                 params.push(tournamentID);
@@ -708,6 +714,7 @@ const searchMatches = async (
                 search += " AND sub.MatchTime >= ?";
                 params.push(after);
             }
+            console.log("bracketSide is set to: ", bracketSide);
             if (bracketSide) {
                 search += " AND sub.BracketSide = ?";
                 params.push(bracketSide);
@@ -722,7 +729,8 @@ const searchMatches = async (
                     search += " DESC";
                 }
             }
-
+            console.log("Match Search Query: ", search);
+            console.log("Search params: ", params);
             const [rows] = await db.query(search, params);
             return rows.length === 0 ? null : rows;
         }
