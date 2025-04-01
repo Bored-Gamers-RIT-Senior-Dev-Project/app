@@ -210,42 +210,30 @@ const updateTournamentParticipant = async (
     try {
         let updates = [];
         let params = [];
-        console.log("========== DEBUG ===========");
-        console.log("Updating", teamID, "team");
 
         if (round) {
-            console.log("to round", round);
             updates.push("Round = ?");
             params.push(round);
         }
         if (byes === 0 || byes) {
-            console.log("with", byes, "BYEs");
             updates.push("Byes = ?");
             params.push(byes);
         }
         if (status) {
-            console.log("a status of", status);
             updates.push("Status = ?");
             params.push(status);
         }
         if (bracketSide) {
-            console.log("placing them on the", bracketSide, "side");
             updates.push("BracketSide = ?");
             params.push(bracketSide);
         }
         if (nextMatchID == 0) {
-            console.log("with the next match being NULL");
             updates.push("NextMatchID = NULL");
         } else if (nextMatchID) {
-            console.log("with the next match being", nextMatchID);
             updates.push("NextMatchID = ?");
+            params.push(nextMatchID);
         }
         if (bracketOrder) {
-            console.log(
-                "and placing them in the",
-                bracketOrder,
-                "slot of the order"
-            );
             updates.push("BracketOrder = ?");
             params.push(bracketOrder);
         }
@@ -253,7 +241,6 @@ const updateTournamentParticipant = async (
         if (updates.length === 0) {
             throw new Error("No params provided for participant update.");
         }
-        console.log("======= END DEBUG =======");
         params.push(tournamentID);
         params.push(teamID);
 
@@ -695,7 +682,6 @@ const searchMatches = async (
             `;
 
             const params = [];
-            console.log("tournamentID is set to: ", tournamentID);
             if (tournamentID) {
                 search += " AND sub.TournamentID = ?";
                 params.push(tournamentID);
@@ -712,13 +698,11 @@ const searchMatches = async (
                 search += " AND sub.MatchTime >= ?";
                 params.push(after);
             }
-            console.log("bracketSide is set to: ", bracketSide);
             if (bracketSide) {
                 search += " AND sub.BracketSide = ?";
                 params.push(bracketSide);
             }
             if (round) {
-                console.log("MatchRound is set to: ", round);
                 search += " AND sub.MatchRound = ?";
                 params.push(round);
             }
@@ -733,7 +717,6 @@ const searchMatches = async (
             return rows.length === 0 ? null : rows;
         }
     } catch (error) {
-        console.error("Error searching for match:", error.message);
         throw error;
     }
 };
