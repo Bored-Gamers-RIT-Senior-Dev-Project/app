@@ -174,12 +174,6 @@ const addTournamentParticipant = async (tournamentID, teamID) => {
  */
 const removeTournamentParticipant = async (tournamentID, teamID) => {
     try {
-        console.log(
-            "Deleting team ",
-            teamID,
-            " from tournament ",
-            tournamentID
-        );
         await db.query(
             `DELETE FROM tournament_participants WHERE TournamentID = ? AND TeamID = ?`,
             [tournamentID, teamID]
@@ -216,38 +210,42 @@ const updateTournamentParticipant = async (
     try {
         let updates = [];
         let params = [];
+        console.log("========== DEBUG ===========");
+        console.log("Updating", teamID, "team");
 
-        if (tournamentID) {
-            updates.push("TournamentID = ?");
-            params.push(tournamentID);
-        }
-        if (teamID) {
-            updates.push("TeamID = ?");
-            params.push(teamID);
-        }
         if (round) {
+            console.log("to round", round);
             updates.push("Round = ?");
             params.push(round);
         }
-        if (byes) {
+        if (byes === 0 || byes) {
+            console.log("with", byes, "BYEs");
             updates.push("Byes = ?");
             params.push(byes);
         }
         if (status) {
+            console.log("a status of", status);
             updates.push("Status = ?");
             params.push(status);
         }
         if (bracketSide) {
+            console.log("placing them on the", bracketSide, "side");
             updates.push("BracketSide = ?");
             params.push(bracketSide);
         }
         if (nextMatchID == 0) {
+            console.log("with the next match being NULL");
             updates.push("NextMatchID = NULL");
-            params.push(nextMatchID);
         } else if (nextMatchID) {
+            console.log("with the next match being", nextMatchID);
             updates.push("NextMatchID = ?");
         }
         if (bracketOrder) {
+            console.log(
+                "and placing them in the",
+                bracketOrder,
+                "slot of the order"
+            );
             updates.push("BracketOrder = ?");
             params.push(bracketOrder);
         }
@@ -255,7 +253,7 @@ const updateTournamentParticipant = async (
         if (updates.length === 0) {
             throw new Error("No params provided for participant update.");
         }
-
+        console.log("======= END DEBUG =======");
         params.push(tournamentID);
         params.push(teamID);
 
@@ -720,6 +718,7 @@ const searchMatches = async (
                 params.push(bracketSide);
             }
             if (round) {
+                console.log("MatchRound is set to: ", round);
                 search += " AND sub.MatchRound = ?";
                 params.push(round);
             }
@@ -729,8 +728,7 @@ const searchMatches = async (
                     search += " DESC";
                 }
             }
-            console.log("Match Search Query: ", search);
-            console.log("Search params: ", params);
+
             const [rows] = await db.query(search, params);
             return rows.length === 0 ? null : rows;
         }

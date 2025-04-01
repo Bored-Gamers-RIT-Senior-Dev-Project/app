@@ -149,11 +149,16 @@ const searchTournaments = async (
  */
 const getTournamentBracket = async (tournamentID) => {
     try {
+        console.log("Generating full bracket for tournament ID:", tournamentID);
         const bracket = [];
         const participants = await searchTournamentParticipants(tournamentID);
         const numTeams = participants.length;
+        console.log("Total participants found:", numTeams);
 
         if (numTeams < 2) {
+            console.log(
+                "Less than 2 participants. Returning placeholder bracket."
+            );
             bracket.push({
                 title: "Round 1",
                 seeds: [
@@ -180,10 +185,13 @@ const getTournamentBracket = async (tournamentID) => {
         }
 
         const rounds = Math.ceil(Math.log2(numTeams));
+        console.log("We should have", rounds, "rounds in the tournament.");
         let previousLeftCount = Math.ceil(numTeams / 2);
         let previousRightCount = Math.floor(numTeams / 2);
 
-        // Store winners from previous rounds to use in bye matches
+        console.log("Left bracket should have", previousLeftCount, "teams");
+        console.log("Right bracket should have", previousRightCount, "teams");
+
         let previousLeftWinners = [];
         let previousRightWinners = [];
 
@@ -198,7 +206,7 @@ const getTournamentBracket = async (tournamentID) => {
                 null,
                 null,
                 null,
-                "BracketSide, BracketOrder",
+                "BracketSide, sub.BracketOrder",
                 null,
                 i
             );
@@ -210,9 +218,21 @@ const getTournamentBracket = async (tournamentID) => {
                 null,
                 null,
                 null,
-                "BracketSide, BracketOrder",
+                "BracketSide, sub.BracketOrder",
                 null,
                 i
+            );
+
+            console.log(
+                "Found",
+                leftMatches?.length ?? 0,
+                "matches on the left side."
+            );
+
+            console.log(
+                "Found",
+                rightMatches?.length ?? 0,
+                "matches on the right side."
             );
 
             let currentLeftCount = 0;
@@ -220,8 +240,8 @@ const getTournamentBracket = async (tournamentID) => {
 
             const seeds = [];
 
-            // FINAL ROUND
             if (isFinalRound) {
+                console.log("Detected it's the final round of the tournament.");
                 const totalPrev = previousLeftCount + previousRightCount;
                 const tbdCount = totalPrev >= 2 ? 1 : 0;
 
@@ -251,8 +271,10 @@ const getTournamentBracket = async (tournamentID) => {
                 break;
             }
 
-            // Process LEFT bracket
             if (!leftMatches || leftMatches.length === 0) {
+                console.log(
+                    "No matches on left. Checking conditions for TBD or BYE."
+                );
                 let tbdCount = 0;
 
                 if (i === 1) {
@@ -264,8 +286,11 @@ const getTournamentBracket = async (tournamentID) => {
                     previousRightCount > 1 &&
                     previousLeftWinners.length > 0
                 ) {
-                    // Generate BYE match
                     const winner = previousLeftWinners[0];
+                    console.log(
+                        "Generating BYE match for left winner:",
+                        winner
+                    );
                     leftMatches = [
                         {
                             MatchID: `BYE-L-${i}-0`,
@@ -292,6 +317,7 @@ const getTournamentBracket = async (tournamentID) => {
                 }
 
                 if (!leftMatches || leftMatches.length === 0) {
+                    console.log("Creating", tbdCount, "TBD matches on left.");
                     leftMatches = Array.from({ length: tbdCount }).map(
                         (_, idx) => ({
                             MatchID: `TBD-L-${i}-${idx}`,
@@ -315,8 +341,10 @@ const getTournamentBracket = async (tournamentID) => {
                 currentLeftCount = leftMatches.length;
             }
 
-            // Process RIGHT bracket
             if (!rightMatches || rightMatches.length === 0) {
+                console.log(
+                    "No matches on right. Checking conditions for TBD or BYE."
+                );
                 let tbdCount = 0;
 
                 if (i === 1) {
@@ -329,6 +357,10 @@ const getTournamentBracket = async (tournamentID) => {
                     previousRightWinners.length > 0
                 ) {
                     const winner = previousRightWinners[0];
+                    console.log(
+                        "Generating BYE match for right winner:",
+                        winner
+                    );
                     rightMatches = [
                         {
                             MatchID: `BYE-R-${i}-0`,
@@ -355,6 +387,7 @@ const getTournamentBracket = async (tournamentID) => {
                 }
 
                 if (!rightMatches || rightMatches.length === 0) {
+                    console.log("Creating", tbdCount, "TBD matches on right.");
                     rightMatches = Array.from({ length: tbdCount }).map(
                         (_, idx) => ({
                             MatchID: `TBD-R-${i}-${idx}`,
@@ -392,6 +425,19 @@ const getTournamentBracket = async (tournamentID) => {
                 (m) => m.WinnerID != null || isBye(m)
             );
 
+            console.log(
+                "Left winners from round",
+                i,
+                ":",
+                previousLeftWinners.map((t) => t.Team1ID || t.Team2ID)
+            );
+            console.log(
+                "Right winners from round",
+                i,
+                ":",
+                previousRightWinners.map((t) => t.Team1ID || t.Team2ID)
+            );
+
             const formatByeMatches = (matches) => {
                 return matches.map((match) => {
                     if (
@@ -419,9 +465,10 @@ const getTournamentBracket = async (tournamentID) => {
         }
 
         const tournament = await searchTournaments(tournamentID);
-
+        console.log("Bracket generation complete.");
         return [tournament, bracket];
     } catch (error) {
+        console.error("Error generating tournament bracket:", error);
         throw error;
     }
 };
@@ -780,10 +827,10 @@ const startTournament = async (tournamentID) => {
         if (rightSide.length + leftSide.length != numParticipants) {
             throw new Error("Mathing error.");
         }
-        console.log("Setting left side members...");
+
         let bracketOrder = 1;
-        leftSide.forEach((item) => {
-            updateTournamentParticipant(
+        for (const item of leftSide) {
+            await updateTournamentParticipant(
                 tournamentID,
                 item.TeamID,
                 1,
@@ -794,10 +841,11 @@ const startTournament = async (tournamentID) => {
                 bracketOrder
             );
             bracketOrder++;
-        });
+        }
+
         bracketOrder = 1;
-        rightSide.forEach((item) => {
-            updateTournamentParticipant(
+        for (const item of rightSide) {
+            await updateTournamentParticipant(
                 tournamentID,
                 item.TeamID,
                 1,
@@ -808,54 +856,9 @@ const startTournament = async (tournamentID) => {
                 bracketOrder
             );
             bracketOrder++;
-        });
-        const participants = await searchTournamentParticipants(
-            tournamentID,
-            null,
-            null,
-            null,
-            null,
-            1,
-            null,
-            "active",
-            "left",
-            null,
-            null,
-            null,
-            null,
-            "BracketOrder"
-        );
-
-        console.log(
-            "The left side of the tournament has",
-            participants.length,
-            "teams"
-        );
-
-        const participantsright = await searchTournamentParticipants(
-            tournamentID,
-            null,
-            null,
-            null,
-            null,
-            1,
-            null,
-            "active",
-            "right",
-            null,
-            null,
-            null,
-            null,
-            "BracketOrder"
-        );
-
-        console.log(
-            "The right side of the tournament has",
-            participantsright.length,
-            "teams"
-        );
-        //nextRound(tournamentID, "left", 1);
-        //nextRound(tournamentID, "right", 1);
+        }
+        await nextRound(tournamentID, "left", 1);
+        await nextRound(tournamentID, "right", 1);
     } catch (error) {
         throw error;
     }
@@ -872,11 +875,13 @@ const startTournament = async (tournamentID) => {
 const nextRound = async (tournamentID, bracketSide, round) => {
     try {
         console.log(
-            "Proceeding with round: ",
+            "Proceeding with round:",
             round,
-            " on the ",
+            "on the",
             bracketSide,
-            " of the tournament."
+            "of the tournament (",
+            tournamentID,
+            ")."
         );
         const participants = await searchTournamentParticipants(
             tournamentID,
@@ -886,13 +891,13 @@ const nextRound = async (tournamentID, bracketSide, round) => {
             null,
             round,
             null,
-            "active",
+            null,
             bracketSide,
             null,
             null,
             null,
             null,
-            "BracketOrder"
+            "BracketSide"
         );
 
         let numParticipants = participants.length;
@@ -905,31 +910,30 @@ const nextRound = async (tournamentID, bracketSide, round) => {
             round
         );
         if (numParticipants === 1) {
+            console.log("Only one team is included. Determining bye team...");
             const team = participants[0];
-            const now = new Date();
-            await createMatch(
-                tournamentID,
-                team.TeamID,
-                team.TeamID,
-                Date(now.getTime() + 15 * 60 * 1000)
-            );
             await updateTournamentParticipant(
                 tournamentID,
                 team.TeamID,
                 team.Round + 1,
                 team.Byes + 1,
                 "active",
-                team.BracketSide,
+                null,
                 null,
                 0
             );
             return;
         } else if (numParticipants % 2 === 0) {
+            console.log(
+                "Creating matches for even number of teams (",
+                numParticipants,
+                ")"
+            );
             for (let i = 0; i < numParticipants; i += 2) {
                 const team1 = participants[i];
                 const team2 = participants[i + 1];
-                const now = new Date();
-                createMatch(
+                const now = await new Date();
+                await createMatch(
                     tournamentID,
                     team1.TeamID,
                     team2.TeamID,
@@ -937,6 +941,7 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                 );
             }
         } else {
+            console.log("Determining bye team...");
             const byeTeam = (
                 await searchTournamentParticipants(
                     tournamentID,
@@ -955,14 +960,38 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                     "Byes, TeamCreatedAt"
                 )
             )[0];
-            updateTournamentParticipant(
+            console.log("Bye team is", byeTeam.TeamID);
+            await updateTournamentParticipant(
                 tournamentID,
                 byeTeam.TeamID,
                 byeTeam.TeamRound + 1,
-                byeTeam.TeamByeCount + 1,
+                byeTeam.TeamByeCount + 1
+            );
+            console.log("Bye team updated. Checking if updated succeeded...");
+            const updatedByeTeam = await searchTournamentParticipants(
+                tournamentID,
                 null,
                 null,
-                0
+                null,
+                null,
+                round + 1,
+                null,
+                "active",
+                bracketSide,
+                null,
+                null,
+                null,
+                true,
+                "BracketOrder"
+            );
+            console.log(
+                "Verification search turned up",
+                updatedByeTeam.length,
+                "results."
+            );
+            console.log(
+                "Updated bye team to round",
+                updatedByeTeam[0].TeamRound
             );
             const updatedParticipants = await searchTournamentParticipants(
                 tournamentID,
@@ -986,7 +1015,7 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                     const team1 = updatedParticipants[i];
                     const team2 = updatedParticipants[i + 1];
                     const now = new Date();
-                    createMatch(
+                    await createMatch(
                         tournamentID,
                         team1.TeamID,
                         team2.TeamID,
@@ -1100,31 +1129,51 @@ const searchMatches = async (
  */
 const updateMatchResult = async (matchID, winnerID, score1, score2) => {
     try {
+        console.log("Updating match result:", {
+            matchID,
+            winnerID,
+            score1,
+            score2,
+        });
         matchID = validateInteger(matchID, "matchID");
         winnerID = validateInteger(winnerID, "winnerID");
         score1 = validateInteger(score1, "score1");
         score2 = validateInteger(score2, "score2");
-        if (score1 == score2) {
+
+        if (score1 === score2) {
+            console.error("Score1 and Score2 are equal. No ties allowed.");
             throw new Error("There are no ties! Please choose a winner.");
         }
+
         await TournamentModel.updateMatchResult(
             matchID,
             winnerID,
             score1,
             score2
         );
+        console.log("Match result updated in DB.");
+
         const match = await searchMatches(matchID);
-        const currentRound = searchTournamentParticipants(
+        if (!match) throw new Error("Match not found after update.");
+
+        const participants = await searchTournamentParticipants(
             match.TournamentID,
             match.Team1ID
-        )[0].Round;
+        );
+        if (!participants || participants.length === 0)
+            throw new Error("Could not retrieve participant info for Team1.");
+
+        const currentRound = participants[0].TeamRound;
+        console.log("Current round for team:", currentRound);
+
         if (score1 > score2) {
-            updateTournamentParticipant(
+            console.log("Winner is Team1");
+            await updateTournamentParticipant(
                 match.TournamentID,
                 match.Team1ID,
                 currentRound + 1
             );
-            updateTournamentParticipant(
+            await updateTournamentParticipant(
                 match.TournamentID,
                 match.Team2ID,
                 null,
@@ -1135,12 +1184,13 @@ const updateMatchResult = async (matchID, winnerID, score1, score2) => {
                 null
             );
         } else {
-            updateTournamentParticipant(
+            console.log("Winner is Team2");
+            await updateTournamentParticipant(
                 match.TournamentID,
                 match.Team2ID,
                 currentRound + 1
             );
-            updateTournamentParticipant(
+            await updateTournamentParticipant(
                 match.TournamentID,
                 match.Team1ID,
                 null,
@@ -1151,31 +1201,49 @@ const updateMatchResult = async (matchID, winnerID, score1, score2) => {
                 null
             );
         }
-        const bracketSide = searchTournamentParticipants(
+
+        const sideInfo = await searchTournamentParticipants(
             match.TournamentID,
             match.Team1ID
-        )[0].BracketSide;
-        if (
-            searchTournamentParticipants(
-                match.TournamentID,
-                match.winnerID,
-                null,
-                null,
-                null,
-                currentRound,
-                null,
-                "active",
-                bracketSide,
-                null,
-                null,
-                null,
-                true
-            ).length === 0
-        ) {
-            nextRound(match.TournamentID, bracketSide, currentRound + 1);
+        );
+        if (!sideInfo || sideInfo.length === 0) {
+            throw new Error("Could not determine bracket side.");
         }
-        return searchMatches(matchID);
+
+        const bracketSide = sideInfo[0].TeamBracketSide;
+        console.log("Bracket side for next round check:", bracketSide);
+
+        const remainingActive = await searchTournamentParticipants(
+            match.TournamentID,
+            null,
+            null,
+            null,
+            null,
+            currentRound,
+            null,
+            "active",
+            bracketSide,
+            null,
+            null,
+            null,
+            true
+        );
+
+        if (!remainingActive || remainingActive.length === 0) {
+            console.log(
+                "All matches in round",
+                currentRound,
+                "on",
+                bracketSide,
+                "are completed."
+            );
+            await nextRound(match.TournamentID, bracketSide, currentRound + 1);
+        }
+
+        console.log("Match update complete.");
+        return await searchMatches(matchID);
     } catch (error) {
+        console.error("Error in updateMatchResult:", error);
         throw error;
     }
 };
