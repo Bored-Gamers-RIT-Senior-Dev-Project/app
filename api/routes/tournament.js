@@ -450,14 +450,13 @@ router.get("/searchMatches", async (req, res, next) => {
  * Set the result of a match.
  */
 router.put("/setMatchResult", async (req, res, next) => {
-    const { matchID, winnerID, score1, score2 } = req.body;
-    if (!matchID || !winnerID) {
+    const { matchID, score1, score2 } = req.body;
+    if (!matchID || !score1) {
         return res.status(400).json({ message: "Invalid request format." });
     }
     try {
         const match = await TournamentService.updateMatchResult(
             matchID,
-            winnerID,
             score1,
             score2
         );

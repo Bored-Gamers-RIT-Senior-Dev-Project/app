@@ -1026,10 +1026,9 @@ const searchMatches = async (
  * @returns {Promise<object>} Returns the updated match result.
  * @throws {Error} Throws an error if any parameter validation fails or the update fails.
  */
-const updateMatchResult = async (matchID, winnerID, score1, score2) => {
+const updateMatchResult = async (matchID, score1, score2) => {
     try {
         matchID = validateInteger(matchID, "matchID");
-        winnerID = validateInteger(winnerID, "winnerID");
         score1 = validateInteger(score1, "score1");
         score2 = validateInteger(score2, "score2");
 
@@ -1038,26 +1037,27 @@ const updateMatchResult = async (matchID, winnerID, score1, score2) => {
             throw new Error("There are no ties! Please choose a winner.");
         }
 
-        await TournamentModel.updateMatchResult(
-            matchID,
-            winnerID,
-            score1,
-            score2
-        );
-
         const match = await searchMatches(matchID);
-        if (!match) throw new Error("Match not found after update.");
+
+        if (!match) throw new Error("Could not find match");
 
         const participants = await searchTournamentParticipants(
             match.TournamentID,
             match.Team1ID
         );
+
         if (!participants || participants.length === 0)
             throw new Error("Could not retrieve participant info for Team1.");
 
         const currentRound = participants[0].TeamRound;
 
         if (score1 > score2) {
+            await TournamentModel.updateMatchResult(
+                match.MatchID,
+                match.Team1ID,
+                score1,
+                score2
+            );
             await updateTournamentParticipant(
                 match.TournamentID,
                 match.Team1ID,
@@ -1074,6 +1074,12 @@ const updateMatchResult = async (matchID, winnerID, score1, score2) => {
                 null
             );
         } else {
+            await TournamentModel.updateMatchResult(
+                match.MatchID,
+                match.Team2ID,
+                score1,
+                score2
+            );
             await updateTournamentParticipant(
                 match.TournamentID,
                 match.Team2ID,
@@ -1091,11 +1097,11 @@ const updateMatchResult = async (matchID, winnerID, score1, score2) => {
             );
         }
 
-        const sideInfo = await searchTournamentParticipants(
+        const matchSide = await searchTournamentParticipants(
             match.TournamentID,
             match.Team1ID
         );
-        if (!sideInfo || sideInfo.length === 0) {
+        if (!matchSide || matchSide.length === 0) {
             throw new Error("Could not determine bracket side.");
         }
 
