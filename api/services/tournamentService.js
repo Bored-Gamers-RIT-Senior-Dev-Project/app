@@ -1,4 +1,5 @@
 const TournamentModel = require("../models/tournamentModel");
+const TeamModel = require("../models/teamModel");
 
 /* Helper Functions */
 
@@ -495,6 +496,12 @@ const addTournamentParticipant = async (tournamentID, teamID) => {
     try {
         tournamentID = validateInteger(tournamentID, "tournamentID");
         teamID = validateInteger(teamID, "teamID");
+        const team = await TeamModel.getTeamById(teamID, false);
+        if (team.length === 0) {
+            throw new Error(
+                "Team is not approved. Please approve team before adding them to this tournament."
+            );
+        }
         const existingParticipant =
             await TournamentModel.searchTournamentParticipants(
                 tournamentID,
