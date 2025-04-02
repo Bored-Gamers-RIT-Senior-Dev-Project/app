@@ -96,6 +96,7 @@ const searchTournaments = async (
     sortAsDescending = false
 ) => {
     try {
+        // Search tournament by ID, otherwise use other filters
         if (tournamentID !== null) {
             tournamentID = validateInteger(tournamentID, "tournamentID");
             const tournament = await TournamentModel.searchTournaments(
@@ -114,6 +115,7 @@ const searchTournaments = async (
             );
             return tournament;
         } else {
+            // TODO probably a better way to do this
             if (
                 sortAsDescending === "true" ||
                 sortAsDescending === "True" ||
@@ -151,9 +153,12 @@ const searchTournaments = async (
 const getTournamentBracket = async (tournamentID) => {
     try {
         const bracket = [];
+
+        // Fetch all participants for the tournament
         const participants = await searchTournamentParticipants(tournamentID);
         const numTeams = participants.length;
 
+        // If not enough teams to form matches, return a placeholder match
         if (numTeams < 2) {
             bracket.push({
                 title: "Round 1",
@@ -176,20 +181,26 @@ const getTournamentBracket = async (tournamentID) => {
                 ],
             });
 
+            // Return tournament details and placeholder bracket
             const tournament = await searchTournaments(tournamentID);
             return [tournament, bracket];
         }
 
+        // Determine how many rounds are needed for the number of teams (single elimination)
         const rounds = Math.ceil(Math.log2(numTeams));
+
+        // Track number of teams on each side from the previous round
         let previousLeftCount = Math.ceil(numTeams / 2);
         let previousRightCount = Math.floor(numTeams / 2);
 
         let previousLeftWinners = [];
         let previousRightWinners = [];
 
+        // Generate the bracket round-by-round
         for (let i = 1; i <= rounds; i++) {
             const isFinalRound = i === rounds;
 
+            // Get any pre-scheduled matches for this round and bracket side
             let leftMatches = await searchMatches(
                 null,
                 tournamentID,
@@ -217,6 +228,7 @@ const getTournamentBracket = async (tournamentID) => {
             let currentLeftCount = 0;
             let currentRightCount = 0;
 
+            // Handle final round separately
             if (isFinalRound) {
                 const lastMatch = await searchMatches(
                     null,
@@ -230,6 +242,8 @@ const getTournamentBracket = async (tournamentID) => {
                     rounds
                 );
                 let finalMatch = [];
+
+                // Use existing match if present; otherwise create a placeholder
                 if (lastMatch[0]) {
                     finalMatch = lastMatch[0];
                 } else {
@@ -260,6 +274,7 @@ const getTournamentBracket = async (tournamentID) => {
                 break;
             }
 
+            // If no matches found on the left, create BYEs or placeholders
             if (!leftMatches || leftMatches.length === 0) {
                 let tbdCount = 0;
 
@@ -272,6 +287,7 @@ const getTournamentBracket = async (tournamentID) => {
                     previousRightCount > 1 &&
                     previousLeftWinners.length > 0
                 ) {
+                    // Carry forward the lone winner with a BYE
                     const winner = previousLeftWinners[0];
                     leftMatches = [
                         {
@@ -299,6 +315,7 @@ const getTournamentBracket = async (tournamentID) => {
                 }
 
                 if (!leftMatches || leftMatches.length === 0) {
+                    // Create placeholder matches
                     leftMatches = Array.from({ length: tbdCount }).map(
                         (_, index) => ({
                             MatchID: `TBD-PLACEHOLDER`,
@@ -322,6 +339,7 @@ const getTournamentBracket = async (tournamentID) => {
                 currentLeftCount = leftMatches.length;
             }
 
+            // Repeat the same logic for right bracket side
             if (!rightMatches || rightMatches.length === 0) {
                 let tbdCount = 0;
 
@@ -383,14 +401,17 @@ const getTournamentBracket = async (tournamentID) => {
                 currentRightCount = rightMatches.length;
             }
 
+            // Track the number of matches for the next iteration
             previousLeftCount = currentLeftCount;
             previousRightCount = currentRightCount;
 
+            // Identify any matches that are BYEs (used in logic above)
             const isBye = (match) =>
                 match.Team1ID !== null &&
                 match.Team1ID === match.Team2ID &&
                 match.WinnerID === match.Team1ID;
 
+            // Store winners of current round to potentially advance
             previousLeftWinners = leftMatches.filter(
                 (m) => m.WinnerID != null || isBye(m)
             );
@@ -398,6 +419,7 @@ const getTournamentBracket = async (tournamentID) => {
                 (m) => m.WinnerID != null || isBye(m)
             );
 
+            // Format BYE matches to remove duplicated Team1/Team2 info
             const formatByeMatches = (matches) => {
                 return matches.map((match) => {
                     if (
@@ -418,12 +440,14 @@ const getTournamentBracket = async (tournamentID) => {
             leftMatches = formatByeMatches(leftMatches);
             rightMatches = formatByeMatches(rightMatches);
 
+            // Push the completed round into the bracket
             bracket.push({
                 title: `Round ${i}`,
                 seeds: [...leftMatches, ...rightMatches],
             });
         }
 
+        // Return the tournament details along with the full bracket
         const tournament = await searchTournaments(tournamentID);
         return [tournament, bracket];
     } catch (error) {
@@ -732,7 +756,10 @@ const searchTournamentFacilitators = async (
  */
 const startTournament = async (tournamentID) => {
     try {
+        // Validate that tournamentID is a proper integer
         tournamentID = validateInteger(tournamentID, "tournamentID");
+
+        // Fetch and randomly shuffle all active participants
         const shuffleParticipants =
             await TournamentModel.searchTournamentParticipants(
                 tournamentID,
@@ -742,16 +769,20 @@ const startTournament = async (tournamentID) => {
                 null,
                 null,
                 null,
-                "active",
+                "active", // status filter
                 null,
                 null,
                 null,
                 null,
                 null,
-                "RAND()"
+                "RAND()" // random sort order
             );
+
         const numParticipants = shuffleParticipants.length;
         let leftSide, rightSide;
+
+        // Distribute teams between left and right bracket sides based on team count mod 4
+        // These conditions help balance the bracket layout for odd-sized pools
         if (numParticipants % 4 == 0) {
             leftSide = shuffleParticipants.slice(0, numParticipants / 2);
             rightSide = shuffleParticipants.slice(numParticipants / 2);
@@ -775,25 +806,29 @@ const startTournament = async (tournamentID) => {
                 Math.floor(numParticipants / 2)
             );
         }
+
+        // Sanity check to ensure all participants were assigned
         if (rightSide.length + leftSide.length != numParticipants) {
             throw new Error("Mathing error.");
         }
 
+        // Assign bracket metadata (round, side, order) to each team on the left
         let bracketOrder = 1;
         for (const item of leftSide) {
             await updateTournamentParticipant(
                 tournamentID,
                 item.TeamID,
-                1,
-                0,
-                "active",
-                "left",
-                null,
+                1, // Round number
+                0, // Bye count
+                "active", // Status
+                "left", // Bracket side
+                null, // Next match ID
                 bracketOrder
             );
             bracketOrder++;
         }
 
+        // Repeat for right-side teams
         bracketOrder = 1;
         for (const item of rightSide) {
             await updateTournamentParticipant(
@@ -808,9 +843,12 @@ const startTournament = async (tournamentID) => {
             );
             bracketOrder++;
         }
+
+        // Generate the first round of matches for both bracket sides
         await nextRound(tournamentID, "left", 1);
         await nextRound(tournamentID, "right", 1);
     } catch (error) {
+        // Let the caller handle the error
         throw error;
     }
 };
@@ -825,9 +863,12 @@ const startTournament = async (tournamentID) => {
  */
 const nextRound = async (tournamentID, bracketSide, round) => {
     try {
+        // Get total number of participants to calculate how many rounds are needed
         const totalParticipants =
             await TournamentModel.searchTournamentParticipants(tournamentID);
         const totalRounds = Math.ceil(Math.log2(totalParticipants.length));
+
+        // Get all active participants in the given round and bracket side
         const participants = await searchTournamentParticipants(
             tournamentID,
             null,
@@ -841,6 +882,8 @@ const nextRound = async (tournamentID, bracketSide, round) => {
         );
 
         let numParticipants = participants.length;
+
+        // Final round logic: check if a match can be scheduled with the other bracket side
         if (round === totalRounds) {
             let otherBracketSide;
             if (bracketSide === "left") {
@@ -849,6 +892,7 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                 otherBracketSide = "left";
             }
 
+            // Check if the opposing side has only one remaining team
             const otherSideParticipants = await searchTournamentParticipants(
                 tournamentID,
                 null,
@@ -861,28 +905,35 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                 otherBracketSide
             );
 
+            // If both sides have one team each, create the final match
             if (otherSideParticipants.length === 1) {
                 const now = new Date();
                 createMatch(
                     tournamentID,
                     participants[0].TeamID,
                     otherSideParticipants[0].TeamID,
-                    Date(now.getTime() + 15 * 60 * 1000)
+                    Date(now.getTime() + 15 * 60 * 1000) // Schedule 15 minutes from now
                 );
             }
+
+            // If only one team left, give it a BYE to next round
         } else if (numParticipants === 1) {
             const team = participants[0];
             await updateTournamentParticipant(
                 tournamentID,
                 team.TeamID,
-                team.Round + 1,
-                team.Byes + 1,
+                team.Round + 1, // Advance to next round
+                team.Byes + 1, // Add a BYE
                 "active",
                 null,
                 null,
                 0
             );
+
+            // Recursively move them to the next round
             await nextRound(tournamentID, bracketSide, round + 1);
+
+            // If even number of participants, pair them up and create matches
         } else if (numParticipants % 2 === 0) {
             for (let i = 0; i < numParticipants; i += 2) {
                 const team1 = participants[i];
@@ -895,7 +946,10 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                     Date(now.getTime() + 15 * 60 * 1000)
                 );
             }
+
+            // Odd number of teams: assign a BYE and try again
         } else {
+            // Select the participant with the fewest BYEs and earliest creation date
             const byeTeam = (
                 await searchTournamentParticipants(
                     tournamentID,
@@ -915,6 +969,7 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                 )
             )[0];
 
+            // Advance the BYE team
             await updateTournamentParticipant(
                 tournamentID,
                 byeTeam.TeamID,
@@ -922,6 +977,7 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                 byeTeam.TeamByeCount + 1
             );
 
+            // Fetch updated list of participants for this round and side
             const updatedParticipants = await searchTournamentParticipants(
                 tournamentID,
                 null,
@@ -938,7 +994,10 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                 null,
                 "BracketOrder"
             );
+
             numParticipants = updatedParticipants.length;
+
+            // Now with an even number, create the matches
             if (numParticipants % 2 === 0) {
                 for (let i = 0; i < numParticipants; i += 2) {
                     const team1 = updatedParticipants[i];
@@ -952,10 +1011,12 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                     );
                 }
             } else {
+                // Something went wrong — still an odd number after BYE
                 throw new Error("Mathing error when generating next round.");
             }
         }
     } catch (error) {
+        // Re-throw any error to be handled by calling function
         throw error;
     }
 };
@@ -1058,43 +1119,54 @@ const searchMatches = async (
  */
 const updateMatchResult = async (matchID, score1, score2) => {
     try {
+        // Validate input parameters
         matchID = validateInteger(matchID, "matchID");
         score1 = validateInteger(score1, "score1");
         score2 = validateInteger(score2, "score2");
 
+        // Disallow ties — the system requires a clear winner
         if (score1 === score2) {
             console.error("Score1 and Score2 are equal. No ties allowed.");
             throw new Error("There are no ties! Please choose a winner.");
         }
 
+        // Fetch the match using matchID
         const match = await searchMatches(matchID);
 
+        // Ensure the match exists
         if (!match) throw new Error("Could not find match");
 
+        // Get participant information for Team1 to identify round and bracket side
         const participants = await searchTournamentParticipants(
             match.TournamentID,
             match.Team1ID
         );
 
+        // Ensure participant information is available
         if (!participants || participants.length === 0)
             throw new Error("Could not retrieve participant info for Team1.");
 
         const currentRound = participants[0].TeamRound;
         const bracketSide = participants[0].TeamBracketSide;
 
+        // Handle the case where Team1 is the winner
         if (score1 > score2) {
+            // Update match record with winner and scores
             await TournamentModel.updateMatchResult(
                 match.MatchID,
                 match.Team1ID,
                 score1,
                 score2
             );
+
+            // Advance Team1 to the next round
             await updateTournamentParticipant(
                 match.TournamentID,
                 match.Team1ID,
                 currentRound + 1
             );
 
+            // Mark Team2 as "lost" and disqualify from future rounds
             await updateTournamentParticipant(
                 match.TournamentID,
                 match.Team2ID,
@@ -1106,17 +1178,22 @@ const updateMatchResult = async (matchID, score1, score2) => {
                 null
             );
         } else {
+            // Handle the case where Team2 is the winner
             await TournamentModel.updateMatchResult(
                 match.MatchID,
                 match.Team2ID,
                 score1,
                 score2
             );
+
+            // Advance Team2 to the next round
             await updateTournamentParticipant(
                 match.TournamentID,
                 match.Team2ID,
                 currentRound + 1
             );
+
+            // Mark Team1 as "lost" and disqualify from future rounds
             await updateTournamentParticipant(
                 match.TournamentID,
                 match.Team1ID,
@@ -1129,6 +1206,7 @@ const updateMatchResult = async (matchID, score1, score2) => {
             );
         }
 
+        // Check if there are any remaining active teams in the current round for this bracket side
         const remainingActive = await searchTournamentParticipants(
             match.TournamentID,
             null,
@@ -1141,12 +1219,15 @@ const updateMatchResult = async (matchID, score1, score2) => {
             bracketSide
         );
 
+        // If all matches in this round are completed, initiate the next round
         if (!remainingActive || remainingActive.length === 0) {
             await nextRound(match.TournamentID, bracketSide, currentRound + 1);
         }
 
+        // Return the updated match result
         return await searchMatches(matchID);
     } catch (error) {
+        // Log and rethrow any errors for upstream handling
         console.error("Error in updateMatchResult:", error);
         throw error;
     }
