@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const TournamentService = require("../services/tournamentService");
+const { makeObjectCamelCase } = require("../utils");
 
 /**
  * POST /create
@@ -32,7 +33,7 @@ router.post("/create", async (req, res, next) => {
         }
         return res.status(201).json({
             message: "Tournament created successfully.",
-            tournament,
+            tournament: makeObjectCamelCase(tournament),
         });
     } catch (error) {
         next(error);
@@ -79,7 +80,7 @@ router.get("/search", async (req, res, next) => {
         if (!tournamentID && tournament === null) {
             return res.status(200).json([]);
         }
-        return res.status(200).json(tournament);
+        return res.status(200).json(makeObjectCamelCase(tournament));
     } catch (error) {
         next(error);
     }
@@ -112,7 +113,7 @@ router.put("/updateDetails", async (req, res, next) => {
         );
         return res.status(200).json({
             message: "Tournament updated successfully",
-            tournament,
+            tournament: makeObjectCamelCase(tournament),
         });
     } catch (error) {
         next(error);
@@ -152,9 +153,12 @@ router.get("/getBracket", async (req, res, next) => {
         return res.status(400).json({ message: "Invalid request." });
     }
     try {
-        const [tournament, bracket] =
+        const [tournament, thisBracket] =
             await TournamentService.getTournamentBracket(tournamentID);
-        return res.status(200).json({ tournament, bracket });
+        return res.status(200).json({
+            tournament: makeObjectCamelCase(tournament),
+            bracket: makeObjectCamelCase(thisBracket),
+        });
     } catch (error) {
         next(error);
     }
@@ -185,7 +189,7 @@ router.put("/cancel", async (req, res, next) => {
         );
         return res.status(201).json({
             message: "Tournament cancelled",
-            tournament,
+            tournament: makeObjectCamelCase(tournament),
         });
     } catch (error) {
         next(error);
@@ -293,7 +297,7 @@ router.put("/disqualifyTeam", async (req, res) => {
         return res.status(401).send();
     }
     try {
-        const teams = await TournamentService.disqualifyTournamentParticipant(
+        await TournamentService.disqualifyTournamentParticipant(
             uid,
             tournamentID,
             teamID,
@@ -305,7 +309,6 @@ router.put("/disqualifyTeam", async (req, res) => {
         );
         return res.status(201).json({
             message: "Team disqualified from tournament successfully",
-            teams,
         });
     } catch (error) {
         if (error.message === "Team not found in this tournament.") {
@@ -364,7 +367,7 @@ router.get("/searchParticipatingTeams", async (req, res, next) => {
         if (!tournamentID && !teamID && participant === null) {
             return res.status(200).json([]);
         }
-        return res.status(200).json(participant);
+        return res.status(200).json(makeObjectCamelCase(participant));
     } catch (error) {
         next(error);
     }
@@ -450,7 +453,7 @@ router.get("/searchFacilitators", async (req, res, next) => {
                 email,
                 universityID
             );
-        return res.status(200).json({ facilitators });
+        return res.status(200).json(makeObjectCamelCase(facilitators));
     } catch (error) {
         next(error);
     }
@@ -488,7 +491,7 @@ router.get("/searchMatches", async (req, res, next) => {
         if (!matchID && matches === null) {
             return res.status(200).json([]);
         }
-        return res.status(200).json(matches);
+        return res.status(200).json(makeObjectCamelCase(matches));
     } catch (error) {
         next(error);
     }
@@ -516,7 +519,7 @@ router.put("/setMatchResult", async (req, res, next) => {
         );
         return res.status(201).json({
             message: "Match updated successfully",
-            match,
+            match: makeObjectCamelCase(match),
         });
     } catch (error) {
         next(error);
