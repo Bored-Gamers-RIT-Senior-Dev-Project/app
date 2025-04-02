@@ -227,8 +227,11 @@ const updateTournamentParticipant = async (
             updates.push("BracketSide = ?");
             params.push(bracketSide);
         }
-        if (nextMatchID == 0) {
+        if (nextMatchID === -1) {
             updates.push("NextMatchID = NULL");
+        } else if (nextMatchID === 0) {
+            updates.push("NextMatchID = 0");
+            params.push(nextMatchID);
         } else if (nextMatchID) {
             updates.push("NextMatchID = ?");
             params.push(nextMatchID);
@@ -348,7 +351,7 @@ const searchTournamentParticipants = async (
             searchQuery += " AND tournament_participants.BracketSide = ?";
             params.push(bracketSide);
         }
-        if (nextMatchID) {
+        if (nextMatchID === 0 || nextMatchID) {
             searchQuery += " AND tournament_participants.NextMatchID = ?";
             params.push(nextMatchID);
         }

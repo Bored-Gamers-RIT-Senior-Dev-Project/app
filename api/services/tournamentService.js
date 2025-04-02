@@ -732,7 +732,6 @@ const startTournament = async (tournamentID) => {
                 null,
                 "RAND()"
             );
-        const rounds = Math.ceil(Math.log2(shuffleParticipants.length));
         const numParticipants = shuffleParticipants.length;
         let leftSide, rightSide;
         if (numParticipants % 4 == 0) {
@@ -808,6 +807,9 @@ const startTournament = async (tournamentID) => {
  */
 const nextRound = async (tournamentID, bracketSide, round) => {
     try {
+        const totalParticipants =
+            await TournamentModel.searchTournamentParticipants(tournamentID);
+        const totalRounds = Math.ceil(Math.log2(totalParticipants.length));
         const participants = await searchTournamentParticipants(
             tournamentID,
             null,
@@ -816,17 +818,41 @@ const nextRound = async (tournamentID, bracketSide, round) => {
             null,
             round,
             null,
-            null,
-            bracketSide,
-            null,
-            null,
-            null,
-            null,
-            "BracketSide"
+            "active",
+            bracketSide
         );
 
         let numParticipants = participants.length;
-        if (numParticipants === 1) {
+        if (round === totalRounds) {
+            let otherBracketSide;
+            if (bracketSide === "left") {
+                otherBracketSide = "right";
+            } else {
+                otherBracketSide = "left";
+            }
+
+            const otherSideParticipants = await searchTournamentParticipants(
+                tournamentID,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "active",
+                otherBracketSide
+            );
+
+            if (otherSideParticipants.length === 1) {
+                const now = new Date();
+                createMatch(
+                    tournamentID,
+                    participants[0].TeamID,
+                    otherSideParticipants[0].TeamID,
+                    Date(now.getTime() + 15 * 60 * 1000)
+                );
+            }
+        } else if (numParticipants === 1) {
             const team = participants[0];
             await updateTournamentParticipant(
                 tournamentID,
@@ -838,12 +864,12 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                 null,
                 0
             );
-            return;
+            await nextRound(tournamentID, bracketSide, round + 1);
         } else if (numParticipants % 2 === 0) {
             for (let i = 0; i < numParticipants; i += 2) {
                 const team1 = participants[i];
                 const team2 = participants[i + 1];
-                const now = await new Date();
+                const now = new Date();
                 await createMatch(
                     tournamentID,
                     team1.TeamID,
@@ -866,32 +892,18 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                     null,
                     null,
                     null,
-                    true,
+                    null,
                     "Byes, TeamCreatedAt"
                 )
             )[0];
+
             await updateTournamentParticipant(
                 tournamentID,
                 byeTeam.TeamID,
                 byeTeam.TeamRound + 1,
                 byeTeam.TeamByeCount + 1
             );
-            const updatedByeTeam = await searchTournamentParticipants(
-                tournamentID,
-                null,
-                null,
-                null,
-                null,
-                round + 1,
-                null,
-                "active",
-                bracketSide,
-                null,
-                null,
-                null,
-                true,
-                "BracketOrder"
-            );
+
             const updatedParticipants = await searchTournamentParticipants(
                 tournamentID,
                 null,
@@ -905,7 +917,7 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                 null,
                 null,
                 null,
-                true,
+                null,
                 "BracketOrder"
             );
             numParticipants = updatedParticipants.length;
@@ -1050,6 +1062,7 @@ const updateMatchResult = async (matchID, score1, score2) => {
             throw new Error("Could not retrieve participant info for Team1.");
 
         const currentRound = participants[0].TeamRound;
+        const bracketSide = participants[0].TeamBracketSide;
 
         if (score1 > score2) {
             await TournamentModel.updateMatchResult(
@@ -1063,6 +1076,7 @@ const updateMatchResult = async (matchID, score1, score2) => {
                 match.Team1ID,
                 currentRound + 1
             );
+
             await updateTournamentParticipant(
                 match.TournamentID,
                 match.Team2ID,
@@ -1070,7 +1084,7 @@ const updateMatchResult = async (matchID, score1, score2) => {
                 null,
                 "lost",
                 null,
-                0,
+                -1,
                 null
             );
         } else {
@@ -1092,20 +1106,10 @@ const updateMatchResult = async (matchID, score1, score2) => {
                 null,
                 "lost",
                 null,
-                0,
+                -1,
                 null
             );
         }
-
-        const matchSide = await searchTournamentParticipants(
-            match.TournamentID,
-            match.Team1ID
-        );
-        if (!matchSide || matchSide.length === 0) {
-            throw new Error("Could not determine bracket side.");
-        }
-
-        const bracketSide = sideInfo[0].TeamBracketSide;
 
         const remainingActive = await searchTournamentParticipants(
             match.TournamentID,
@@ -1116,11 +1120,7 @@ const updateMatchResult = async (matchID, score1, score2) => {
             currentRound,
             null,
             "active",
-            bracketSide,
-            null,
-            null,
-            null,
-            true
+            bracketSide
         );
 
         if (!remainingActive || remainingActive.length === 0) {
