@@ -158,7 +158,7 @@ const getTournamentBracket = async (tournamentID) => {
                 title: "Round 1",
                 seeds: [
                     {
-                        MatchID: "TBD-ONLY-0",
+                        MatchID: "TBD-PLACEHOLDER",
                         TournamentID: tournamentID,
                         MatchTime: null,
                         Team1ID: null,
@@ -216,15 +216,13 @@ const getTournamentBracket = async (tournamentID) => {
             let currentLeftCount = 0;
             let currentRightCount = 0;
 
-            const seeds = [];
-
             if (isFinalRound) {
                 const totalPrev = previousLeftCount + previousRightCount;
                 const tbdCount = totalPrev >= 2 ? 1 : 0;
 
                 const finalMatch = Array.from({ length: tbdCount }).map(
-                    (_, idx) => ({
-                        MatchID: `TBD-FINAL-${idx}`,
+                    (_, index) => ({
+                        MatchID: `TBD-PLACEHOLDER`,
                         TournamentID: tournamentID,
                         MatchTime: null,
                         Team1ID: null,
@@ -235,7 +233,7 @@ const getTournamentBracket = async (tournamentID) => {
                         WinnerID: null,
                         Score2: null,
                         BracketSide: "final",
-                        BracketOrder: idx,
+                        BracketOrder: index,
                         MatchRound: i,
                     })
                 );
@@ -263,7 +261,7 @@ const getTournamentBracket = async (tournamentID) => {
                     const winner = previousLeftWinners[0];
                     leftMatches = [
                         {
-                            MatchID: `BYE-L-${i}-0`,
+                            MatchID: `BYE-PLACEHOLDER`,
                             TournamentID: tournamentID,
                             MatchTime: null,
                             Team1ID: winner.Team1ID ?? winner.Team2ID ?? null,
@@ -288,8 +286,8 @@ const getTournamentBracket = async (tournamentID) => {
 
                 if (!leftMatches || leftMatches.length === 0) {
                     leftMatches = Array.from({ length: tbdCount }).map(
-                        (_, idx) => ({
-                            MatchID: `TBD-L-${i}-${idx}`,
+                        (_, index) => ({
+                            MatchID: `TBD-PLACEHOLDER`,
                             TournamentID: tournamentID,
                             MatchTime: null,
                             Team1ID: null,
@@ -300,7 +298,7 @@ const getTournamentBracket = async (tournamentID) => {
                             WinnerID: null,
                             Score2: null,
                             BracketSide: "left",
-                            BracketOrder: idx,
+                            BracketOrder: index,
                             MatchRound: i,
                         })
                     );
@@ -325,7 +323,7 @@ const getTournamentBracket = async (tournamentID) => {
                     const winner = previousRightWinners[0];
                     rightMatches = [
                         {
-                            MatchID: `BYE-R-${i}-0`,
+                            MatchID: `BYE-PLACEHOLDER`,
                             TournamentID: tournamentID,
                             MatchTime: null,
                             Team1ID: winner.Team1ID ?? winner.Team2ID ?? null,
@@ -350,8 +348,8 @@ const getTournamentBracket = async (tournamentID) => {
 
                 if (!rightMatches || rightMatches.length === 0) {
                     rightMatches = Array.from({ length: tbdCount }).map(
-                        (_, idx) => ({
-                            MatchID: `TBD-R-${i}-${idx}`,
+                        (_, index) => ({
+                            MatchID: `TBD-PLACEHOLDER`,
                             TournamentID: tournamentID,
                             MatchTime: null,
                             Team1ID: null,
@@ -361,7 +359,7 @@ const getTournamentBracket = async (tournamentID) => {
                             Team2Name: "TBD",
                             Score2: null,
                             BracketSide: "right",
-                            BracketOrder: idx,
+                            BracketOrder: index,
                             MatchRound: i,
                         })
                     );
