@@ -31,6 +31,21 @@ const validateInteger = (value, fieldName) => {
     return value;
 };
 
+/**
+ * Checks if a facilitator is a facilitator of a specific tournament.
+ * @param {number} tournaemntID - tournament to check.
+ * @param {number} userID - User to check for in facilitators.
+ * @returns {boolean} Whether or not use is a facilitator of the tournament.
+ */
+const checkFacilitatorTournament = (tournamentID, userID) => {
+    const facilitator = searchTournamentFacilitators(tournamentID, userID);
+    if (!facilitator || facilitator.length === 0) {
+        return false;
+    } else {
+        return true;
+    }
+};
+
 /* End Helper Functions */
 
 /**
@@ -490,7 +505,9 @@ const updateTournamentDetails = async (
         const user = await userModel.getUserByFirebaseId(uid);
         if (
             user.role !== "Super Admin" &&
-            user.role !== "Aardvark Games Employee"
+            user.role !== "Aardvark Games Employee" &&
+            (user.role !== "University Admin" ||
+                !checkFacilitatorTournament(tournamentID, user.userID))
         ) {
             throw createHttpError(403);
         }
@@ -549,7 +566,8 @@ const addTournamentParticipant = async (uid, tournamentID, teamID) => {
         if (
             user.role !== "Super Admin" &&
             user.role !== "Aardvark Games Employee" &&
-            user.role !== "University Admin"
+            (user.role !== "University Admin" ||
+                !checkFacilitatorTournament(tournamentID, user.userID))
         ) {
             throw createHttpError(403);
         }
@@ -589,7 +607,8 @@ const removeTournamentParticipant = async (uid, tournamentID, teamID) => {
         if (
             user.role !== "Super Admin" &&
             user.role !== "Aardvark Games Employee" &&
-            user.role !== "University Admin"
+            (user.role !== "University Admin" ||
+                !checkFacilitatorTournament(tournamentID, user.userID))
         ) {
             throw createHttpError(403);
         }
@@ -740,8 +759,10 @@ const disqualifyTournamentParticipant = async (
         if (
             user.role !== "Super Admin" &&
             user.role !== "Aardvark Games Employee" &&
-            user.role !== "University Admin" &&
-            user.role !== "Tournament Facilitator"
+            (user.role !== "University Admin" ||
+                !checkFacilitatorTournament(tournamentID, user.userID)) &&
+            (user.role !== "Tournament Facilitator" ||
+                !checkFacilitatorTournament(tournamentID, user.userID))
         ) {
             throw createHttpError(403);
         }
@@ -775,7 +796,8 @@ const addTournamentFacilitator = async (uid, tournamentID, userID) => {
         if (
             user.role !== "Super Admin" &&
             user.role !== "Aardvark Games Employee" &&
-            user.role !== "University Admin"
+            (user.role !== "University Admin" ||
+                !checkFacilitatorTournament(tournamentID, user.userID))
         ) {
             throw createHttpError(403);
         }
@@ -809,7 +831,8 @@ const removeTournamentFacilitator = async (uid, tournamentID, userID) => {
         if (
             user.role !== "Super Admin" &&
             user.role !== "Aardvark Games Employee" &&
-            user.role !== "University Admin"
+            (user.role !== "University Admin" ||
+                !checkFacilitatorTournament(tournamentID, user.userID))
         ) {
             throw createHttpError(403);
         }
@@ -1233,12 +1256,19 @@ const searchMatches = async (
  */
 const updateMatchResult = async (uid, matchID, score1, score2) => {
     try {
+        // Get tournament ID to validate facilitator of tournament
+        const tournamentID = searchMatches(matchID)[0].TournamentID;
+        if (!tournamentID || tournamentID === null) {
+            throw new Error("Error finding tournament for this match.");
+        }
         const user = await userModel.getUserByFirebaseId(uid);
         if (
             user.role !== "Super Admin" &&
             user.role !== "Aardvark Games Employee" &&
-            user.role !== "University Admin" &&
-            user.role !== "Tournament Facilitator"
+            (user.role !== "University Admin" ||
+                !checkFacilitatorTournament(tournamentID, user.userID)) &&
+            (user.role !== "Tournament Facilitator" ||
+                !checkFacilitatorTournament(tournamentID, user.userID))
         ) {
             throw createHttpError(403);
         }
