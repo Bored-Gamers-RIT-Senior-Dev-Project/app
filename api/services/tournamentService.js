@@ -35,6 +35,7 @@ const validateInteger = (value, fieldName) => {
 
 /**
  * Creates a new tournament in the database with the status of "Upcoming".
+ * @param {string} uid - FirebaseUID of the user trying to perform the action.
  * @param {string} tournamentName - Name of the tournament.
  * @param {string} startDate - Start date of the tournament in YYYY-MM-DD format.
  * @param {string} endDate - End date of the tournament in YYYY-MM-DD format. If not provided, defaults to startDate.
@@ -43,12 +44,20 @@ const validateInteger = (value, fieldName) => {
  * @throws {Error} Throws an error with status 403 if the user is unauthorized.
  */
 const createTournament = async (
+    uid,
     tournamentName,
     startDate,
-    endDate = null,
+    endDate,
     location
 ) => {
     try {
+        const user = await userModel.getUserByFirebaseId(uid);
+        if (
+            user.role !== "Super Admin" &&
+            user.role !== "Aardvark Games Employee"
+        ) {
+            throw createHttpError(403);
+        }
         // If no end date provided, default the end date to the start date.
         let finalEndDate = endDate === null ? startDate : endDate;
         const tournament = await TournamentModel.createTournament(
@@ -82,17 +91,17 @@ const createTournament = async (
  * @throws {Error} Throws an error if validation fails or the query fails.
  */
 const searchTournaments = async (
-    tournamentID = null,
-    tournamentName = null,
-    startDate = null,
-    endDate = null,
-    startsBefore = null,
-    startsAfter = null,
-    endsBefore = null,
-    endsAfter = null,
-    status = null,
-    location = null,
-    sortBy = null,
+    tournamentID,
+    tournamentName,
+    startDate,
+    endDate,
+    startsBefore,
+    startsAfter,
+    endsBefore,
+    endsAfter,
+    status,
+    location,
+    sortBy,
     sortAsDescending = false
 ) => {
     try {
@@ -458,6 +467,7 @@ const getTournamentBracket = async (tournamentID) => {
 
 /**
  * Updates the tournament details.
+ * @param {string} uid - FirebaseUID of the user trying to perform the action.
  * @param {number|string|null} tournamentID - ID of the tournament.
  * @param {string|null} tournamentName - New tournament name.
  * @param {string|null} startDate - New start date in YYYY-MM-DD format.
@@ -468,14 +478,22 @@ const getTournamentBracket = async (tournamentID) => {
  * @throws {Error} Throws an error if validation fails or the update fails.
  */
 const updateTournamentDetails = async (
-    tournamentID = null,
-    tournamentName = null,
-    startDate = null,
-    endDate = null,
-    status = null,
+    uid,
+    tournamentID,
+    tournamentName,
+    startDate,
+    endDate,
+    status,
     location = null
 ) => {
     try {
+        const user = await userModel.getUserByFirebaseId(uid);
+        if (
+            user.role !== "Super Admin" &&
+            user.role !== "Aardvark Games Employee"
+        ) {
+            throw createHttpError(403);
+        }
         const tournamentIDnum = Number(tournamentID);
         validateInteger(tournamentIDnum, "tournamentID");
         await TournamentModel.updateTournamentDetails(
@@ -495,12 +513,20 @@ const updateTournamentDetails = async (
 
 /**
  * Delete a tournament.
+ * @param {string} uid - FirebaseUID of the user trying to perform the action.
  * @param {number|string|null} tournamentID - ID of the tournament to delete.
  * @returns {Promise<void>}
  * @throws {Error} Throws an error if tournament deletion fails.
  */
-const deleteTournament = async (tournamentID = null) => {
+const deleteTournament = async (uid, tournamentID = null) => {
     try {
+        const user = await userModel.getUserByFirebaseId(uid);
+        if (
+            user.role !== "Super Admin" &&
+            user.role !== "Aardvark Games Employee"
+        ) {
+            throw createHttpError(403);
+        }
         const tournamentIDnum = Number(tournamentID);
         validateInteger(tournamentIDnum, "tournamentID");
         await TournamentModel.deleteTournament(tournamentID);
@@ -511,13 +537,22 @@ const deleteTournament = async (tournamentID = null) => {
 
 /**
  * Adds a participant to a tournament.
+ * @param {string} uid - FirebaseUID of the user trying to perform the action.
  * @param {number|string} tournamentID - ID of the tournament.
  * @param {number|string} teamID - ID of the team.
  * @returns {Promise<void>}
  * @throws {Error} Throws an error if the team is already registered or the addition fails.
  */
-const addTournamentParticipant = async (tournamentID, teamID) => {
+const addTournamentParticipant = async (uid, tournamentID, teamID) => {
     try {
+        const user = await userModel.getUserByFirebaseId(uid);
+        if (
+            user.role !== "Super Admin" &&
+            user.role !== "Aardvark Games Employee" &&
+            user.role !== "University Admin"
+        ) {
+            throw createHttpError(403);
+        }
         tournamentID = validateInteger(tournamentID, "tournamentID");
         teamID = validateInteger(teamID, "teamID");
         const team = await TeamModel.getTeamById(teamID, false);
@@ -542,13 +577,22 @@ const addTournamentParticipant = async (tournamentID, teamID) => {
 
 /**
  * Removes a participant from a tournament.
+ * @param {string} uid - FirebaseUID of the user trying to perform the action.
  * @param {number|string} tournamentID - ID of the tournament.
  * @param {number|string} teamID - ID of the team.
  * @returns {Promise<void>}
  * @throws {Error} Throws an error if the participant is not found or removal fails.
  */
-const removeTournamentParticipant = async (tournamentID, teamID) => {
+const removeTournamentParticipant = async (uid, tournamentID, teamID) => {
     try {
+        const user = await userModel.getUserByFirebaseId(uid);
+        if (
+            user.role !== "Super Admin" &&
+            user.role !== "Aardvark Games Employee" &&
+            user.role !== "University Admin"
+        ) {
+            throw createHttpError(403);
+        }
         tournamentID = validateInteger(tournamentID, "tournamentID");
         teamID = validateInteger(teamID, "teamID");
         const existingParticipant =
@@ -667,14 +711,74 @@ const updateTournamentParticipant = async (
 };
 
 /**
+ * Updates a tournament participant's details.
+ * @param {string} uid - FirebaseUID of the user trying to perform the action.
+ * @param {number|string} tournamentID - ID of the tournament.
+ * @param {number|string} teamID - ID of the team.
+ * @param {number} round - New round number.
+ * @param {number} byes - New bye count.
+ * @param {string} status - New participant status.
+ * @param {string} bracketSide - New bracket side ("left" or "right").
+ * @param {number|null} nextMatchID - ID of the next match or null.
+ * @param {number} bracketOrder - New order in the bracket.
+ * @returns {Promise<object>} Returns the updated participant record.
+ * @throws {Error} Throws an error if the update fails.
+ */
+const disqualifyTournamentParticipant = async (
+    uid,
+    tournamentID,
+    teamID,
+    round,
+    byes,
+    status,
+    bracketSide,
+    nextMatchID,
+    bracketOrder
+) => {
+    try {
+        const user = await userModel.getUserByFirebaseId(uid);
+        if (
+            user.role !== "Super Admin" &&
+            user.role !== "Aardvark Games Employee" &&
+            user.role !== "University Admin" &&
+            user.role !== "Tournament Facilitator"
+        ) {
+            throw createHttpError(403);
+        }
+        const participant = await TournamentModel.updateTournamentParticipant(
+            tournamentID,
+            teamID,
+            round,
+            byes,
+            status,
+            bracketSide,
+            nextMatchID,
+            bracketOrder
+        );
+        return participant;
+    } catch (error) {
+        throw error;
+    }
+};
+
+/**
  * Adds a facilitator to a tournament.
+ * @param {string} uid - FirebaseUID of the user trying to perform the action.
  * @param {number|string} tournamentID - ID of the tournament.
  * @param {number|string} userID - ID of the facilitator.
  * @returns {Promise<void>}
  * @throws {Error} Throws an error if the facilitator already exists or if the operation fails.
  */
-const addTournamentFacilitator = async (tournamentID, userID) => {
+const addTournamentFacilitator = async (uid, tournamentID, userID) => {
     try {
+        const user = await userModel.getUserByFirebaseId(uid);
+        if (
+            user.role !== "Super Admin" &&
+            user.role !== "Aardvark Games Employee" &&
+            user.role !== "University Admin"
+        ) {
+            throw createHttpError(403);
+        }
         tournamentID = validateInteger(tournamentID, "tournamentID");
         userID = validateInteger(userID, "userID");
         const existingFacilitator =
@@ -693,13 +797,22 @@ const addTournamentFacilitator = async (tournamentID, userID) => {
 
 /**
  * Removes a facilitator from a tournament.
+ * @param {string} uid - FirebaseUID of the user trying to perform the action.
  * @param {number|string} tournamentID - ID of the tournament.
  * @param {number|string} userID - ID of the facilitator.
  * @returns {Promise<void>}
  * @throws {Error} Throws an error if the facilitator is not found or if the removal fails.
  */
-const removeTournamentFacilitator = async (tournamentID, userID) => {
+const removeTournamentFacilitator = async (uid, tournamentID, userID) => {
     try {
+        const user = await userModel.getUserByFirebaseId(uid);
+        if (
+            user.role !== "Super Admin" &&
+            user.role !== "Aardvark Games Employee" &&
+            user.role !== "University Admin"
+        ) {
+            throw createHttpError(403);
+        }
         tournamentID = validateInteger(tournamentID, "tournamentID");
         userID = validateInteger(userID, "userID");
         const existingFacilitator =
@@ -1110,6 +1223,7 @@ const searchMatches = async (
 
 /**
  * Updates the match result in the database based on matchID.
+ * @param {string} uid - FirebaseUID of the user trying to perform the action.
  * @param {number|string} matchID - ID of the match to update.
  * @param {number|string} winnerID - ID for the winning team.
  * @param {number|string} score1 - Score for team one.
@@ -1117,8 +1231,17 @@ const searchMatches = async (
  * @returns {Promise<object>} Returns the updated match result.
  * @throws {Error} Throws an error if any parameter validation fails or the update fails.
  */
-const updateMatchResult = async (matchID, score1, score2) => {
+const updateMatchResult = async (uid, matchID, score1, score2) => {
     try {
+        const user = await userModel.getUserByFirebaseId(uid);
+        if (
+            user.role !== "Super Admin" &&
+            user.role !== "Aardvark Games Employee" &&
+            user.role !== "University Admin" &&
+            user.role !== "Tournament Facilitator"
+        ) {
+            throw createHttpError(403);
+        }
         // Validate input parameters
         matchID = validateInteger(matchID, "matchID");
         score1 = validateInteger(score1, "score1");
@@ -1243,6 +1366,7 @@ module.exports = {
     removeTournamentParticipant,
     searchTournamentParticipants,
     updateTournamentParticipant,
+    disqualifyTournamentParticipant,
     addTournamentFacilitator,
     removeTournamentFacilitator,
     searchTournamentFacilitators,

@@ -13,8 +13,13 @@ router.post("/create", async (req, res, next) => {
             .status(400)
             .json({ message: "Invalid request format or parameter(s)." });
     }
+    const { uid } = req.user;
+    if (!uid) {
+        return res.status(401).send();
+    }
     try {
         const tournament = await TournamentService.createTournament(
+            uid,
             tournamentName,
             startDate,
             endDate,
@@ -90,8 +95,14 @@ router.put("/updateDetails", async (req, res, next) => {
     if (!tournamentID) {
         return res.status(400).json({ message: "Invalid request format." });
     }
+
+    const { uid } = req.user;
+    if (!uid) {
+        return res.status(401).send();
+    }
     try {
         const tournament = await TournamentService.updateTournamentDetails(
+            uid,
             tournamentID,
             tournamentName,
             startDate,
@@ -117,8 +128,12 @@ router.put("/start", async (req, res, next) => {
     if (!tournamentID) {
         return res.status(400).json({ message: "Invalid request format." });
     }
+    const { uid } = req.user;
+    if (!uid) {
+        return res.status(401).send();
+    }
     try {
-        await TournamentService.startTournament(tournamentID);
+        await TournamentService.startTournament(uid, tournamentID);
         return res.status(200).json({
             message: "Tournament started successfully.",
         });
@@ -154,8 +169,13 @@ router.put("/cancel", async (req, res, next) => {
     if (!tournamentID) {
         return res.status(400).json({ message: "Invalid request format." });
     }
+    const { uid } = req.user;
+    if (!uid) {
+        return res.status(401).send();
+    }
     try {
         const tournament = await TournamentService.updateTournamentDetails(
+            uid,
             tournamentID,
             null,
             null,
@@ -181,8 +201,13 @@ router.delete("/delete", async (req, res, next) => {
     if (!tournamentID) {
         return res.status(400).json({ message: "Invalid request format." });
     }
+
+    const { uid } = req.user;
+    if (!uid) {
+        return res.status(401).send();
+    }
     try {
-        await TournamentService.deleteTournament(tournamentID);
+        await TournamentService.deleteTournament(uid, tournamentID);
         return res.status(200).json({
             message: "Tournament deleted successfully.",
         });
@@ -200,8 +225,13 @@ router.post("/addTeam", async (req, res, next) => {
     if (!tournamentID || !teamID) {
         return res.status(400).json({ message: "Invalid request format." });
     }
+    const { uid } = req.user;
+    if (!uid) {
+        return res.status(401).send();
+    }
     try {
         const teams = await TournamentService.addTournamentParticipant(
+            uid,
             tournamentID,
             teamID
         );
@@ -228,14 +258,13 @@ router.delete("/removeTeam", async (req, res, next) => {
     if (!tournamentID || !teamID) {
         return res.status(400).json({ message: "Invalid request format." });
     }
+    const { uid } = req.user;
+    if (!uid) {
+        return res.status(401).send();
+    }
     try {
-        console.log(
-            "In router. team to delete is ",
-            teamID,
-            " from tournament ",
-            tournamentID
-        );
         await TournamentService.removeTournamentParticipant(
+            uid,
             tournamentID,
             teamID
         );
@@ -259,8 +288,13 @@ router.put("/disqualifyTeam", async (req, res) => {
     if (!tournamentID || !teamID) {
         return res.status(400).json({ message: "Invalid request format." });
     }
+    const { uid } = req.user;
+    if (!uid) {
+        return res.status(401).send();
+    }
     try {
-        const teams = await TournamentService.updateTournamentParticipant(
+        const teams = await TournamentService.disqualifyTournamentParticipant(
+            uid,
             tournamentID,
             teamID,
             null,
@@ -345,8 +379,13 @@ router.post("/addFacilitator", async (req, res, next) => {
     if (!tournamentID || !userID) {
         return res.status(400).json({ message: "Invalid request format." });
     }
+    const { uid } = req.user;
+    if (!uid) {
+        return res.status(401).send();
+    }
     try {
         const facilitators = await TournamentService.addTournamentFacilitator(
+            uid,
             tournamentID,
             userID
         );
@@ -373,9 +412,14 @@ router.post("/removeFacilitator", async (req, res) => {
     if (!tournamentID || !userID) {
         return res.status(400).json({ message: "Invalid request format." });
     }
+    const { uid } = req.user;
+    if (!uid) {
+        return res.status(401).send();
+    }
     try {
         const facilitators =
             await TournamentService.removeTournamentFacilitator(
+                uid,
                 tournamentID,
                 userID
             );
@@ -459,8 +503,13 @@ router.put("/setMatchResult", async (req, res, next) => {
     if (!matchID || !score1) {
         return res.status(400).json({ message: "Invalid request format." });
     }
+    const { uid } = req.user;
+    if (!uid) {
+        return res.status(401).send();
+    }
     try {
         const match = await TournamentService.updateMatchResult(
+            uid,
             matchID,
             score1,
             score2
