@@ -217,26 +217,39 @@ const getTournamentBracket = async (tournamentID) => {
             let currentRightCount = 0;
 
             if (isFinalRound) {
-                const totalPrev = previousLeftCount + previousRightCount;
-                const tbdCount = totalPrev >= 2 ? 1 : 0;
-
-                const finalMatch = Array.from({ length: tbdCount }).map(
-                    (_, index) => ({
-                        MatchID: `TBD-PLACEHOLDER`,
-                        TournamentID: tournamentID,
-                        MatchTime: null,
-                        Team1ID: null,
-                        Team1Name: "TBD",
-                        Score1: null,
-                        Team2ID: null,
-                        Team2Name: "TBD",
-                        WinnerID: null,
-                        Score2: null,
-                        BracketSide: "final",
-                        BracketOrder: index,
-                        MatchRound: i,
-                    })
+                const lastMatch = await searchMatches(
+                    null,
+                    tournamentID,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    rounds
                 );
+                let finalMatch = [];
+                if (lastMatch[0]) {
+                    finalMatch = lastMatch[0];
+                } else {
+                    finalMatch = Array.from({ length: tbdCount }).map(
+                        (_, index) => ({
+                            MatchID: `TBD-PLACEHOLDER`,
+                            TournamentID: tournamentID,
+                            MatchTime: null,
+                            Team1ID: null,
+                            Team1Name: "TBD",
+                            Score1: null,
+                            Team2ID: null,
+                            Team2Name: "TBD",
+                            WinnerID: null,
+                            Score2: null,
+                            BracketSide: "left",
+                            BracketOrder: index,
+                            MatchRound: i,
+                        })
+                    );
+                }
 
                 bracket.push({
                     title: `Round ${i}`,
