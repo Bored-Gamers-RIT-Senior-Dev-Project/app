@@ -20,6 +20,11 @@ router.post("/create", async (req, res, next) => {
             endDate,
             location
         );
+        if (!tournament) {
+            return res
+                .status(500)
+                .json({ error: "Unknown error creating tournament." });
+        }
         return res.status(201).json({
             message: "Tournament created successfully.",
             tournament,
