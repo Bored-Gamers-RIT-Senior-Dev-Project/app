@@ -23,6 +23,18 @@ jobs:
               with:
                   ref: ${{ github.event.inputs.branch || github.ref_name }}
 
+            - name: Create .env File
+              run: |
+                  cat <<EOF > .env
+                  VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }}
+                  VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+                  VITE_FIREBASE_PROJECT_ID=${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+                  VITE_FIREBASE_STORAGE_BUCKET=${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+                  VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+                  VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }}
+                  VITE_FIREBASE_MEASUREMENT_ID=${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
+                  EOF
+
             - name: Build Docker Image
               run: |
                   docker buildx build --network=host -t bg-client ./client
@@ -35,6 +47,7 @@ jobs:
 
             - name: Deploy Application via SSH
               run: |
+                  scp .env ${{ secrets.SSH_USER }}@${{ secrets.SSH_STAGING_HOST }}:/tmp/.env
                   ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_STAGING_HOST }} << 'EOF'
                     CONTAINER_NAME=bg-client_app
                     IMAGE_TAR=/tmp/bg-client.tar
@@ -53,7 +66,7 @@ jobs:
 
                     # Run the new container on port 5173
                     echo "Running container: $CONTAINER_NAME"
-                    docker run -d --name "$CONTAINER_NAME" -p 5173:5173 bg-client
+                    docker run -d --name "$CONTAINER_NAME" -p 5173:5173 --env-file /tmp/.env bg-client
 
                     # Clean up image tar file
                     echo "Cleaning up image file..."
