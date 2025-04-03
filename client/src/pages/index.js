@@ -4,6 +4,7 @@ import { Rules } from "./Rules";
 import { Schedule } from "./Schedule";
 import { Search } from "./Search";
 import { About } from "./About";
+import { Faq } from "./Faq";
 import { University } from "./University";
 import { TeamsPage } from "./TeamsPage";
 import { UserSettings } from "./UserSettings";
@@ -20,6 +21,7 @@ export {
     Schedule,
     Search,
     About,
+    Faq,
     University,
     TeamsPage,
     UserSettings,
