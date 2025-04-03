@@ -12,6 +12,7 @@ import { UserSignUp } from "./UserSignUp";
 import { ReportView } from "./ReportView";
 import { AdminDashboard } from "./AdminDashboard";
 import { UserManager } from "./UserManager";
+import { MatchesPage } from "./MatchesPage";
 
 export {
     Home,
@@ -28,5 +29,6 @@ export {
     ReportView,
     AdminDashboard,
     UserManager,
+    MatchesPage,
 };
 

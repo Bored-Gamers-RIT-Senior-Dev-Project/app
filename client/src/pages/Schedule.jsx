@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Paper,
@@ -6,17 +6,19 @@ import {
   TextField,
   Select,
   MenuItem,
-  Stack,
+  Grid,
   Accordion,
   AccordionSummary,
   AccordionDetails,
   CircularProgress,
   Button,
-  Grid,
-  Autocomplete,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { formatDistanceToNow } from "date-fns";
+import { useNavigate } from "react-router";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 const Schedule = () => {
   const [tournaments, setTournaments] = useState([]);
@@ -25,9 +27,11 @@ const Schedule = () => {
     location: "",
     status: "",
     sortBy: "",
-    matchTeam: "",
+    startDate: null,
+    endDate: null,
   });
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   const tournamentStatuses = ["Active", "Completed", "Cancelled", "Upcoming"];
 
   const formatDateRange = (start, end) => {
@@ -37,15 +41,10 @@ const Schedule = () => {
     return `${startDate} - ${endDate}`;
   };
 
-  const getMatchCountdown = (matchTime) => {
-    const matchDate = new Date(matchTime);
-    return formatDistanceToNow(matchDate, { addSuffix: true });
-  };
-
   useEffect(() => {
     const fetchTournaments = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/tournaments/with-matches");
+        const res = await fetch("http://localhost:3000/api/tournaments");
         const data = await res.json();
         if (Array.isArray(data)) {
           setTournaments(data);
@@ -70,7 +69,7 @@ const Schedule = () => {
   };
 
   const clearFilters = () => {
-    setFilters({ name: "", location: "", status: "", sortBy: "", matchTeam: "" });
+    setFilters({ name: "", location: "", status: "", sortBy: "", startDate: null, endDate: null });
   };
 
   const filteredTournaments = tournaments
@@ -88,6 +87,14 @@ const Schedule = () => {
         filters.status === "" ||
         tournament.status.toLowerCase() === filters.status.toLowerCase()
     )
+    .filter((tournament) => {
+      const start = filters.startDate;
+      const end = filters.endDate;
+      const tournamentStartDate = new Date(tournament.startDate);
+      if (start && tournamentStartDate < new Date(start)) return false;
+      if (end && tournamentStartDate > new Date(end)) return false;
+      return true;
+    })
     .sort((a, b) => {
       if (filters.sortBy === "date") {
         return new Date(a.startDate) - new Date(b.startDate);
@@ -100,14 +107,11 @@ const Schedule = () => {
   return (
     <Box sx={{ maxWidth: "900px", margin: "auto", padding: 2 }}>
       <Typography variant="h4" sx={{ fontWeight: "bold", textAlign: "center", marginBottom: 3 }}>
-        Tournament Schedule
+        All Tournaments
       </Typography>
 
       <Box sx={{ position: "sticky", top: 0, zIndex: 10, backgroundColor: "#fff", mb: 3 }}>
         <Paper sx={{ padding: 3, borderRadius: "10px" }}>
-          <Typography variant="h6" gutterBottom>
-            Tournament Filters
-          </Typography>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -137,7 +141,9 @@ const Schedule = () => {
               >
                 <MenuItem value="">Filter by Status</MenuItem>
                 {tournamentStatuses.map((status) => (
-                  <MenuItem key={status} value={status}>{status}</MenuItem>
+                  <MenuItem key={status} value={status}>
+                    {status}
+                  </MenuItem>
                 ))}
               </Select>
             </Grid>
@@ -154,24 +160,29 @@ const Schedule = () => {
                 <MenuItem value="location">Location</MenuItem>
               </Select>
             </Grid>
-          </Grid>
-
-          <Typography variant="h6" mt={3} gutterBottom>
-            Match Filters
-          </Typography>
-          <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Match Team Name"
-                name="matchTeam"
-                value={filters.matchTeam}
-                onChange={handleFilterChange}
-              />
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DatePicker
+                  label="Start Date"
+                  value={filters.startDate}
+                  onChange={(newValue) => setFilters((prev) => ({ ...prev, startDate: newValue }))}
+                  renderInput={(params) => <TextField {...params} fullWidth />}
+                />
+              </LocalizationProvider>
             </Grid>
             <Grid item xs={12} sm={6}>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DatePicker
+                  label="End Date"
+                  value={filters.endDate}
+                  onChange={(newValue) => setFilters((prev) => ({ ...prev, endDate: newValue }))}
+                  renderInput={(params) => <TextField {...params} fullWidth />}
+                />
+              </LocalizationProvider>
+            </Grid>
+            <Grid item xs={12}>
               <Button fullWidth variant="outlined" onClick={clearFilters}>
-                Clear All Filters
+                Clear Filters
               </Button>
             </Grid>
           </Grid>
@@ -183,76 +194,33 @@ const Schedule = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <Stack spacing={2}>
-          {filteredTournaments.map((tournament) => {
-            const filteredMatches = (tournament.matches || []).filter(
-              (match) =>
-                match.team1Name.toLowerCase().includes(filters.matchTeam.toLowerCase()) ||
-                match.team2Name.toLowerCase().includes(filters.matchTeam.toLowerCase())
-            );
-
-            return (
-              <Accordion key={tournament.tournamentId} defaultExpanded>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Box width="100%">
-                    <Typography variant="h6" fontWeight="bold">
-                      {tournament.tournamentName} ({filteredMatches.length} matches)
-                    </Typography>
-                    <Typography>
-                      {formatDateRange(tournament.startDate, tournament.endDate)}
-                    </Typography>
-                    <Typography>{tournament.location}</Typography>
-                    <Typography variant="body2">Status: {tournament.status}</Typography>
-                  </Box>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                    Matches
-                  </Typography>
-                  {filteredMatches.length > 0 ? (
-                    filteredMatches.map((match) => (
-                      <Box
-                        key={match.matchId}
-                        display="flex"
-                        justifyContent="space-between"
-                        alignItems="center"
-                        px={2}
-                        py={1}
-                        border="1px solid #ccc"
-                        borderRadius="10px"
-                        mb={1}
-                      >
-                        <Typography>{match.team1Name}</Typography>
-                        <Typography fontWeight="bold" color="primary">
-                          vs
-                        </Typography>
-                        <Typography>{match.team2Name}</Typography>
-                        <Typography variant="caption" color="textSecondary">
-                          {getMatchCountdown(match.matchTime)}
-                        </Typography>
-                        <Typography variant="body2" color="textSecondary">
-                          {match.score1} - {match.score2}
-                        </Typography>
-                        {match.winnerId && (
-                          <Typography variant="body2" color="primary">
-                            Winner: {match.winnerId === match.team1Id ? match.team1Name : match.team2Name}
-                          </Typography>
-                        )}
-                      </Box>
-                    ))
-                  ) : (
-                    <Typography variant="body2" color="textSecondary">
-                      No matches found for this tournament.
-                    </Typography>
-                  )}
-                </AccordionDetails>
-              </Accordion>
-            );
-          })}
-        </Stack>
+        filteredTournaments.map((tournament) => (
+          <Accordion key={tournament.tournamentId} defaultExpanded>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Box width="100%">
+                <Typography
+                  variant="h6"
+                  fontWeight="bold"
+                  sx={{ color: "primary.main", textDecoration: "underline", cursor: "pointer" }}
+                  onClick={() => navigate(`/tournaments/${tournament.tournamentId}/matches`)}
+                >
+                  {tournament.tournamentName}
+                </Typography>
+                <Typography>{formatDateRange(tournament.startDate, tournament.endDate)}</Typography>
+                <Typography>{tournament.location}</Typography>
+                <Typography variant="body2">Status: {tournament.status}</Typography>
+              </Box>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Typography variant="body2" color="textSecondary">
+                Tournament details go here.
+              </Typography>
+            </AccordionDetails>
+          </Accordion>
+        ))
       )}
     </Box>
   );
 };
 
-export { Schedule };
+export {Schedule};

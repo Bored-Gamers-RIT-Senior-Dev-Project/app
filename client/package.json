@@ -10,11 +10,13 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "@date-io/date-fns": "^3.2.1",
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.0",
         "@mui/icons-material": "^6.4.7",
-        "@mui/material": "^6.4.9",
-        "@mui/x-date-pickers": "^7.28.2",
+        "@mui/material": "^6.4.10",
+        "@mui/x-date-pickers": "^7.28.3",
+        "@mui/x-date-pickers-pro": "^7.28.3",
         "@zxcvbn-ts/core": "^3.0.4",
         "@zxcvbn-ts/language-common": "^3.0.4",
         "@zxcvbn-ts/language-en": "^3.0.2",

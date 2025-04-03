@@ -14,7 +14,8 @@ import {
     UserSignUp,
     ReportView,
     AdminDashboard,
-    UserManager
+    UserManager,
+    MatchesPage
 } from "../pages";
 import { UserPreferences } from "../pages/UserPreferences.DEMO";
 import { search, university, users } from "./api";
@@ -106,6 +107,11 @@ const router = createBrowserRouter([
                 path: "/schedule",
                 element: <Schedule />,
             },
+            {
+                path: "/tournaments/:id/matches",
+                element: <MatchesPage />,
+            },
+            
             {
                 path: "/admin/reports",
                 element: <ReportView />,
