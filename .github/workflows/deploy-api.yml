@@ -55,6 +55,7 @@ jobs:
 
             - name: Deploy Application via SSH
               run: |
+                  scp .env ${{ secrets.SSH_USER }}@${{ secrets.SSH_STAGING_HOST }}:/tmp/.env
                   ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_STAGING_HOST }} << 'EOF'
                     CONTAINER_NAME=bg-api_app
                     IMAGE_TAR=/tmp/bg-api.tar
