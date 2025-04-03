@@ -25,7 +25,7 @@ jobs:
 
             - name: Create .env File
               run: |
-                  cat <<EOF > .env
+                  cat <<EOF > ./client/.env
                   VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }}
                   VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
                   VITE_FIREBASE_PROJECT_ID=${{ secrets.VITE_FIREBASE_PROJECT_ID }}
@@ -66,7 +66,7 @@ jobs:
 
                     # Run the new container on port 5173
                     echo "Running container: $CONTAINER_NAME"
-                    docker run -d --name "$CONTAINER_NAME" -p 5173:5173 --env-file /tmp/.env bg-client
+                    docker run -d --name "$CONTAINER_NAME" -p 5173:5173 bg-client
 
                     # Clean up image tar file
                     echo "Cleaning up image file..."
