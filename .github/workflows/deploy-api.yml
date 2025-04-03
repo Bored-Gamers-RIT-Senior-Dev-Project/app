@@ -79,4 +79,5 @@ jobs:
                     # Clean up image tar file
                     echo "Cleaning up image file..."
                     rm -f "$IMAGE_TAR"
+                    rm -f /tmp/.env
                   EOF
