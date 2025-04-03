@@ -73,7 +73,7 @@ jobs:
 
                     # Run the new container on port 5173
                     echo "Running container: $CONTAINER_NAME"
-                    docker run -d --name "$CONTAINER_NAME" -p 3000:3000 bg-api
+                    docker run -d --name "$CONTAINER_NAME" -p 3000:3000 --env-file /tmp/.env bg-api
 
                     # Clean up image tar file
                     echo "Cleaning up image file..."
