@@ -1,5 +1,7 @@
 import { Box, Paper, Typography, Stack } from "@mui/material";
 import { ImageHolder } from "../components/ImageHolder";
+import setupimg from "../assets/rules/setup.jpg";  
+import playingimg from "../assets/rules/playing.jpg"
 
 const Rules = () => {
   return (
@@ -45,7 +47,7 @@ const Rules = () => {
           </Box>
           <Box sx={{ padding: "5px 10px" }}>
             <ImageHolder
-              src="https://placehold.co/600x300"
+              src={setupimg}
               alt="Setup Guide"
               sx={{
                 width: "100%",
@@ -89,7 +91,7 @@ const Rules = () => {
           </Box>
           <Box sx={{ padding: "5px 10px" }}>
             <ImageHolder
-              src="https://placehold.co/600x300"
+              src={playingimg}
               alt="Gameplay"
               sx={{
                 width: "100%",

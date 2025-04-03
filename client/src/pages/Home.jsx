@@ -5,6 +5,11 @@ import image1 from "../assets/art/game_pieces_on_desert_board.jpg";
 import image2 from "../assets/art/students_playing.png";
 import { ImageButton } from "../components/ImageButton";
 import { ImageHolder } from "../components/ImageHolder";
+import rulesimg from "../assets/home/Rules.webp";
+import teamsimg from "../assets/home/teams.jpg";
+import mapimg from "../assets/home/map.jpg";
+import gamenightimg from "../assets/home/game_night.jpeg";    
+
 
 const Home = () => {
     const navigate = useNavigate();
@@ -33,10 +38,17 @@ const Home = () => {
                     </Typography>
                 </Grid>
                 <Grid size={6}>
-                    <ImageHolder src="https://placehold.co/600x400" />
+                    <ImageHolder src={mapimg}/>
                 </Grid>
                 <Grid size={6}>
-                    <ImageHolder src="https://placehold.co/600x400" />
+                    <ImageHolder 
+                        src={gamenightimg} 
+                        sx={{
+                            height: 268, // or 280 for a touch more
+                            width: "100%",
+                            objectFit: "cover",
+                        }}
+                    />
                 </Grid>
                 <Grid size={12}>
                     <Typography
@@ -62,14 +74,14 @@ const Home = () => {
                 </Grid>
                 <Grid size={6}>
                     <ImageButton
-                        src={"https://placehold.co/600x400"}
+                        src={rulesimg}
                         text="Learn the Rules"
                         onClick={() => navigate("/rules")}
                     />
                 </Grid>
                 <Grid size={6}>
                     <ImageButton
-                        src={"https://placehold.co/600x400"}
+                        src={teamsimg}
                         text="Find a Team"
                         onClick={() => navigate("/search")}
                     />
