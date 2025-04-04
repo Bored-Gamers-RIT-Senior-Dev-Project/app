@@ -176,16 +176,29 @@ const removeTournamentParticipant = async (tournamentID, teamID) => {
     }
 };
 
+// Define enums using frozen objects.
+const MatchStatus = Object.freeze({
+    ACTIVE: "active",
+    LOST: "lost",
+    WINNER: "winner",
+    DISQUALIFIED: "disqualified",
+});
+
+const BracketSide = Object.freeze({
+    LEFT: "left",
+    RIGHT: "right",
+});
+
 /**
  * Updates a tournament participant's details.
  * @param {number} tournamentID - ID of the tournament.
  * @param {number} teamID - ID of the team.
- * @param {number} round - The current round for the team.
- * @param {number} byes - Number of byes awarded.
- * @param {string} status - Current status (e.g., "active", "lost").
- * @param {string} bracketSide - The side of the bracket ("left" or "right").
- * @param {number|null} nextMatchID - ID of the next match, or null.
- * @param {number} bracketOrder - Order in the bracket.
+ * @param {number} [round] - The current round for the team.
+ * @param {number} [byes] - Number of byes awarded.
+ * @param {"active"|"lost"|"winner"|"disqualified"} [status] - Current status.
+ * @param {"left"|"right"} [bracketSide] - The side of the bracket.
+ * @param {number} [nextMatchID] - ID of the next match.
+ * @param {number} [bracketOrder] - Order in the bracket.
  * @returns {Promise<void>}
  * @throws {Error} Throws an error if no parameters are provided or if the update fails.
  */
@@ -212,10 +225,24 @@ const updateTournamentParticipant = async (
             params.push(byes);
         }
         if (status) {
+            if (!Object.values(MatchStatus).includes(status)) {
+                throw new Error(
+                    `Invalid status: ${status}. Valid statuses are: ${Object.values(
+                        MatchStatus
+                    ).join(", ")}.`
+                );
+            }
             updates.push("Status = ?");
             params.push(status);
         }
         if (bracketSide) {
+            if (!Object.values(BracketSide).includes(bracketSide)) {
+                throw new Error(
+                    `Invalid bracketSide: ${bracketSide}. Valid values are: ${Object.values(
+                        BracketSide
+                    ).join(", ")}.`
+                );
+            }
             updates.push("BracketSide = ?");
             params.push(bracketSide);
         }
