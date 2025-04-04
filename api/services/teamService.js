@@ -44,7 +44,14 @@ const getTeams = async (uid, universityId = null, showUnapproved = false) => {
     return await teamModel.getTeams(!showUnapproved);
 };
 
-const getTeam = async (uid, teamId, showPendingChanges) => {
+/**
+ * Gets team information based on a team's ID
+ * @param {string} uid Firebase UID provided by auth
+ * @param {number} teamId Team ID to search for
+ * @param {boolean} showPendingChanges if the data should include pending changes.
+ * @returns Team information
+ */
+const getTeam = async (uid, teamId, showPendingChanges = false) => {
     const team = await teamModel.getTeam(teamId);
 
     //TODO: Role validation & Logic to get Pending  updates.
