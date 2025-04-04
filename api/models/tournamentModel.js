@@ -5,7 +5,6 @@ const db = require("../config/db");
  * @param {string} tournamentName - Name of the tournament.
  * @param {string} startDate - Start date of tournament in YYYY-MM-DD format.
  * @param {string} endDate - End date of tournament in YYYY-MM-DD format.
- * @param {string} status - Status of the tournament. Should always be "Upcoming" when creating a tournament.
  * @param {string} location - The location of the tournament. Likely an address or university name.
  * @returns {Promise<object>} Returns the created tournament record.
  * @throws {Error} Throws an error if the tournament cannot be inserted into the database.
@@ -14,21 +13,20 @@ const createTournament = async (
     tournamentName,
     startDate,
     endDate,
-    status,
     location
 ) => {
     try {
         const [result] = await db.query(
             `INSERT INTO tournaments (TournamentName, StartDate, EndDate, Status, Location)
              VALUES (?, ?, ?, ?, ?)`,
-            [tournamentName, startDate, endDate, status, location]
+            [tournamentName, startDate, endDate, "Upcoming", location]
         );
         return {
             id: result.insertId,
             tournamentName,
             startDate,
             endDate,
-            status,
+            status: "Upcoming",
             location,
         };
     } catch (error) {

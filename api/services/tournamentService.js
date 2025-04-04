@@ -79,7 +79,6 @@ const createTournament = async (
             tournamentName,
             startDate,
             finalEndDate,
-            "Upcoming",
             location
         );
         return tournament;
