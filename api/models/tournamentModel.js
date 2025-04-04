@@ -37,8 +37,8 @@ const createTournament = async (
 
 /**
  * Searches tournaments by one or more optional criteria.
- * If tournamentID is defined, this function returns the single tournament
- * record with that ID. Otherwise, it uses any of the provided parameters to filter the tournaments.
+ * If tournamentID is defined, this function returns the tournament record with that ID.
+ * Otherwise, it uses any of the provided parameters to filter the tournaments.
  * @param {number} [tournamentID] - ID for the tournament. If provided, only the tournament with this ID is returned.
  * @param {string} [tournamentName] - Name of the tournament.
  * @param {string} [startDate] - Start date of the tournament in YYYY-MM-DD format.
@@ -51,7 +51,7 @@ const createTournament = async (
  * @param {string} [location] - The location of the tournament.
  * @param {string} [sortBy] - Field to sort the results by.
  * @param {boolean} [sortAsDescending] - If true, sorts the results in descending order.
- * @returns {Promise<object|object[]|null>} Returns a tournament object, an array of tournaments, or null if none found.
+ * @returns {Promise<object[]>} Returns an array of tournament objects. Returns an empty array if no tournaments are found.
  * @throws {Error} Throws an error if the database query fails.
  */
 const searchTournaments = async (
@@ -71,19 +71,17 @@ const searchTournaments = async (
     try {
         if (tournamentID) {
             const [rows] = await db.query(
-                `
-                SELECT * 
-                FROM tournaments
-                WHERE TournamentID = ?
-            `,
+                `SELECT * 
+                 FROM tournaments
+                 WHERE TournamentID = ?`,
                 [tournamentID]
             );
             if (rows.length === 0) {
-                return null;
+                return [];
             } else if (rows.length > 1) {
                 throw Error("Search error for tournament ID: " + tournamentID);
             }
-            return rows[0];
+            return rows; // Always return an array.
         } else {
             let search = "SELECT * FROM tournaments WHERE 1=1";
             const params = [];
@@ -132,11 +130,7 @@ const searchTournaments = async (
             }
 
             const [rows] = await db.query(search, params);
-
-            if (rows.length === 0) {
-                return null;
-            }
-            return rows;
+            return rows; // rows will be an empty array if no records were found.
         }
     } catch (error) {
         console.error("Error searching for tournament:", error.message);
