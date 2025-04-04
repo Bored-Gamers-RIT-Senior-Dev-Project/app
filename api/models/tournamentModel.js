@@ -1,5 +1,18 @@
 const db = require("../config/db");
 
+// Define enums using frozen objects.
+const TeamStatus = Object.freeze({
+    ACTIVE: "active",
+    LOST: "lost",
+    WINNER: "winner",
+    DISQUALIFIED: "disqualified",
+});
+
+const BracketSide = Object.freeze({
+    LEFT: "left",
+    RIGHT: "right",
+});
+
 /**
  * Creates a new tournament in the database.
  * @param {string} tournamentName - Name of the tournament.
@@ -176,19 +189,6 @@ const removeTournamentParticipant = async (tournamentID, teamID) => {
     }
 };
 
-// Define enums using frozen objects.
-const MatchStatus = Object.freeze({
-    ACTIVE: "active",
-    LOST: "lost",
-    WINNER: "winner",
-    DISQUALIFIED: "disqualified",
-});
-
-const BracketSide = Object.freeze({
-    LEFT: "left",
-    RIGHT: "right",
-});
-
 /**
  * Updates a tournament participant's details.
  * @param {number} tournamentID - ID of the tournament.
@@ -225,10 +225,10 @@ const updateTournamentParticipant = async (
             params.push(byes);
         }
         if (status) {
-            if (!Object.values(MatchStatus).includes(status)) {
+            if (!Object.values(TeamStatus).includes(status)) {
                 throw new Error(
                     `Invalid status: ${status}. Valid statuses are: ${Object.values(
-                        MatchStatus
+                        TeamStatus
                     ).join(", ")}.`
                 );
             }
@@ -278,22 +278,23 @@ const updateTournamentParticipant = async (
 
 /**
  * Searches tournament participants based on various criteria.
- * @param {number|null} tournamentID - ID of the tournament.
- * @param {number|null} teamID - ID of the team.
- * @param {string|null} teamName - Name of the team (supports partial match).
- * @param {number|null} teamLeaderID - ID of the team leader.
- * @param {string|null} teamLeaderName - Name of the team leader.
- * @param {number|null} round - The current round for the participant.
- * @param {number|null} byes - Number of byes awarded.
- * @param {string|null} status - Status of the participant.
- * @param {string|null} bracketSide - Bracket side ("left" or "right").
- * @param {number|null} nextMatchID - ID of the next match.
- * @param {number|null} universityID - ID of the university.
- * @param {string|null} universityName - Name of the university (supports partial match).
- * @param {boolean|null} isApproved - Approval status of the team.
- * @param {string|null} sortBy - Field to sort the results by.
- * @param {boolean} sortAsDescending - If true, sorts results in descending order.
- * @returns {Promise<object[]|null>} Returns an array of participant records or null if none found.
+ * All parameters are optional.
+ * @param {number} [tournamentID] - ID of the tournament.
+ * @param {number} [teamID] - ID of the team.
+ * @param {string} [teamName] - Name of the team (supports partial match).
+ * @param {number} [teamLeaderID] - ID of the team leader.
+ * @param {string} [teamLeaderName] - Name of the team leader (supports partial match).
+ * @param {number} [round] - The current round for the participant.
+ * @param {number} [byes] - Number of byes awarded.
+ * @param {"active"|"lost"|"winner"|"disqualified"} [status] - Status of the participant.
+ * @param {"left"|"right"} [bracketSide] - Bracket side.
+ * @param {number} [nextMatchID] - ID of the next match.
+ * @param {number} [universityID] - ID of the university.
+ * @param {string} [universityName] - Name of the university (supports partial match).
+ * @param {boolean} [isApproved] - Approval status of the team.
+ * @param {string} [sortBy] - Field to sort the results by.
+ * @param {boolean} [sortAsDescending] - If true, sorts results in descending order.
+ * @returns {Promise<object[]>} Returns an array of participant records (empty if none found).
  * @throws {Error} Throws an error if the search query fails.
  */
 const searchTournamentParticipants = async (
@@ -315,66 +316,84 @@ const searchTournamentParticipants = async (
 ) => {
     try {
         let searchQuery = `
-        SELECT 
-            tournament_participants.TeamID,
-            tournament_participants.Round AS TeamRound,
-            tournament_participants.Byes AS TeamByeCount,
-            tournament_participants.Status AS ParticipantStatus,
-            tournament_participants.BracketSide AS TeamBracketSide,
-            tournament_participants.NextMatchID AS TeamNextMatchID,
-            tournament_participants.BracketOrder AS TeamBracketOrder,
-            tournament_participants.TournamentID,
-            tournaments.TournamentName,
-            tournaments.Status AS TournamentStatus,
-            teams.TeamName,
-            teams.ProfileImageURL AS TeamProfileImageURL,
-            teams.TeamLeaderID,
-            teams.IsApproved AS TeamApprovalStatus,
-            teams.CreatedAt AS TeamCreatedAt,
-            CONCAT(users.FirstName, ' ', users.LastName) AS TeamLeaderFullName,
-            universities.UniversityName,
-            universities.LogoURL AS UniversityLogoURL
+            SELECT 
+                tournament_participants.TeamID,
+                tournament_participants.Round AS TeamRound,
+                tournament_participants.Byes AS TeamByeCount,
+                tournament_participants.Status AS ParticipantStatus,
+                tournament_participants.BracketSide AS TeamBracketSide,
+                tournament_participants.NextMatchID AS TeamNextMatchID,
+                tournament_participants.BracketOrder AS TeamBracketOrder,
+                tournament_participants.TournamentID,
+                tournaments.TournamentName,
+                tournaments.Status AS TournamentStatus,
+                teams.TeamName,
+                teams.ProfileImageURL AS TeamProfileImageURL,
+                teams.TeamLeaderID,
+                teams.IsApproved AS TeamApprovalStatus,
+                teams.CreatedAt AS TeamCreatedAt,
+                CONCAT(users.FirstName, ' ', users.LastName) AS TeamLeaderFullName,
+                universities.UniversityName,
+                universities.LogoURL AS UniversityLogoURL
             FROM tournament_participants
             JOIN tournaments ON tournament_participants.TournamentID = tournaments.TournamentID
             JOIN teams ON tournament_participants.TeamID = teams.TeamID
             JOIN universities ON teams.UniversityID = universities.UniversityID
             JOIN users ON teams.TeamLeaderID = users.UserID
-        WHERE 1=1
-      `;
+            WHERE 1=1
+        `;
         const params = [];
 
-        if (tournamentID) {
+        if (tournamentID != null) {
             searchQuery += " AND tournament_participants.TournamentID = ?";
             params.push(tournamentID);
         }
-        if (teamID) {
+        if (teamID != null) {
             searchQuery += " AND tournament_participants.TeamID = ?";
             params.push(teamID);
         }
         if (teamLeaderName) {
-            searchQuery += " AND users.TeamLeaderFullName = ?";
+            searchQuery +=
+                " AND CONCAT(users.FirstName, ' ', users.LastName) LIKE ?";
+            params.push(`%${teamLeaderName}%`);
         }
-        if (round) {
+        if (round != null) {
             searchQuery += " AND tournament_participants.Round = ?";
             params.push(round);
         }
-        if (byes) {
+        if (byes != null) {
             searchQuery += " AND tournament_participants.Byes = ?";
             params.push(byes);
         }
         if (status) {
+            // Validate status against TeamStatus
+            if (!Object.values(TeamStatus).includes(status)) {
+                throw new Error(
+                    `Invalid status: ${status}. Valid values are: ${Object.values(
+                        TeamStatus
+                    ).join(", ")}.`
+                );
+            }
             searchQuery += " AND tournament_participants.Status = ?";
             params.push(status);
         }
         if (bracketSide) {
+            // Validate bracketSide against BracketSide
+            if (!Object.values(BracketSide).includes(bracketSide)) {
+                throw new Error(
+                    `Invalid bracketSide: ${bracketSide}. Valid values are: ${Object.values(
+                        BracketSide
+                    ).join(", ")}.`
+                );
+            }
             searchQuery += " AND tournament_participants.BracketSide = ?";
             params.push(bracketSide);
         }
-        if (nextMatchID === 0 || nextMatchID) {
+        if (nextMatchID != null) {
             searchQuery += " AND tournament_participants.NextMatchID = ?";
             params.push(nextMatchID);
         }
-        if (universityID) {
+        if (universityID != null) {
             searchQuery += " AND teams.UniversityID = ?";
             params.push(universityID);
         }
@@ -382,16 +401,16 @@ const searchTournamentParticipants = async (
             searchQuery += " AND teams.TeamName LIKE ?";
             params.push(`%${teamName}%`);
         }
-        if (teamLeaderID) {
+        if (teamLeaderID != null) {
             searchQuery += " AND teams.TeamLeaderID = ?";
             params.push(teamLeaderID);
         }
-        if (isApproved) {
+        if (isApproved != null) {
             searchQuery += " AND teams.IsApproved = ?";
             params.push(isApproved);
         }
         if (universityName) {
-            searchQuery += " AND users.UniversityName LIKE ?";
+            searchQuery += " AND universities.UniversityName LIKE ?";
             params.push(`%${universityName}%`);
         }
         if (sortBy) {
@@ -401,7 +420,7 @@ const searchTournamentParticipants = async (
             searchQuery += " DESC";
         }
         const [rows] = await db.query(searchQuery, params);
-        return rows;
+        return rows || [];
     } catch (error) {
         console.error(
             "Error searching for tournament participants:",
