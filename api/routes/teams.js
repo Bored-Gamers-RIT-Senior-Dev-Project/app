@@ -27,13 +27,17 @@ router.get("", async (req, res, next) => {
  * @param {number} req.params.id The ID of the team to get.
  */
 router.get("/:teamId", async (req, res, next) => {
-    const { uid = null } = req.user;
-    const { showUnapproved = false, showPendingChanges = false } = req.query;
+    const uid = req.user?.uid;
+    const { showPendingChanges = false } = req.query;
     const { teamId } = req.params;
 
     try {
-        //const {team, pending} = await teamService.getTeam(uid, teamId, showUnapproved, showPendingChanges);
-        return res.status(200).json({});
+        const result = await teamService.getTeam(
+            uid,
+            teamId,
+            showPendingChanges
+        );
+        return res.status(200).json(result);
     } catch (error) {
         return next(error);
     }

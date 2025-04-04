@@ -1,6 +1,21 @@
 const db = require("../config/db");
 
 /**
+ * Gets a team by its teamID
+ * @param {number} teamId The team's ID in the database
+ * @returns The team columns if found, null if no team is found
+ */
+const getTeam = async (teamId) => {
+    const sql = "SELECT * FROM teams WHERE TeamId = ?";
+    const [rows] = await db.query(sql, [teamId]);
+
+    if (rows.length < 1) {
+        return null;
+    }
+    return rows[0];
+};
+
+/**
  * Searches for teams based on the search term.
  *
  * @param {string} teamName - The team name to search for.
@@ -135,6 +150,7 @@ const createTeam = async (universityId, teamName, userId) => {
 };
 
 module.exports = {
+    getTeam,
     createTeam,
     getTeams,
     getTeamById,
