@@ -1,6 +1,7 @@
 const teamModel = require("../models/teamModel");
 const userModel = require("../models/userModel");
 const createError = require("http-errors");
+const { makeObjectCamelCase } = require("../utils");
 
 /**
  * Searches for teams based on the search term.
@@ -64,7 +65,7 @@ const getTeam = async (uid, teamId, showPendingChanges = false) => {
         team.pendingChanges = pendingChanges;
     }
 
-    return team;
+    return makeObjectCamelCase(team);
 };
 
 /**
