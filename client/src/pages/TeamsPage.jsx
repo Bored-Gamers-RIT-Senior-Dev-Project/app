@@ -20,13 +20,13 @@ import {
     Typography,
 } from "@mui/material";
 import { useState } from "react";
+import { useLoaderData } from "react-router";
 
 const TeamsPage = () => {
+    const team = useLoaderData();
     const [editMode, setEditMode] = useState(false);
-    const [teamName, setTeamName] = useState("Team Name");
-    const [teamSummary, setTeamSummary] = useState(
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    );
+    const [teamName, setTeamName] = useState(team.teamName);
+    const [teamSummary, setTeamSummary] = useState(team.description ?? "");
     const [members, setMembers] = useState([
         {
             id: 1,
