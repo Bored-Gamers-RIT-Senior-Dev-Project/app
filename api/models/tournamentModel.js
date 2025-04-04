@@ -524,11 +524,11 @@ const searchTournamentFacilitators = async (
 /**
  * Updates tournament details.
  * @param {number} tournamentID - ID of the tournament to update.
- * @param {string|null} tournamentName - New tournament name.
- * @param {string|null} startDate - New start date in YYYY-MM-DD format.
- * @param {string|null} endDate - New end date in YYYY-MM-DD format.
- * @param {string|null} status - New status (e.g., "Upcoming", "Active").
- * @param {string|null} location - New location for the tournament.
+ * @param {string} [tournamentName] - New tournament name.
+ * @param {string} [startDate] - New start date in YYYY-MM-DD format.
+ * @param {string} [endDate] - New end date in YYYY-MM-DD format.
+ * @param {string} [status] - New status (e.g., "Upcoming", "Active").
+ * @param {string} [location] - New location for the tournament.
  * @returns {Promise<void>}
  * @throws {Error} Throws an error if no update parameters are provided or if the update fails.
  */
