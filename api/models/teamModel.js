@@ -16,7 +16,8 @@ const getTeam = async (teamId) => {
     t.CreatedAt AS createdAt,
     COUNT(DISTINCT teamMember.UserID) AS members,
     CONCAT(captain.FirstName, ' ', captain.LastName) AS captainName,
-    captain.Email AS captainEmail
+    captain.Email AS captainEmail,
+    captain.UserId AS captainId
 FROM
     teams t
         JOIN
