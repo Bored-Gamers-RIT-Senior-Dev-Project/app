@@ -3,16 +3,52 @@ const db = require("../config/db");
 /**
  * Gets a team by its teamID
  * @param {number} teamId The team's ID in the database
- * @returns The team columns if found, null if no team is found
+ * @returns {object} The team columns if found, null if no team is found
  */
 const getTeam = async (teamId) => {
-    const sql = "SELECT * FROM teams WHERE TeamId = ?";
+    const sql = `SELECT 
+    t.TeamID AS id,
+    t.TeamName AS teamName,
+    t.ProfileImageURL AS profileImageUrl,
+    t.UniversityID AS universityId,
+    u.UniversityName AS universityName,
+    t.Description AS description,
+    t.CreatedAt AS createdAt,
+    COUNT(DISTINCT teamMember.UserID) AS members,
+    CONCAT(captain.FirstName, ' ', captain.LastName) AS captainName,
+    captain.Email AS captainEmail
+FROM
+    teams t
+        JOIN
+    users captain ON captain.UserID = t.TeamLeaderID
+        JOIN
+    users teamMember ON teamMember.TeamID = t.TeamId
+        JOIN
+    universities u ON t.UniversityID = u.UniversityID
+    WHERE t.TeamID = ?`;
     const [rows] = await db.query(sql, [teamId]);
-
     if (rows.length < 1) {
+        console.log("Team not found: " + teamId);
         return null;
     }
+
+    console.log("Team Found: ", rows[0]);
     return rows[0];
+};
+
+/**
+ * Gets a list of all team members
+ * @param {number} teamId Team's ID
+ * @param {boolean} showUnapproved If members who haven't been confirmed by a University ID should be allowed.
+ * @returns {List<object>} List of users with the correct teamID.
+ */
+const getMembers = async (teamId, showUnapproved) => {
+    const sql = `
+        SELECT * FROM users WHERE TeamId = ?
+    `;
+    const [rows] = await db.query(sql, [teamId]);
+
+    return rows;
 };
 
 /**
@@ -151,6 +187,7 @@ const createTeam = async (universityId, teamName, userId) => {
 
 module.exports = {
     getTeam,
+    getMembers,
     createTeam,
     getTeams,
     getTeamById,
