@@ -471,12 +471,13 @@ const removeTournamentFacilitator = async (tournamentID, userID) => {
 
 /**
  * Searches tournament facilitators based on provided criteria.
- * @param {number|null} tournamentID - ID of the tournament.
- * @param {number|null} userID - ID of the facilitator user.
- * @param {string|null} name - Facilitator's full or partial name.
- * @param {string|null} email - Facilitator's email address.
- * @param {number|null} universityID - ID of the university.
- * @returns {Promise<object[]|null>} Returns an array of facilitator records or null if none found.
+ * All parameters are optional.
+ * @param {number} [tournamentID] - ID of the tournament.
+ * @param {number} [userID] - ID of the facilitator user.
+ * @param {string} [name] - Facilitator's full or partial name.
+ * @param {string} [email] - Facilitator's email address.
+ * @param {number} [universityID] - ID of the university.
+ * @returns {Promise<object[]>} Returns an array of facilitator records (empty if none found).
  * @throws {Error} Throws an error if the query fails.
  */
 const searchTournamentFacilitators = async (
@@ -491,11 +492,11 @@ const searchTournamentFacilitators = async (
             "SELECT users.UserID, CONCAT(users.FirstName, ' ', users.LastName) AS FullName, Email, ProfileImageURL FROM tournament_facilitators JOIN users ON tournament_facilitators.UserID = users.UserID WHERE 1=1";
         const params = [];
 
-        if (tournamentID) {
+        if (tournamentID != null) {
             search += " AND TournamentID = ?";
             params.push(tournamentID);
         }
-        if (userID) {
+        if (userID != null) {
             search += " AND users.UserID = ?";
             params.push(userID);
         }
@@ -508,12 +509,12 @@ const searchTournamentFacilitators = async (
             search += " AND Email LIKE ?";
             params.push(`%${email}%`);
         }
-        if (universityID) {
+        if (universityID != null) {
             search += " AND UniversityID = ?";
             params.push(universityID);
         }
         const [rows] = await db.query(search, params);
-        return rows;
+        return rows || [];
     } catch (error) {
         console.error("Error searching for facilitator(s):", error.message);
         throw error;
