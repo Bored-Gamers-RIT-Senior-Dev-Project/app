@@ -9,7 +9,7 @@ import {
     Rules,
     Schedule,
     Search,
-    TeamsPage,
+    TeamPage,
     University,
     UserManager,
     UserSettings,
@@ -72,7 +72,7 @@ const routes = [
             },
             {
                 path: "/teams/:teamId",
-                element: <TeamsPage />,
+                element: <TeamPage />,
                 loader: ({ params }) => teams.getInfo({ id: params.teamId }),
             },
             {
