@@ -60,7 +60,7 @@ const getTeam = async (uid, teamId, showPendingChanges = false) => {
         team.pendingChanges = pendingChanges;
     }
 
-    return null;
+    return team;
 };
 
 /**
