@@ -44,6 +44,18 @@ const getTeams = async (uid, universityId = null, showUnapproved = false) => {
     return await teamModel.getTeams(!showUnapproved);
 };
 
+const getTeam = async (uid, teamId, showPendingChanges) => {
+    const team = await teamModel.getTeam(teamId);
+
+    //TODO: Role validation & Logic to get Pending  updates.
+    const pendingChanges = null;
+    if (pendingChanges) {
+        team.pendingChanges = pendingChanges;
+    }
+
+    return null;
+};
+
 /**
  * Adds requestor to the team specified
  * @param {*} uid Requestor firebase uid
@@ -114,4 +126,4 @@ const addUserToTeam = async (uid, teamId, universityId) => {
     );
 };
 
-module.exports = { createTeam, searchTeams, getTeams, joinTeam };
+module.exports = { createTeam, getTeam, searchTeams, getTeams, joinTeam };

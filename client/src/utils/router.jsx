@@ -73,6 +73,7 @@ const routes = [
             {
                 path: "/teams/:teamId",
                 element: <TeamsPage />,
+                loader: ({ params }) => teams.getInfo({ id: params.teamId }),
             },
             {
                 path: "/university/:universityId",
