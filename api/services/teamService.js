@@ -49,10 +49,14 @@ const getTeams = async (uid, universityId = null, showUnapproved = false) => {
  * @param {string} uid Firebase UID provided by auth
  * @param {number} teamId Team ID to search for
  * @param {boolean} showPendingChanges if the data should include pending changes.
- * @returns Team information
+ * @returns {Promise<object>} Team information
  */
 const getTeam = async (uid, teamId, showPendingChanges = false) => {
-    const team = await teamModel.getTeam(teamId);
+    const [team, members] = await Promise.all([
+        teamModel.getTeam(teamId),
+        teamModel.getMembers(teamId, showPendingChanges),
+    ]);
+    team.members = members;
 
     //TODO: Role validation & Logic to get Pending  updates.
     const pendingChanges = null;
