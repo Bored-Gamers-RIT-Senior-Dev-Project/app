@@ -581,6 +581,16 @@ const updateTournamentDetails = async (
     }
 };
 
+/**
+ * Deletes a tournament and all its associated records from the database.
+ * This function removes a tournament by first deleting all dependent records in related tables
+ * (tournament participants, matches, and tournament facilitators) and then deleting the tournament
+ * record itself. All operations are executed within a transaction to ensure data integrity.
+ * If an error occurs, the transaction is rolled back.
+ * @param {number} tournamentID - The ID of the tournament to delete.
+ * @returns {Promise<void>} A promise that resolves when the tournament and its dependencies are successfully deleted.
+ * @throws {Error} Throws an error if the deletion process fails.
+ */
 const deleteTournament = async (tournamentID) => {
     const conn = await db.getConnection(); // assuming you're using a pool
     try {
