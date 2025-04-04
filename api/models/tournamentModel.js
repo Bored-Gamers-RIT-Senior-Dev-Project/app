@@ -37,20 +37,20 @@ const createTournament = async (
 
 /**
  * Searches tournaments by one or more optional criteria.
- * If tournamentID is provided (not null), this function returns the single tournament
+ * If tournamentID is defined, this function returns the single tournament
  * record with that ID. Otherwise, it uses any of the provided parameters to filter the tournaments.
- * @param {number|null} tournamentID - ID for the tournament. If provided, only the tournament with this ID is returned.
- * @param {string|null} tournamentName - Name of the tournament.
- * @param {string|null} startDate - Start date of the tournament in YYYY-MM-DD format.
- * @param {string|null} endDate - End date of the tournament in YYYY-MM-DD format.
- * @param {string|null} startsBefore - Returns tournaments starting on or before this date.
- * @param {string|null} startsAfter - Returns tournaments starting on or after this date.
- * @param {string|null} endsBefore - Returns tournaments ending on or before this date.
- * @param {string|null} endsAfter - Returns tournaments ending on or after this date.
- * @param {string|null} status - Status of the tournament (e.g., "Upcoming", "Active", etc.).
- * @param {string|null} location - The location of the tournament.
- * @param {string|null} sortBy - Field to sort the results by.
- * @param {boolean} sortAsDescending - If true, sorts the results in descending order.
+ * @param {number} [tournamentID] - ID for the tournament. If provided, only the tournament with this ID is returned.
+ * @param {string} [tournamentName] - Name of the tournament.
+ * @param {string} [startDate] - Start date of the tournament in YYYY-MM-DD format.
+ * @param {string} [endDate] - End date of the tournament in YYYY-MM-DD format.
+ * @param {string} [startsBefore] - Returns tournaments starting on or before this date.
+ * @param {string} [startsAfter] - Returns tournaments starting on or after this date.
+ * @param {string} [endsBefore] - Returns tournaments ending on or before this date.
+ * @param {string} [endsAfter] - Returns tournaments ending on or after this date.
+ * @param {string} [status] - Status of the tournament (e.g., "Upcoming", "Active", etc.).
+ * @param {string} [location] - The location of the tournament.
+ * @param {string} [sortBy] - Field to sort the results by.
+ * @param {boolean} [sortAsDescending] - If true, sorts the results in descending order.
  * @returns {Promise<object|object[]|null>} Returns a tournament object, an array of tournaments, or null if none found.
  * @throws {Error} Throws an error if the database query fails.
  */
