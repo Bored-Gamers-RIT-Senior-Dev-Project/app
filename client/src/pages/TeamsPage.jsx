@@ -1,9 +1,11 @@
 //Source: chatgpt
-import AddIcon from "@mui/icons-material/Add";
-import UploadIcon from "@mui/icons-material/CloudUpload";
-import EditIcon from "@mui/icons-material/Edit";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import SaveIcon from "@mui/icons-material/Save";
+import {
+    Add as AddIcon,
+    Edit as EditIcon,
+    MoreVert as MoreVertIcon,
+    Save as SaveIcon,
+    Upload as UploadIcon,
+} from "@mui/icons-material";
 import {
     Avatar,
     Box,
