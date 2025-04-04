@@ -138,4 +138,35 @@ const addUserToTeam = async (uid, teamId, universityId) => {
     );
 };
 
-module.exports = { createTeam, getTeam, searchTeams, getTeams, joinTeam };
+/**
+ * TODO: JSdocs
+ * @param {*} uid
+ * @param {*} teamName
+ * @param {*} description
+ * @param {*} profileImageUrl
+ */
+const postUpdateRequest = async (
+    uid,
+    teamId,
+    teamName,
+    description,
+    profileImageUrl
+) => {
+    //TODO: Verify user is captain(/team member?) using uid
+    //TODO: Here or in teamModel, check if team has an existing update request and update that instead of creating a new one if it does.
+    return await teamModel.teamUpdateRequest(
+        teamId,
+        teamName,
+        description,
+        profileImageUrl
+    );
+};
+
+module.exports = {
+    createTeam,
+    getTeam,
+    searchTeams,
+    getTeams,
+    joinTeam,
+    postUpdateRequest,
+};

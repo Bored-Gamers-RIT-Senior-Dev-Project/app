@@ -135,17 +135,27 @@ router.put("/:teamId", async (req, res, next) => {
 /**
  * Update a team's information (user variant, changes must be reviewed)
  * Requires [Team Captain role and matching teamID]
+ * @param {Object} req.body The request body containing the update details.
+ * @param {string} req.body.teamName The new name of the team.
+ * @param {string} req.body.profileImageUrl The URL of the team's profile image.
+ * @param {string} req.body.description A description of the team.
  */
 router.post("/:teamId/update", async (req, res, next) => {
     const uid = req?.user?.uid;
     if (!uid) return res.status(401).send();
 
     const { teamId } = req.params;
-    const { teamName, profileImageUrl, universityId } = req.body;
+    const { teamName, profileImageUrl, description } = req.body;
 
     try {
-        //const status = await teamService.postUpdateRequest(uid, teamId, teamName, profileImageUrl, universityId);
-        //return res.status(200).json({ status });
+        const status = await teamService.postUpdateRequest(
+            uid,
+            teamId,
+            teamName,
+            description,
+            profileImageUrl
+        );
+        return res.status(200).json(status);
     } catch (error) {
         return next(error);
     }

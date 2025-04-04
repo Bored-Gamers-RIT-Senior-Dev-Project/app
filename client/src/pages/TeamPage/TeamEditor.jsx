@@ -5,13 +5,15 @@ import { useState } from "react";
 import { usePostSubmit } from "../../hooks/usePostSubmit";
 
 const TeamEditor = ({ teamName, teamSummary, teamImage, exitEditMode }) => {
-    const [imageUrl, setImageUrl] = useState(teamImage);
-    const [name, setName] = useState(teamName);
-    const [description, setDescription] = useState(teamSummary);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [name, setName] = useState(null);
+    const [description, setDescription] = useState(null);
     const submit = usePostSubmit();
 
     const handleSave = () => {
-        submit({ teamName: name, description, profileImageUrl: imageUrl });
+        if (description || teamName || imageUrl) {
+            submit({ teamName: name, description, profileImageUrl: imageUrl });
+        }
         exitEditMode();
     };
 
@@ -24,8 +26,8 @@ const TeamEditor = ({ teamName, teamSummary, teamImage, exitEditMode }) => {
                 sx={{ mb: 2 }}
             >
                 <Avatar
-                    src={imageUrl}
-                    alt={teamName}
+                    src={imageUrl ?? teamImage}
+                    alt={name ?? teamName}
                     sx={{ height: "5em", width: "5em", margin: "auto" }}
                 />
                 <Button
@@ -46,7 +48,7 @@ const TeamEditor = ({ teamName, teamSummary, teamImage, exitEditMode }) => {
                 sx={{ mb: 2 }}
             >
                 <TextField
-                    value={name}
+                    value={name ?? teamName}
                     onChange={(e) => setName(e.target.value)}
                     variant="outlined"
                     autoFocus
@@ -62,7 +64,7 @@ const TeamEditor = ({ teamName, teamSummary, teamImage, exitEditMode }) => {
                     fullWidth
                     multiline
                     rows={3}
-                    value={description}
+                    value={description ?? teamSummary}
                     onChange={(e) => setDescription(e.target.value)}
                     variant="outlined"
                 />
