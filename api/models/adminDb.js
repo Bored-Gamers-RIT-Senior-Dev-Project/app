@@ -1,5 +1,5 @@
 const db = require("../config/db");
-const { createHttpError, HttpError } = require("http-errors");
+const createHttpError = require("http-errors");
 
 const getRoleList = async () => {
     const sql = `SELECT * FROM roles`;
@@ -75,4 +75,48 @@ const getReportOneTotals = async () => {
     return rows[0];
 };
 
-module.exports = { getReportOne, getReportOneTotals, getRoleList };
+/**
+ * Gets a list of events the University Admin needs to review, then returns them as a list.
+ * @param {number} universityId University Admin's University ID
+ * @returns {List<object>} An array of all events that need to be evaluated.
+ */
+const getUniversityAdminTickets = async (universityId) => {
+    const newTeamsQuery = `SELECT *, "newTeam" type FROM teams WHERE IsApproved = false`;
+
+    const newUsersQuery = `SELECT *, "newUser" type FROM users WHERE IsValidated = false`;
+
+    const teamEditsQuery = `SELECT upd.*, "teamEdit" type
+        FROM team_update upd
+        JOIN teams t ON upd.UpdatedTeamID = t.TeamId
+        WHERE t.UniversityId = ?`;
+
+    const userEditsQuery = `SELECT upd.*, "userEdit" type
+        FROM user_update upd
+        JOIN users u ON upd.UpdatedUserID = u.TeamId
+        WHERE u.UniversityId = ?`;
+
+    const [newTeams, newUsers, teamEdits, userEdits] = await Promise.all(
+        [newTeamsQuery, newUsersQuery, teamEditsQuery, userEditsQuery].map(
+            (q) => db.query(q, [universityId]).then(([rows]) => rows)
+        )
+    );
+
+    const result = [...teamEdits, ...userEdits, ...newUsers, ...newTeams];
+
+    //Sort generated using copilot
+    result.sort((a, b) => {
+        const dateA = a.CreatedAt ?? a.RequestedDate;
+        const dateB = b.CreatedAt ?? b.RequestedDate;
+
+        return new Date(dateA) - new Date(dateB);
+    });
+
+    return result;
+};
+
+module.exports = {
+    getReportOne,
+    getReportOneTotals,
+    getRoleList,
+    getUniversityAdminTickets,
+};

@@ -25,4 +25,16 @@ const generateReports = async (uid) => {
     return rv;
 };
 
-module.exports = { generateReports, getRoleList };
+/**
+ * TODO: Docs
+ * @param {*} uid
+ */
+const getUniversityAdminTickets = async (uid) => {
+    const user = await User.getUserByFirebaseId(uid);
+    console.log("User is ", user);
+    //TODO: Permissions and validation
+
+    await Admin.getUniversityAdminTickets(user.universityId);
+};
+
+module.exports = { generateReports, getRoleList, getUniversityAdminTickets };

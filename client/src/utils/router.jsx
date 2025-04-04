@@ -136,7 +136,7 @@ const routes = [
                 element: <AdminDashboard />,
             },
             {
-                path: "/admin/users",
+                path: "/admin",
                 element: <UserManager />,
                 children: [
                     {
@@ -212,6 +212,11 @@ const routes = [
                     },
                 ],
                 loader: users.getList,
+            },
+            {
+                path: "/representative",
+                element: <AdminDashboard />,
+                loader: admin.getUniversityAdminTickets,
             },
             {
                 path: "*",

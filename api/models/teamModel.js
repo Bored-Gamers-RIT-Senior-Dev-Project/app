@@ -29,11 +29,9 @@ FROM
     WHERE t.TeamID = ?`;
     const [rows] = await db.query(sql, [teamId]);
     if (rows.length < 1) {
-        console.log("Team not found: " + teamId);
         return null;
     }
 
-    console.log("Team Found: ", rows[0]);
     return rows[0];
 };
 
@@ -146,6 +144,7 @@ const getTeamsByUniversityId = async (universityId, approvedOnly = true) => {
     return query[0];
 };
 
+//TODO: JSdocs
 const getTeamById = async (teamId, showUnapproved, showPendingChanges) => {
     const sql = `SELECT 
     t.TeamID AS id,
@@ -176,6 +175,7 @@ WHERE
     return result[0][0];
 };
 
+//TODO: Jsdocs
 const createTeam = async (universityId, teamName, userId) => {
     const sql = `INSERT INTO teams (UniversityId, TeamName, TeamLeaderID) VALUES (?, ?, ?)`;
     const [resultSetHeader] = await db.query(sql, [
@@ -186,6 +186,33 @@ const createTeam = async (universityId, teamName, userId) => {
     return resultSetHeader.insertId;
 };
 
+/**
+ * TODO: JSDocs
+ * @param {} teamId
+ * @param {*} teamName
+ * @param {*} description
+ * @param {*} profileImageUrl
+ */
+const teamUpdateRequest = async (
+    teamId,
+    teamName,
+    description,
+    profileImageUrl
+) => {
+    const sql = `
+        INSERT INTO team_update (UpdatedTeamID, TeamName, ProfileImageURL, Description)
+        VALUES (?, ?, ?, ?)
+    `;
+    const [result] = await db.query(sql, [
+        teamId,
+        teamName,
+        profileImageUrl,
+        description,
+    ]);
+
+    return result.affectedRows > 0;
+};
+
 module.exports = {
     getTeam,
     getMembers,
@@ -194,4 +221,5 @@ module.exports = {
     getTeamById,
     searchTeams,
     getTeamsByUniversityId,
+    teamUpdateRequest,
 };
