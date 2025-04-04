@@ -996,6 +996,15 @@ const startTournament = async (tournamentID) => {
             bracketOrder++;
         }
 
+        // Update tournament status
+        await TournamentModel.updateTournamentDetails(
+            tournamentID,
+            null,
+            nill,
+            null,
+            "Active"
+        );
+
         // Generate the first round of matches for both bracket sides
         await nextRound(tournamentID, "left", 1);
         await nextRound(tournamentID, "right", 1);
