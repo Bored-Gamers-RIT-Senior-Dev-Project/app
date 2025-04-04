@@ -213,8 +213,8 @@ const updateTournamentParticipant = async (
     bracketOrder
 ) => {
     try {
-        let updates = [];
-        let params = [];
+        const updates = [];
+        const params = [];
 
         if (round) {
             updates.push("Round = ?");
@@ -521,8 +521,8 @@ const updateTournamentDetails = async (
     location
 ) => {
     try {
-        let updates = [];
-        let params = [];
+        const updates = [];
+        const params = [];
 
         if (tournamentName) {
             updates.push("TournamentName = ?");
