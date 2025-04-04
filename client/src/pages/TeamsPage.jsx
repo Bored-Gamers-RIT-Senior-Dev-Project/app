@@ -1,36 +1,51 @@
 //Source: chatgpt
-import { useState } from "react";
-import {
-    Grid,
-    Box,
-    Paper,
-    Typography,
-    TextField,
-    Button,
-    Card,
-    CardContent,
-    IconButton,
-    Tabs,
-    Tab,
-    Avatar,
-    Menu,
-    MenuItem
-} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import UploadIcon from "@mui/icons-material/CloudUpload";
 import EditIcon from "@mui/icons-material/Edit";
-import SaveIcon from "@mui/icons-material/Save";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import AddIcon from "@mui/icons-material/Add";
-
+import SaveIcon from "@mui/icons-material/Save";
+import {
+    Avatar,
+    Box,
+    Button,
+    Card,
+    Grid2 as Grid,
+    IconButton,
+    Menu,
+    MenuItem,
+    Paper,
+    Tab,
+    Tabs,
+    TextField,
+    Typography,
+} from "@mui/material";
+import { useState } from "react";
 
 const TeamsPage = () => {
     const [editMode, setEditMode] = useState(false);
     const [teamName, setTeamName] = useState("Team Name");
-    const [teamSummary, setTeamSummary] = useState("Lorem ipsum dolor sit amet, consectetur adipiscing elit.");
+    const [teamSummary, setTeamSummary] = useState(
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    );
     const [members, setMembers] = useState([
-        { id: 1, name: "User Name", role: "Member", blurb: "Lorem ipsum dolor asdf this is a user blurb." },
-        { id: 2, name: "User Name", role: "Scientist", blurb: "Fourth-year student studying engineering. Member of the e-sports team." },
-        { id: 3, name: "User Name", role: "Writer", blurb: "Third-year student double-majoring Creative Writing and Theater." }
+        {
+            id: 1,
+            name: "User Name",
+            role: "Member",
+            blurb: "Lorem ipsum dolor asdf this is a user blurb.",
+        },
+        {
+            id: 2,
+            name: "User Name",
+            role: "Scientist",
+            blurb: "Fourth-year student studying engineering. Member of the e-sports team.",
+        },
+        {
+            id: 3,
+            name: "User Name",
+            role: "Writer",
+            blurb: "Third-year student double-majoring Creative Writing and Theater.",
+        },
     ]);
     const [tab, setTab] = useState(0);
     const [menuAnchor, setMenuAnchor] = useState(null);
@@ -54,17 +69,34 @@ const TeamsPage = () => {
     };
 
     return (
-        <Box sx={{ width: "100%", display: "flex", justifyContent: "center", padding: { xs: 2, md: 4 } }}>
+        <Box
+            sx={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                padding: { xs: 2, md: 4 },
+            }}
+        >
             <Paper
                 sx={{
                     padding: { xs: 2, md: 4 },
                     width: "100%",
-                    maxWidth: { xs: "100%", sm: "90%", md: "1100px", lg: "1200px" },
-                    margin: "auto"
+                    maxWidth: {
+                        xs: "100%",
+                        sm: "90%",
+                        md: "1100px",
+                        lg: "1200px",
+                    },
+                    margin: "auto",
                 }}
             >
                 {/* Team Name + Edit Button */}
-                <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    sx={{ mb: 2 }}
+                >
                     {editMode ? (
                         <TextField
                             value={teamName}
@@ -77,14 +109,29 @@ const TeamsPage = () => {
                         <Typography variant="h4">{teamName}</Typography>
                     )}
                     <IconButton onClick={toggleEditMode}>
-                        {editMode ? <SaveIcon sx={{ color: "blue" }} /> : <EditIcon sx={{ color: "blue" }} />}
+                        {editMode ? (
+                            <SaveIcon sx={{ color: "blue" }} />
+                        ) : (
+                            <EditIcon sx={{ color: "blue" }} />
+                        )}
                     </IconButton>
                 </Box>
 
                 {/* Team Image Upload (Only in Edit Mode) */}
                 {editMode && (
-                    <Paper sx={{ padding: 2, textAlign: "center", width: "100%", mb: 2 }}>
-                        <Button component="label" variant="contained" startIcon={<UploadIcon />}>
+                    <Paper
+                        sx={{
+                            padding: 2,
+                            textAlign: "center",
+                            width: "100%",
+                            mb: 2,
+                        }}
+                    >
+                        <Button
+                            component="label"
+                            variant="contained"
+                            startIcon={<UploadIcon />}
+                        >
                             Upload Team Image
                             <input type="file" hidden />
                         </Button>
@@ -119,7 +166,11 @@ const TeamsPage = () => {
                 </Box>
 
                 {/* Tabs for Members / Events */}
-                <Tabs value={tab} onChange={(e, newValue) => setTab(newValue)} sx={{ borderBottom: 1, borderColor: "divider" }}>
+                <Tabs
+                    value={tab}
+                    onChange={(e, newValue) => setTab(newValue)}
+                    sx={{ borderBottom: 1, borderColor: "divider" }}
+                >
                     <Tab label="Members" />
                     <Tab label="Events" />
                 </Tabs>
@@ -128,20 +179,42 @@ const TeamsPage = () => {
                 {tab === 0 && (
                     <Grid container spacing={2} sx={{ mt: 2 }}>
                         {members.map((member) => (
-                            <Grid item xs={12} key={member.id}>
-                                <Card sx={{ display: "flex", alignItems: "center", padding: 2, position: "relative" }}>
-                                    <Avatar sx={{ width: 50, height: 50, mr: 2 }}>U</Avatar>
+                            <Grid size={12} key={member.id}>
+                                <Card
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        padding: 2,
+                                        position: "relative",
+                                    }}
+                                >
+                                    <Avatar
+                                        sx={{ width: 50, height: 50, mr: 2 }}
+                                    >
+                                        U
+                                    </Avatar>
                                     <Box sx={{ flexGrow: 1 }}>
-                                        <Typography variant="h6">{member.name}</Typography>
-                                        <Typography variant="body2">{member.role}</Typography>
-                                        <Typography variant="body2" sx={{ fontStyle: "italic" }}>
+                                        <Typography variant="h6">
+                                            {member.name}
+                                        </Typography>
+                                        <Typography variant="body2">
+                                            {member.role}
+                                        </Typography>
+                                        <Typography
+                                            variant="body2"
+                                            sx={{ fontStyle: "italic" }}
+                                        >
                                             {member.blurb}
                                         </Typography>
                                     </Box>
 
                                     {/* Edit Mode - Dropdown Menu */}
                                     {editMode && (
-                                        <IconButton onClick={(e) => handleMenuOpen(e, member)}>
+                                        <IconButton
+                                            onClick={(e) =>
+                                                handleMenuOpen(e, member)
+                                            }
+                                        >
                                             <MoreVertIcon />
                                         </IconButton>
                                     )}
@@ -158,7 +231,9 @@ const TeamsPage = () => {
                     onClose={handleMenuClose}
                 >
                     <MenuItem onClick={handleRemoveMember}>Remove</MenuItem>
-                    <MenuItem onClick={() => alert("Change Role clicked!")}>Change Role</MenuItem>
+                    <MenuItem onClick={() => alert("Change Role clicked!")}>
+                        Change Role
+                    </MenuItem>
                 </Menu>
 
                 {/* Floating Add Member Button */}
@@ -167,7 +242,17 @@ const TeamsPage = () => {
                         <Button
                             variant="contained"
                             startIcon={<AddIcon />}
-                            onClick={() => setMembers([...members, { id: members.length + 1, name: "New Member", role: "Role", blurb: "Description..." }])}
+                            onClick={() =>
+                                setMembers([
+                                    ...members,
+                                    {
+                                        id: members.length + 1,
+                                        name: "New Member",
+                                        role: "Role",
+                                        blurb: "Description...",
+                                    },
+                                ])
+                            }
                         >
                             Add Member
                         </Button>
