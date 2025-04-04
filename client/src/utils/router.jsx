@@ -31,13 +31,13 @@ import { events } from "./events";
  */
 const makeAction =
     (action, spinner = true) =>
-    async (params) => {
+    async ({ request, params }) => {
         if (spinner) {
             events.publish("spinner.open");
         }
         try {
-            const data = await params.request.json();
-            const response = await action(data);
+            const data = await request.json();
+            const response = await action(data, params);
             return response;
         } finally {
             if (spinner) {
@@ -74,6 +74,7 @@ const routes = [
                 path: "/teams/:teamId",
                 element: <TeamPage />,
                 loader: ({ params }) => teams.getInfo({ id: params.teamId }),
+                action: makeAction(teams.update),
             },
             {
                 path: "/university/:universityId",
@@ -171,19 +172,7 @@ const routes = [
                                 throw e;
                             }
                         },
-                        action: async ({ request, params }) => {
-                            events.publish("spinner.open");
-                            try {
-                                const data = await request.json();
-                                const response = await users.update(
-                                    params.userId,
-                                    data
-                                );
-                                return response;
-                            } finally {
-                                events.publish("spinner.close");
-                            }
-                        },
+                        action: makeAction(users.update),
                     },
                     {
                         path: "/admin/users/deleteUser/:userId",

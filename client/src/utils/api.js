@@ -124,6 +124,20 @@ const teams = Object.freeze({
         events.publish("refreshAuth"); //Refresh the user profile to load the user's team data.
         return data;
     },
+    /**
+     * TODO: Jsdocs for this function
+     * @param {*} param0
+     * @param {*} param1
+     * @returns
+     */
+    update: async ({ teamName, description, profileImageUrl }, { teamId }) => {
+        const { data } = await api.post(`teams/${teamId}/update`, {
+            teamName,
+            description,
+            profileImageUrl,
+        });
+        return data;
+    },
 });
 
 const users = Object.freeze({
