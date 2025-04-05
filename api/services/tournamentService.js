@@ -149,6 +149,40 @@ const searchTournaments = async (
 const getTournamentBracket = async (tournamentID) => {
     const bracket = [];
 
+    // Define a single constant template for TBD matches.
+    const TBD_MATCH = {
+        MatchID: "TBD-PLACEHOLDER",
+        TournamentID: tournamentID,
+        MatchTime: null,
+        Team1ID: null,
+        Team1Name: "TBD",
+        Score1: null,
+        Team2ID: null,
+        Team2Name: "TBD",
+        WinnerID: null,
+        Score2: null,
+        BracketSide: "TBD",
+        BracketOrder: 0,
+        MatchRound: 0,
+    };
+
+    // Define a single constant template for BYE matches.
+    const BYE_MATCH = {
+        MatchID: "BYE-PLACEHOLDER",
+        TournamentID: tournamentID,
+        MatchTime: null,
+        Team1ID: null,
+        Team1Name: "Winner", // This will be replaced with the actual winner info.
+        Score1: null,
+        Team2ID: null,
+        Team2Name: "BYE",
+        WinnerID: null,
+        Score2: null,
+        BracketSide: "BYE", // Will be replaced with "left" or "right".
+        BracketOrder: 0,
+        MatchRound: 0,
+    };
+
     // Fetch all participants for the tournament
     const participants = await searchTournamentParticipants(tournamentID);
     const numTeams = participants.length;
@@ -157,23 +191,7 @@ const getTournamentBracket = async (tournamentID) => {
     if (numTeams < 2) {
         bracket.push({
             title: "Round 1",
-            seeds: [
-                {
-                    MatchID: "TBD-PLACEHOLDER",
-                    TournamentID: tournamentID,
-                    MatchTime: null,
-                    Team1ID: null,
-                    Team1Name: "TBD",
-                    Score1: null,
-                    Team2ID: null,
-                    Team2Name: "TBD",
-                    WinnerID: null,
-                    Score2: null,
-                    BracketSide: "final",
-                    BracketOrder: 0,
-                    MatchRound: 1,
-                },
-            ],
+            seeds: [TBD_MATCH],
         });
 
         // Return tournament details and placeholder bracket
@@ -187,7 +205,6 @@ const getTournamentBracket = async (tournamentID) => {
     // Track number of teams on each side from the previous round
     let previousLeftCount = Math.ceil(numTeams / 2);
     let previousRightCount = Math.floor(numTeams / 2);
-
     let previousLeftWinners = [];
     let previousRightWinners = [];
 
@@ -237,28 +254,11 @@ const getTournamentBracket = async (tournamentID) => {
                 rounds
             );
             let finalMatch = [];
-
-            // Use existing match if present; otherwise create a placeholder
             if (lastMatch[0]) {
                 finalMatch = lastMatch[0];
             } else {
-                finalMatch = Array.from({ length: tbdCount }).map(
-                    (_, index) => ({
-                        MatchID: `TBD-PLACEHOLDER`,
-                        TournamentID: tournamentID,
-                        MatchTime: null,
-                        Team1ID: null,
-                        Team1Name: "TBD",
-                        Score1: null,
-                        Team2ID: null,
-                        Team2Name: "TBD",
-                        WinnerID: null,
-                        Score2: null,
-                        BracketSide: "left",
-                        BracketOrder: index,
-                        MatchRound: i,
-                    })
-                );
+                // For final round, assume one match is needed
+                finalMatch = Array(1).fill(TBD_MATCH);
             }
 
             bracket.push({
@@ -282,23 +282,17 @@ const getTournamentBracket = async (tournamentID) => {
                 previousRightCount > 1 &&
                 previousLeftWinners.length > 0
             ) {
-                // Carry forward the lone winner with a BYE
+                // Carry forward the lone winner with a BYE match
                 const winner = previousLeftWinners[0];
                 leftMatches = [
                     {
-                        MatchID: `BYE-PLACEHOLDER`,
+                        ...BYE_MATCH,
                         TournamentID: tournamentID,
-                        MatchTime: null,
                         Team1ID: winner.Team1ID ?? winner.Team2ID ?? null,
                         Team1Name:
                             winner.Team1Name ?? winner.Team2Name ?? "Winner",
-                        Score1: null,
-                        Team2ID: null,
-                        Team2Name: "BYE",
                         WinnerID: winner.Team1ID ?? winner.Team2ID ?? null,
-                        Score2: null,
                         BracketSide: "left",
-                        BracketOrder: 0,
                         MatchRound: i,
                     },
                 ];
@@ -308,24 +302,8 @@ const getTournamentBracket = async (tournamentID) => {
             }
 
             if (!leftMatches || leftMatches.length === 0) {
-                // Create placeholder matches
-                leftMatches = Array.from({ length: tbdCount }).map(
-                    (_, index) => ({
-                        MatchID: `TBD-PLACEHOLDER`,
-                        TournamentID: tournamentID,
-                        MatchTime: null,
-                        Team1ID: null,
-                        Team1Name: "TBD",
-                        Score1: null,
-                        Team2ID: null,
-                        Team2Name: "TBD",
-                        WinnerID: null,
-                        Score2: null,
-                        BracketSide: "left",
-                        BracketOrder: index,
-                        MatchRound: i,
-                    })
-                );
+                // Use the shared TBD_MATCH object for placeholders.
+                leftMatches = Array(tbdCount).fill(TBD_MATCH);
                 currentLeftCount = tbdCount;
             }
         } else {
@@ -348,19 +326,13 @@ const getTournamentBracket = async (tournamentID) => {
                 const winner = previousRightWinners[0];
                 rightMatches = [
                     {
-                        MatchID: `BYE-PLACEHOLDER`,
+                        ...BYE_MATCH,
                         TournamentID: tournamentID,
-                        MatchTime: null,
                         Team1ID: winner.Team1ID ?? winner.Team2ID ?? null,
                         Team1Name:
                             winner.Team1Name ?? winner.Team2Name ?? "Winner",
-                        Score1: null,
-                        Team2ID: null,
-                        Team2Name: "BYE",
                         WinnerID: winner.Team1ID ?? winner.Team2ID ?? null,
-                        Score2: null,
                         BracketSide: "right",
-                        BracketOrder: 0,
                         MatchRound: i,
                     },
                 ];
@@ -370,22 +342,7 @@ const getTournamentBracket = async (tournamentID) => {
             }
 
             if (!rightMatches || rightMatches.length === 0) {
-                rightMatches = Array.from({ length: tbdCount }).map(
-                    (_, index) => ({
-                        MatchID: `TBD-PLACEHOLDER`,
-                        TournamentID: tournamentID,
-                        MatchTime: null,
-                        Team1ID: null,
-                        Team1Name: "TBD",
-                        Score1: null,
-                        Team2ID: null,
-                        Team2Name: "TBD",
-                        Score2: null,
-                        BracketSide: "right",
-                        BracketOrder: index,
-                        MatchRound: i,
-                    })
-                );
+                rightMatches = Array(tbdCount).fill(TBD_MATCH);
                 currentRightCount = tbdCount;
             }
         } else {
