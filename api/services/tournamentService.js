@@ -629,30 +629,14 @@ const updateTournamentParticipant = async (
 };
 
 /**
- * Updates a tournament participant's details.
+ * Updates a tournament participant's status to disqualified.
  * @param {string} uid - FirebaseUID of the user trying to perform the action.
  * @param {number|string} tournamentID - ID of the tournament.
  * @param {number|string} teamID - ID of the team.
- * @param {number} round - New round number.
- * @param {number} byes - New bye count.
- * @param {string} status - New participant status.
- * @param {string} bracketSide - New bracket side ("left" or "right").
- * @param {number} nextMatchID - ID of the next match or null.
- * @param {number} bracketOrder - New order in the bracket.
  * @returns {Promise<object>} Returns the updated participant record.
  * @throws {Error} Throws an error if the update fails.
  */
-const disqualifyTournamentParticipant = async (
-    uid,
-    tournamentID,
-    teamID,
-    round,
-    byes,
-    status,
-    bracketSide,
-    nextMatchID,
-    bracketOrder
-) => {
+const disqualifyTournamentParticipant = async (uid, tournamentID, teamID) => {
     const user = await userModel.getUserByFirebaseId(uid);
     if (
         user.role !== "Super Admin" &&
@@ -664,16 +648,14 @@ const disqualifyTournamentParticipant = async (
     ) {
         throw createHttpError(403);
     }
-    const participant = await TournamentModel.updateTournamentParticipant(
+    await updateTournamentParticipant(
         tournamentID,
         teamID,
-        round,
-        byes,
-        status,
-        bracketSide,
-        nextMatchID,
-        bracketOrder
+        null,
+        null,
+        "disqualified"
     );
+    participant = await searchTournamentParticipants(tournamentID, teamID);
     return participant;
 };
 
