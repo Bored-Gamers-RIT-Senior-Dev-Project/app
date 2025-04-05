@@ -97,7 +97,7 @@ const createTournament = async (
  * @param {string} [location] - Tournament location.
  * @param {string} [sortBy] - Field to sort the results by.
  * @param {string|boolean} [sortAsDescending] - If true, sorts results in descending order.
- * @returns {Promise<object|object[]|null>} Returns a tournament record or an array of tournaments.
+ * @returns {Promise<object[]>} Returns a tournament record or an array of tournaments.
  * @throws {Error} Throws an error if validation fails or the query fails.
  */
 const searchTournaments = async (
@@ -157,7 +157,7 @@ const searchTournaments = async (
                 sortBy,
                 sortAsDescending
             );
-            return tournament;
+            return tournament || [];
         }
     } catch (error) {
         throw error;
@@ -641,7 +641,7 @@ const removeTournamentParticipant = async (uid, tournamentID, teamID) => {
  * @param {boolean} [isApproved] - Approval status.
  * @param {string} [sortBy] - Field to sort by.
  * @param {boolean} [sortAsDescending] - If true, sorts in descending order.
- * @returns {Promise<object[]|null>} Returns an array of participant records or null.
+ * @returns {Promise<object[]>} Returns an array of participant records.
  * @throws {Error} Throws an error if the search fails.
  */
 const searchTournamentParticipants = async (
@@ -679,7 +679,7 @@ const searchTournamentParticipants = async (
             sortBy,
             sortAsDescending
         );
-        return tournament;
+        return tournament || [];
     } catch (error) {
         throw error;
     }
@@ -855,7 +855,7 @@ const removeTournamentFacilitator = async (uid, tournamentID, userID) => {
  * @param {string} name - Facilitator's name.
  * @param {string} email - Facilitator's email.
  * @param {number} universityID - University ID.
- * @returns {Promise<object[]|null>} Returns an array of facilitator records or null.
+ * @returns {Promise<object[]} Returns an array of facilitator records or null.
  * @throws {Error} Throws an error if the search fails.
  */
 const searchTournamentFacilitators = async (
@@ -873,7 +873,7 @@ const searchTournamentFacilitators = async (
             email,
             universityID
         );
-        return tournament;
+        return tournament || [];
     } catch (error) {
         throw error;
     }
@@ -1204,7 +1204,7 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
  * @param {string} [sortBy] - Field to sort by.
  * @param {string|boolean} [sortAsDescending] - If true, sorts in descending order.
  * @param {number|string} [winnerID] - Winner ID filter.
- * @returns {Promise<object|object[]|null>} Returns a match record if matchID is provided, an array of matches if searching by criteria, or null if not found.
+ * @returns {Promise<object[]>} Returns a match record if matchID is provided, an array of matches if searching by criteria, or null if not found.
  * @throws {Error} Throws an error if validation fails or the search query fails.
  */
 const searchMatches = async (
@@ -1242,7 +1242,7 @@ const searchMatches = async (
                 sortAsDescending,
                 winnerID
             );
-            return match;
+            return match || [];
         }
     } catch (error) {
         throw error;
