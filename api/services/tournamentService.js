@@ -592,12 +592,12 @@ const searchTournamentParticipants = async (
  * Updates a tournament participant's details.
  * @param {number|string} tournamentID - ID of the tournament.
  * @param {number|string} teamID - ID of the team.
- * @param {number} round - New round number.
- * @param {number} byes - New bye count.
- * @param {string} status - New participant status.
- * @param {string} bracketSide - New bracket side ("left" or "right").
- * @param {number} nextMatchID - ID of the next match or null.
- * @param {number} bracketOrder - New order in the bracket.
+ * @param {number} [round] - New round number.
+ * @param {number} [byes] - New bye count.
+ * @param {string} [status] - New participant status.
+ * @param {string} [bracketSide] - New bracket side ("left" or "right").
+ * @param {number} [nextMatchID] - ID of the next match or null.
+ * @param {number} [bracketOrder] - New order in the bracket.
  * @returns {Promise<object>} Returns the updated participant record.
  * @throws {Error} Throws an error if the update fails.
  */
@@ -723,11 +723,11 @@ const removeTournamentFacilitator = async (uid, tournamentID, userID) => {
 
 /**
  * Searches for tournament facilitators based on provided criteria.
- * @param {number} tournamentID - ID of the tournament.
- * @param {number} userID - ID of the facilitator.
- * @param {string} name - Facilitator's name.
- * @param {string} email - Facilitator's email.
- * @param {number} universityID - University ID.
+ * @param {number} [tournamentID] - ID of the tournament.
+ * @param {number} [userID] - ID of the facilitator.
+ * @param {string} [name] - Facilitator's name.
+ * @param {string} [email] - Facilitator's email.
+ * @param {number} [university] - University ID.
  * @returns {Promise<object[]} Returns an array of facilitator records or null.
  * @throws {Error} Throws an error if the search fails.
  */
@@ -1093,7 +1093,6 @@ const searchMatches = async (
  * Updates the match result in the database based on matchID.
  * @param {string} uid - FirebaseUID of the user trying to perform the action.
  * @param {number|string} matchID - ID of the match to update.
- * @param {number|string} winnerID - ID for the winning team.
  * @param {number|string} score1 - Score for team one.
  * @param {number|string} score2 - Score for team two.
  * @returns {Promise<object>} Returns the updated match result.
