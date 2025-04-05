@@ -120,18 +120,7 @@ const searchTournaments = async (
             console.log("Searching solely by tournamentID");
             tournamentID = validateInteger(tournamentID, "tournamentID");
             const tournament = await TournamentModel.searchTournaments(
-                tournamentID,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
+                tournamentID
             );
             return tournament;
         } else {
