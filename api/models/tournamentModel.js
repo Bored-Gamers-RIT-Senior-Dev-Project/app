@@ -656,16 +656,17 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
 /**
  * Searches tournament matches from the database.
  * If matchID is provided, returns a single match record; otherwise, returns an array of matches.
- * @param {number|null} matchID - ID for the match. When provided, all other criteria are ignored.
- * @param {number|null} tournamentID - ID for the tournament.
- * @param {string|null} bracketSide - Bracket side filter.
- * @param {number|null} teamID - ID for a team.
- * @param {string|null} before - Matches before this datetime ("YYYY-MM-DD HH:MM:SS").
- * @param {string|null} after - Matches after this datetime ("YYYY-MM-DD HH:MM:SS").
- * @param {string|null} sortBy - Field to sort the results by.
- * @param {boolean|null} sortAsDescending - If true, sorts the results by descending order.
- * @param {number|null} round - Round number to filter matches.
- * @returns {Promise<object|null|object[]>} Returns a match object, an array of match objects, or null if not found.
+ * @param {number} [matchID] - ID for the match. When provided, all other criteria are ignored.
+ * @param {number} [tournamentID] - ID for the tournament.
+ * @param {string} [bracketSide] - Bracket side filter.
+ * @param {number} [teamID] - ID for a team.
+ * @param {string} [before] - Matches before this datetime ("YYYY-MM-DD HH:MM:SS").
+ * @param {string} [after] - Matches after this datetime ("YYYY-MM-DD HH:MM:SS").
+ * @param {string} [sortBy] - Field to sort the results by.
+ * @param {boolean} sortAsDescending] - If true, sorts the results by descending order.
+ * @param {number} round] - Round number to filter matches.
+ * @returns {Promise<object[]>} Returns a match object or an array of match objects.
+ * If no items are found, returns an empty array.
  * @throws {Error} Throws an error if multiple matches are found for a given matchID or if a database error occurs.
  */
 const searchMatches = async (
@@ -679,99 +680,95 @@ const searchMatches = async (
     sortAsDescending,
     round
 ) => {
-    try {
-        if (matchID) {
-            const [rows] = await db.query(
-                `
-                SELECT * 
-                FROM matches
-                WHERE MatchID = ?
-                `,
-                [matchID]
-            );
-            if (rows.length === 0) {
-                return null;
-            } else if (rows.length > 1) {
-                throw Error("Search error for match ID: " + matchID);
-            }
-            return rows[0];
-        } else {
-            let search = `
-                SELECT *
-                FROM (
-                    SELECT
-                        matches.MatchID,
-                        matches.TournamentID,
-                        matches.MatchTime,
-                        matches.Team1ID,
-                        team1.TeamName AS Team1Name,
-                        team1.ProfileImageURL as Team1ProfileImageURL,
-                        matches.Score1,
-                        matches.Team2ID,
-                        team2.TeamName AS Team2Name,
-                        team2.ProfileImageURL as Team2ProfileImageURL,
-                        matches.Score2,
-                        matches.WinnerID,
-                        participant1.BracketSide AS BracketSide,
-                        participant1.BracketOrder AS BracketOrder,
-                        CASE 
-                            WHEN matches.WinnerID IS NULL THEN participant1.Round
-                            ELSE 
-                                CASE 
-                                    WHEN matches.WinnerID = matches.Team1ID THEN participant2.Round
-                                    ELSE participant1.Round
-                                END
-                        END AS MatchRound
-                    FROM matches
-                    JOIN teams team1 ON matches.Team1ID = team1.TeamID
-                    JOIN teams team2 ON matches.Team2ID = team2.TeamID
-                    JOIN tournament_participants participant1 
-                        ON matches.TournamentID = participant1.TournamentID 
-                        AND matches.Team1ID = participant1.TeamID
-                    JOIN tournament_participants participant2 
-                        ON matches.TournamentID = participant2.TournamentID 
-                        AND matches.Team2ID = participant2.TeamID
-                ) AS sub
-                WHERE 1=1
-            `;
-
-            const params = [];
-            if (tournamentID) {
-                search += " AND sub.TournamentID = ?";
-                params.push(tournamentID);
-            }
-            if (teamID) {
-                search += " AND (sub.Team1ID = ? OR sub.Team2ID = ?)";
-                params.push(teamID, teamID);
-            }
-            if (before) {
-                search += " AND sub.MatchTime <= ?";
-                params.push(before);
-            }
-            if (after) {
-                search += " AND sub.MatchTime >= ?";
-                params.push(after);
-            }
-            if (bracketSide) {
-                search += " AND sub.BracketSide = ?";
-                params.push(bracketSide);
-            }
-            if (round) {
-                search += " AND sub.MatchRound = ?";
-                params.push(round);
-            }
-            if (sortBy) {
-                search += ` ORDER BY sub.${sortBy}`;
-                if (sortAsDescending) {
-                    search += " DESC";
-                }
-            }
-
-            const [rows] = await db.query(search, params);
-            return rows.length === 0 ? null : rows;
+    if (matchID) {
+        const [rows] = await db.query(
+            `
+            SELECT * 
+            FROM matches
+            WHERE MatchID = ?
+            `,
+            [matchID]
+        );
+        if (rows.length === 0) {
+            return [];
+        } else if (rows.length > 1) {
+            throw Error("Search error for match ID: " + matchID);
         }
-    } catch (error) {
-        throw error;
+        return rows[0];
+    } else {
+        let search = `
+            SELECT *
+            FROM (
+                SELECT
+                    matches.MatchID,
+                    matches.TournamentID,
+                    matches.MatchTime,
+                    matches.Team1ID,
+                    team1.TeamName AS Team1Name,
+                    team1.ProfileImageURL AS Team1ProfileImageURL,
+                    matches.Score1,
+                    matches.Team2ID,
+                    team2.TeamName AS Team2Name,
+                    team2.ProfileImageURL AS Team2ProfileImageURL,
+                    matches.Score2,
+                    matches.WinnerID,
+                    participant1.BracketSide AS BracketSide,
+                    participant1.BracketOrder AS BracketOrder,
+                    CASE 
+                        WHEN matches.WinnerID IS NULL THEN participant1.Round
+                        ELSE 
+                            CASE 
+                                WHEN matches.WinnerID = matches.Team1ID THEN participant2.Round
+                                ELSE participant1.Round
+                            END
+                    END AS MatchRound
+                FROM matches
+                JOIN teams team1 ON matches.Team1ID = team1.TeamID
+                JOIN teams team2 ON matches.Team2ID = team2.TeamID
+                JOIN tournament_participants participant1 
+                    ON matches.TournamentID = participant1.TournamentID 
+                    AND matches.Team1ID = participant1.TeamID
+                JOIN tournament_participants participant2 
+                    ON matches.TournamentID = participant2.TournamentID 
+                    AND matches.Team2ID = participant2.TeamID
+            ) AS sub
+            WHERE 1=1
+        `;
+
+        const params = [];
+        if (tournamentID) {
+            search += " AND sub.TournamentID = ?";
+            params.push(tournamentID);
+        }
+        if (teamID) {
+            search += " AND (sub.Team1ID = ? OR sub.Team2ID = ?)";
+            params.push(teamID, teamID);
+        }
+        if (before) {
+            search += " AND sub.MatchTime <= ?";
+            params.push(before);
+        }
+        if (after) {
+            search += " AND sub.MatchTime >= ?";
+            params.push(after);
+        }
+        if (bracketSide) {
+            search += " AND sub.BracketSide = ?";
+            params.push(bracketSide);
+        }
+        if (round) {
+            search += " AND sub.MatchRound = ?";
+            params.push(round);
+        }
+        if (sortBy) {
+            search += ` ORDER BY sub.${sortBy}`;
+            if (sortAsDescending) {
+                search += " DESC";
+            }
+        }
+
+        const [rows] = await db.query(search, params);
+        return rows;
     }
 };
 
