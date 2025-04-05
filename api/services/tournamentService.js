@@ -49,7 +49,7 @@ const checkFacilitatorTournament = (tournamentID, userID) => {
  * @param {string} uid - FirebaseUID of the user trying to perform the action.
  * @param {string} tournamentName - Name of the tournament.
  * @param {string} startDate - Start date of the tournament in YYYY-MM-DD format.
- * @param {string} endDate - End date of the tournament in YYYY-MM-DD format. If not provided, defaults to startDate.
+ * @param {string} [endDate] - End date of the tournament in YYYY-MM-DD format. If not provided, defaults to startDate.
  * @param {string} location - The location of the tournament.
  * @returns {Promise<object>} Returns the created tournament record.
  * @throws {Error} Throws an error with status 403 if the user is unauthorized.
@@ -85,18 +85,18 @@ const createTournament = async (
 
 /**
  * Searches tournaments in the database based on provided parameters.
- * @param {number|string} tournamentID - Tournament ID. If provided, search is based solely on this ID.
- * @param {string} tournamentName - Name of the tournament.
- * @param {string} startDate - Start date of the tournament in YYYY-MM-DD format.
- * @param {string} endDate - End date of the tournament in YYYY-MM-DD format.
- * @param {string} startsBefore - Returns tournaments starting on or before this date.
- * @param {string} startsAfter - Returns tournaments starting on or after this date.
- * @param {string} endsBefore - Returns tournaments ending on or before this date.
- * @param {string} endsAfter - Returns tournaments ending on or after this date.
- * @param {string} status - Tournament status.
- * @param {string} location - Tournament location.
- * @param {string} sortBy - Field to sort the results by.
- * @param {string|boolean} sortAsDescending - If true, sorts results in descending order.
+ * @param {number|string} [tournamentID] - Tournament ID. If provided, search is based solely on this ID.
+ * @param {string} [tournamentName] - Name of the tournament.
+ * @param {string} [startDate] - Start date of the tournament in YYYY-MM-DD format.
+ * @param {string} [endDate] - End date of the tournament in YYYY-MM-DD format.
+ * @param {string} [startsBefore] - Returns tournaments starting on or before this date.
+ * @param {string} [startsAfter] - Returns tournaments starting on or after this date.
+ * @param {string} [endsBefore] - Returns tournaments ending on or before this date.
+ * @param {string} [endsAfter] - Returns tournaments ending on or after this date.
+ * @param {string} [status] - Tournament status.
+ * @param {string} [location] - Tournament location.
+ * @param {string} [sortBy] - Field to sort the results by.
+ * @param {string|boolean} [sortAsDescending] - If true, sorts results in descending order.
  * @returns {Promise<object|object[]|null>} Returns a tournament record or an array of tournaments.
  * @throws {Error} Throws an error if validation fails or the query fails.
  */
@@ -480,11 +480,11 @@ const getTournamentBracket = async (tournamentID) => {
  * Updates the tournament details.
  * @param {string} uid - FirebaseUID of the user trying to perform the action.
  * @param {number|string} tournamentID - ID of the tournament.
- * @param {string} tournamentName - New tournament name.
- * @param {string} startDate - New start date in YYYY-MM-DD format.
- * @param {string} endDate - New end date in YYYY-MM-DD format.
- * @param {string} status - New tournament status.
- * @param {string} location - New tournament location.
+ * @param {string} [tournamentName] - New tournament name.
+ * @param {string} [startDate] - New start date in YYYY-MM-DD format.
+ * @param {string} [endDate] - New end date in YYYY-MM-DD format.
+ * @param {string} [status] - New tournament status.
+ * @param {string} [location] - New tournament location.
  * @returns {Promise<object|object[]|null>} Returns the updated tournament record.
  * @throws {Error} Throws an error if validation fails or the update fails.
  */
@@ -634,21 +634,21 @@ const removeTournamentParticipant = async (
 
 /**
  * Searches for tournament participants based on provided criteria.
- * @param {number} tournamentID - ID of the tournament.
- * @param {number} teamID - ID of the team.
- * @param {string} teamName - Name of the team.
- * @param {number} teamLeaderID - ID of the team leader.
- * @param {string} teamLeaderName - Name of the team leader.
- * @param {number} round - Round number.
- * @param {number} byes - Number of byes.
- * @param {string} status - Participant status.
- * @param {string} bracketSide - Bracket side ("left" or "right").
- * @param {number} nextMatchID - ID of the next match.
- * @param {number} universityID - ID of the university.
- * @param {string} universityName - Name of the university.
- * @param {boolean} isApproved - Approval status.
- * @param {string} sortBy - Field to sort by.
- * @param {boolean} sortAsDescending - If true, sorts in descending order.
+ * @param {number|string} [tournamentID] - ID of the tournament.
+ * @param {number|string} [teamID] - ID of the team.
+ * @param {string} [teamName] - Name of the team.
+ * @param {number} [teamLeaderID] - ID of the team leader.
+ * @param {string} [teamLeaderName] - Name of the team leader.
+ * @param {number} [round] - Round number.
+ * @param {number} [byes] - Number of byes.
+ * @param {string} [status] - Participant status.
+ * @param {string} [bracketSide] - Bracket side ("left" or "right").
+ * @param {number} [nextMatchID] - ID of the next match.
+ * @param {number} [universityID] - ID of the university.
+ * @param {string} [universityName] - Name of the university.
+ * @param {boolean} [isApproved] - Approval status.
+ * @param {string} [sortBy] - Field to sort by.
+ * @param {boolean} [sortAsDescending] - If true, sorts in descending order.
  * @returns {Promise<object[]|null>} Returns an array of participant records or null.
  * @throws {Error} Throws an error if the search fails.
  */
@@ -1211,15 +1211,15 @@ const createMatch = async (tournamentID, team1ID, team2ID, matchTime) => {
 /**
  * Searches for tournament matches based on provided criteria.
  * If matchID is specified, the search is performed solely based on matchID.
- * @param {number|string} matchID - ID for the match.
- * @param {number|string} tournamentID - ID for the tournament.
- * @param {string} bracketSide - Bracket side filter.
- * @param {number|string} teamID - ID for a team.
- * @param {string} before - Latest datetime (inclusive) for matches ("YYYY-MM-DD HH:mm:ss").
- * @param {string} after - Earliest datetime (inclusive) for matches ("YYYY-MM-DD HH:mm:ss").
- * @param {string} sortBy - Field to sort by.
- * @param {string|boolean} sortAsDescending - If true, sorts in descending order.
- * @param {number|string} winnerID - Winner ID filter.
+ * @param {number|string} [matchID] - ID for the match.
+ * @param {number|string} [tournamentID] - ID for the tournament.
+ * @param {string} [bracketSide] - Bracket side filter.
+ * @param {number|string} [teamID] - ID for a team.
+ * @param {string} [before] - Latest datetime (inclusive) for matches ("YYYY-MM-DD HH:mm:ss").
+ * @param {string} [after] - Earliest datetime (inclusive) for matches ("YYYY-MM-DD HH:mm:ss").
+ * @param {string} [sortBy] - Field to sort by.
+ * @param {string|boolean} [sortAsDescending] - If true, sorts in descending order.
+ * @param {number|string} [winnerID] - Winner ID filter.
  * @returns {Promise<object|object[]|null>} Returns a match record if matchID is provided, an array of matches if searching by criteria, or null if not found.
  * @throws {Error} Throws an error if validation fails or the search query fails.
  */
