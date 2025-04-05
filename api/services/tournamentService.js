@@ -1104,7 +1104,7 @@ const searchMatches = async (
 const updateMatchResult = async (uid, matchID, score1, score2) => {
     // Get tournament ID to validate facilitator of tournament
     const tournamentID = searchMatches(matchID)[0].TournamentID;
-    if (!tournamentID || tournamentID === null) {
+    if (!tournamentID) {
         throw new Error("Error finding tournament for this match.");
     }
     const user = await userModel.getUserByFirebaseId(uid);
