@@ -344,11 +344,11 @@ const searchTournamentParticipants = async (
         `;
         const params = [];
 
-        if (tournamentID != null) {
+        if (tournamentID) {
             searchQuery += " AND tournament_participants.TournamentID = ?";
             params.push(tournamentID);
         }
-        if (teamID != null) {
+        if (teamID) {
             searchQuery += " AND tournament_participants.TeamID = ?";
             params.push(teamID);
         }
@@ -357,11 +357,11 @@ const searchTournamentParticipants = async (
                 " AND CONCAT(users.FirstName, ' ', users.LastName) LIKE ?";
             params.push(`%${teamLeaderName}%`);
         }
-        if (round != null) {
+        if (round) {
             searchQuery += " AND tournament_participants.Round = ?";
             params.push(round);
         }
-        if (byes != null) {
+        if (byes) {
             searchQuery += " AND tournament_participants.Byes = ?";
             params.push(byes);
         }
@@ -389,11 +389,11 @@ const searchTournamentParticipants = async (
             searchQuery += " AND tournament_participants.BracketSide = ?";
             params.push(bracketSide);
         }
-        if (nextMatchID != null) {
+        if (nextMatchID) {
             searchQuery += " AND tournament_participants.NextMatchID = ?";
             params.push(nextMatchID);
         }
-        if (universityID != null) {
+        if (universityID) {
             searchQuery += " AND teams.UniversityID = ?";
             params.push(universityID);
         }
@@ -401,11 +401,11 @@ const searchTournamentParticipants = async (
             searchQuery += " AND teams.TeamName LIKE ?";
             params.push(`%${teamName}%`);
         }
-        if (teamLeaderID != null) {
+        if (teamLeaderID) {
             searchQuery += " AND teams.TeamLeaderID = ?";
             params.push(teamLeaderID);
         }
-        if (isApproved != null) {
+        if (isApproved) {
             searchQuery += " AND teams.IsApproved = ?";
             params.push(isApproved);
         }
@@ -492,11 +492,11 @@ const searchTournamentFacilitators = async (
             "SELECT users.UserID, CONCAT(users.FirstName, ' ', users.LastName) AS FullName, Email, ProfileImageURL FROM tournament_facilitators JOIN users ON tournament_facilitators.UserID = users.UserID WHERE 1=1";
         const params = [];
 
-        if (tournamentID != null) {
+        if (tournamentID) {
             search += " AND TournamentID = ?";
             params.push(tournamentID);
         }
-        if (userID != null) {
+        if (userID) {
             search += " AND users.UserID = ?";
             params.push(userID);
         }
@@ -509,7 +509,7 @@ const searchTournamentFacilitators = async (
             search += " AND Email LIKE ?";
             params.push(`%${email}%`);
         }
-        if (universityID != null) {
+        if (universityID) {
             search += " AND UniversityID = ?";
             params.push(universityID);
         }
