@@ -430,8 +430,7 @@ const updateTournamentDetails = async (
     ) {
         throw createHttpError(403);
     }
-    const tournamentIDnum = Number(tournamentID);
-    validateInteger(tournamentIDnum, "tournamentID");
+    tournamentID = validateInteger(tournamentID, "tournamentID");
     await TournamentModel.updateTournamentDetails(
         tournamentID,
         tournamentName,
