@@ -1,6 +1,9 @@
 const TournamentModel = require("../models/tournamentModel");
 const TeamModel = require("../models/teamModel");
 
+// Default time to schedule matches
+const fifteenMinutes = 15 * 60 * 100;
+
 /* Helper Functions */
 
 /**
@@ -909,7 +912,7 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                 tournamentID,
                 participants[0].TeamID,
                 otherSideParticipants[0].TeamID,
-                Date(now.getTime() + 15 * 60 * 1000) // Schedule 15 minutes from now
+                Date(now.getTime() + fifteenMinutes) // Schedule 15 minutes from now
             );
         }
 
@@ -940,7 +943,7 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                 tournamentID,
                 team1.TeamID,
                 team2.TeamID,
-                Date(now.getTime() + 15 * 60 * 1000)
+                Date(now.getTime() + fifteenMinutes)
             );
         }
 
@@ -1004,7 +1007,7 @@ const nextRound = async (tournamentID, bracketSide, round) => {
                     tournamentID,
                     team1.TeamID,
                     team2.TeamID,
-                    Date(now.getTime() + 15 * 60 * 1000)
+                    Date(now.getTime() + fifteenMinutes)
                 );
             }
         } else {
