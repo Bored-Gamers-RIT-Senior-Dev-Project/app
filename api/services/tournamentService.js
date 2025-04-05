@@ -124,12 +124,7 @@ const searchTournaments = async (
             );
             return tournament;
         } else {
-            // TODO probably a better way to do this
-            if (
-                sortAsDescending === "true" ||
-                sortAsDescending === "True" ||
-                sortAsDescending === "TRUE"
-            ) {
+            if (String(sortAsDescending).toLowerCase() === "true") {
                 sortAsDescending = true;
             }
             const tournament = await TournamentModel.searchTournaments(
@@ -1217,11 +1212,7 @@ const searchMatches = async (
             const match = await TournamentModel.searchMatches(matchID);
             return match;
         } else {
-            if (
-                sortAsDescending === "true" ||
-                sortAsDescending === "True" ||
-                sortAsDescending === "TRUE"
-            ) {
+            if (String(sortAsDescending).toLowerCase() === "true") {
                 sortAsDescending = true;
             }
             const match = await TournamentModel.searchMatches(
