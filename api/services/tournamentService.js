@@ -485,7 +485,7 @@ const getTournamentBracket = async (tournamentID) => {
  * @param {string} [endDate] - New end date in YYYY-MM-DD format.
  * @param {string} [status] - New tournament status.
  * @param {string} [location] - New tournament location.
- * @returns {Promise<object|object[]|null>} Returns the updated tournament record.
+ * @returns {Promise<object[]>} Returns the updated tournament record.
  * @throws {Error} Throws an error if validation fails or the update fails.
  */
 const updateTournamentDetails = async (
@@ -518,7 +518,7 @@ const updateTournamentDetails = async (
             location
         );
         const tournament = searchTournaments(tournamentID);
-        return tournament;
+        return tournament || null;
     } catch (error) {
         throw error;
     }
@@ -709,7 +709,7 @@ const updateTournamentParticipant = async (
     bracketOrder
 ) => {
     try {
-        const participant = await TournamentModel.updateTournamentParticipant(
+        await TournamentModel.updateTournamentParticipant(
             tournamentID,
             teamID,
             round,
@@ -718,6 +718,10 @@ const updateTournamentParticipant = async (
             bracketSide,
             nextMatchID,
             bracketOrder
+        );
+        const participant = await searchTournamentParticipants(
+            tournamentID,
+            teamID
         );
         return participant;
     } catch (error) {
