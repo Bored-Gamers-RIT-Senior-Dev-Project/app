@@ -1,4 +1,4 @@
-import { redirect } from "react-router";
+import { Navigate, redirect } from "react-router";
 import App from "../App";
 import {
     About,
@@ -16,11 +16,12 @@ import {
     UserSignIn,
     UserSignUp,
 } from "../pages";
+import { JoinTeamPage } from "../pages/JoinTeamPage";
 import { AddUniversityModal } from "../pages/modals/AddUniversityModal";
 import { AddUserModal } from "../pages/modals/AddUserModal";
 import { DeleteModal } from "../pages/modals/DeleteModal";
 import { EditUserModal } from "../pages/modals/EditUserModal";
-import { admin, search, university, users } from "./api";
+import { admin, search, teams, university, users } from "./api";
 import { events } from "./events";
 
 /**
@@ -70,7 +71,7 @@ const routes = [
                 loader: () => search({ value: "" }),
             },
             {
-                path: "/teamspage",
+                path: "/teams/:teamId",
                 element: <TeamsPage />,
             },
             {
@@ -108,6 +109,20 @@ const routes = [
             {
                 path: "/schedule",
                 element: <Schedule />,
+            },
+            {
+                path: "/join",
+                element: <JoinTeamPage />,
+                loader: () =>
+                    Promise.all([university.getList(), teams.getList(true)]),
+                action: makeAction(teams.join),
+                children: [
+                    {
+                        path: "/join/newTeam",
+                        action: makeAction(teams.create),
+                        element: <Navigate to="/join" />,
+                    },
+                ],
             },
             {
                 path: "/admin/reports",

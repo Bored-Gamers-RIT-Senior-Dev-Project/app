@@ -1,4 +1,5 @@
 const express = require("express");
+const teamService = require("../services/teamService");
 const router = express.Router();
 
 /**
@@ -6,12 +7,16 @@ const router = express.Router();
  * @param {boolean} req.query.showUnapproved Whether to show unapproved teams. Defaults to false.
  */
 router.get("", async (req, res, next) => {
-    const { showUnapproved = false } = req.query;
-    const { uid = null } = req.user;
+    const { showUnapproved = false, university = null } = req.query;
+    const uid = req.user?.uid;
 
     try {
-        //const teamList = await teamService.getTeams(uid, showUnapproved);
-        return res.status(200).json([]);
+        const teamList = await teamService.getTeams(
+            uid,
+            university,
+            showUnapproved
+        );
+        return res.status(200).json(teamList);
     } catch (error) {
         return next(error);
     }
@@ -38,13 +43,13 @@ router.get("/:teamId", async (req, res, next) => {
  * Create a new team.
  */
 router.post("", async (req, res, next) => {
-    const { teamName, profileImageUrl, universityId } = req.body;
+    const { teamName, universityId } = req.body;
 
-    const { uid } = req.user;
+    const uid = req?.user?.uid;
     if (!uid) return res.status(401).send();
 
     try {
-        //const team = await teamService.createTeam(uid, teamName, profileImageUrl, universityId);
+        const team = await teamService.createTeam(uid, universityId, teamName);
         return res.status(201).json({});
     } catch (error) {
         return next(error);
@@ -56,7 +61,7 @@ router.post("", async (req, res, next) => {
  * Requires []
  */
 router.put("/:teamId/assign", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req?.user?.uid;
     const { teamId } = req.params;
     const { userId } = req.body;
     if (!uid) return res.status(401).send();
@@ -70,11 +75,28 @@ router.put("/:teamId/assign", async (req, res, next) => {
 });
 
 /**
+ * Join a team
+ * Requires [Spectator role]
+ */
+router.put("/:teamId/join", async (req, res, next) => {
+    const uid = req?.user?.uid;
+    const { teamId } = req.params;
+    if (!uid) return res.status(401).send();
+
+    try {
+        const team = await teamService.joinTeam(uid, teamId);
+        return res.status(200).json({});
+    } catch (error) {
+        return next(error);
+    }
+});
+
+/**
  * Remove a user from their team.
  * Requires [Admin Role] or [University Rep role and matching team/player university ID] or [Team Captain role and matching teamID] or [Matching User ID]
  */
 router.put("/:teamId/remove", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req?.user?.uid;
     const { teamId } = req.params;
     const { userId } = req.body;
     if (!uid) return res.status(401).send();
@@ -92,7 +114,7 @@ router.put("/:teamId/remove", async (req, res, next) => {
  * Requires [Admin Role] or [University Rep role and matching university ID]
  */
 router.put("/:teamId", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req?.user?.uid;
     if (!uid) return res.status(401).send();
 
     const { teamId } = req.params;
@@ -111,7 +133,7 @@ router.put("/:teamId", async (req, res, next) => {
  * Requires [Team Captain role and matching teamID]
  */
 router.post("/:teamId/update", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req?.user?.uid;
     if (!uid) return res.status(401).send();
 
     const { teamId } = req.params;
@@ -131,7 +153,7 @@ router.post("/:teamId/update", async (req, res, next) => {
  * @param {number} req.params.id The ID of the team to approve.
  */
 router.put("/approve", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req?.user?.uid;
     if (!uid) return res.status(401).send();
 
     try {
@@ -141,3 +163,5 @@ router.put("/approve", async (req, res, next) => {
         return next(error);
     }
 });
+
+module.exports = router;

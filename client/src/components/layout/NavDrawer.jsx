@@ -1,5 +1,6 @@
 import {
     Box,
+    Button,
     Divider,
     Drawer,
     List,
@@ -34,58 +35,62 @@ const buildNavLinks = (user) => {
     if (!user) return links;
 
     const { roleId, universityName, universityId, teamName, teamId } = user;
-    if (roleId === 2) {
-        //Super Admin role
-        links.push({
-            label: "Admin",
-            links: [
-                { key: "adminDash", text: "Dashboard", path: "/admin" },
-                {
-                    key: "adminReports",
-                    text: "Reports View",
-                    path: "/admin/reports",
-                },
-                {
-                    key: "adminUserManager",
-                    text: "User Manager",
-                    path: "/admin/users",
-                },
-            ],
-        });
-    } else if (roleId == 3) {
-        //University admin role
-        links.push({
-            label: universityName ?? "University Representative",
-            links: [
-                {
-                    key: "repDashboard",
-                    text: "Dashboard",
-                    path: "/representative",
-                },
-                {
-                    key: "uniPage",
-                    text: "University Page",
-                    path: `/university/${universityId ?? 1}`,
-                },
-            ],
-        });
-    } else if (roleId == 4) {
-        //Student/Participant Role
-        links.push({
-            label: "Participant",
-            links: [
-                {
-                    key: "myTeam",
-                    text: teamName ?? "My Team",
-                    path: `/teams/${teamId ?? 1}`,
-                },
-                {
-                    key: "teamSchedule",
-                    text: "Team Schedule",
-                    path: `/schedule?team=${teamId ?? 1}`,
-                },
-            ],
-        });
+    switch (roleId) {
+        case 2: //Super Admin role
+        case 3: //AG Employee role
+            links.push({
+                label: "Admin",
+                links: [
+                    { key: "adminDash", text: "Dashboard", path: "/admin" },
+                    {
+                        key: "adminReports",
+                        text: "Reports View",
+                        path: "/admin/reports",
+                    },
+                    {
+                        key: "adminUserManager",
+                        text: "User Manager",
+                        path: "/admin/users",
+                    },
+                ],
+            });
+            break;
+        case 4: //"Marketing Staff" Role
+        case 8: //College Admin role
+            links.push({
+                label: universityName ?? "University Representative",
+                links: [
+                    {
+                        key: "repDashboard",
+                        text: "Dashboard",
+                        path: "/representative",
+                    },
+                    {
+                        key: "uniPage",
+                        text: "University Page",
+                        path: `/university/${universityId ?? 1}`,
+                    },
+                ],
+            });
+            break;
+        case 6: //Team Captain role
+        case 7: //Student/Participant Role
+            links.push({
+                label: "Participant",
+                links: [
+                    {
+                        key: "myTeam",
+                        text: teamName ?? "My Team",
+                        path: `/teams/${teamId ?? 1}`,
+                    },
+                    {
+                        key: "teamSchedule",
+                        text: "Team Schedule",
+                        path: `/schedule?team=${teamId ?? 1}`,
+                    },
+                ],
+            });
+            break;
     }
     return links;
 };
@@ -150,6 +155,19 @@ const NavDrawer = ({ open, setOpen, desktop }) => {
                     ))}
                 </List>
             </Box>
+            {user && user.roleId == 1 && (
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    size="large"
+                    sx={{ marginX: "2em" }}
+                    onClick={() => navigate("/join")}
+                >
+                    Join The
+                    <br />
+                    Competition!
+                </Button>
+            )}
         </Drawer>
     );
 };

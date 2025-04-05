@@ -33,6 +33,7 @@ function App() {
                 backgroundImage: `url(${bg})`,
                 backgroundSize: "cover",
                 backgroundAttachment: "fixed",
+                overflowX: "hidden",
             }}
         >
             <CssBaseline />
