@@ -70,7 +70,7 @@ const createTournament = async (
             throw createHttpError(403);
         }
         // If no end date provided, default the end date to the start date.
-        let finalEndDate = endDate === null ? startDate : endDate;
+        const finalEndDate = endDate ?? startDate;
         const tournament = await TournamentModel.createTournament(
             tournamentName,
             startDate,
