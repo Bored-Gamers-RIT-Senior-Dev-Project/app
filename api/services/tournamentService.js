@@ -39,11 +39,7 @@ const validateInteger = (value, fieldName) => {
  */
 const checkFacilitatorTournament = (tournamentID, userID) => {
     const facilitator = searchTournamentFacilitators(tournamentID, userID);
-    if (!facilitator || facilitator.length === 0) {
-        return false;
-    } else {
-        return true;
-    }
+    return !(!facilitator || facilitator.length === 0);
 };
 
 /* End Helper Functions */
