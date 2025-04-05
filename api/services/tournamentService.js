@@ -56,10 +56,10 @@ const checkFacilitatorTournament = (tournamentID, userID) => {
  */
 const createTournament = async (
     uid,
-    tournamentName = null,
-    startDate = null,
-    endDate = null,
-    location = null
+    tournamentName,
+    startDate,
+    endDate,
+    location
 ) => {
     try {
         const user = await userModel.getUserByFirebaseId(uid);
@@ -101,17 +101,17 @@ const createTournament = async (
  * @throws {Error} Throws an error if validation fails or the query fails.
  */
 const searchTournaments = async (
-    tournamentID = null,
-    tournamentName = null,
-    startDate = null,
-    endDate = null,
-    startsBefore = null,
-    startsAfter = null,
-    endsBefore = null,
-    endsAfter = null,
-    status = null,
-    location = null,
-    sortBy = null,
+    tournamentID,
+    tournamentName,
+    startDate,
+    endDate,
+    startsBefore,
+    startsAfter,
+    endsBefore,
+    endsAfter,
+    status,
+    location,
+    sortBy,
     sortAsDescending = false
 ) => {
     try {
@@ -490,12 +490,12 @@ const getTournamentBracket = async (tournamentID) => {
  */
 const updateTournamentDetails = async (
     uid,
-    tournamentID = null,
-    tournamentName = null,
-    startDate = null,
-    endDate = null,
-    status = null,
-    location = null
+    tournamentID,
+    tournamentName,
+    startDate,
+    endDate,
+    status,
+    location
 ) => {
     try {
         const user = await userModel.getUserByFirebaseId(uid);
@@ -531,7 +531,7 @@ const updateTournamentDetails = async (
  * @returns {Promise<void>}
  * @throws {Error} Throws an error if tournament deletion fails.
  */
-const deleteTournament = async (uid, tournamentID = null) => {
+const deleteTournament = async (uid, tournamentID) => {
     try {
         const user = await userModel.getUserByFirebaseId(uid);
         if (
@@ -556,11 +556,7 @@ const deleteTournament = async (uid, tournamentID = null) => {
  * @returns {Promise<void>}
  * @throws {Error} Throws an error if the team is already registered or the addition fails.
  */
-const addTournamentParticipant = async (
-    uid,
-    tournamentID = null,
-    teamID = null
-) => {
+const addTournamentParticipant = async (uid, tournamentID, teamID) => {
     try {
         const user = await userModel.getUserByFirebaseId(uid);
         if (
@@ -601,11 +597,7 @@ const addTournamentParticipant = async (
  * @returns {Promise<void>}
  * @throws {Error} Throws an error if the participant is not found or removal fails.
  */
-const removeTournamentParticipant = async (
-    uid,
-    tournamentID = null,
-    teamID = null
-) => {
+const removeTournamentParticipant = async (uid, tournamentID, teamID) => {
     try {
         const user = await userModel.getUserByFirebaseId(uid);
         if (
@@ -653,20 +645,20 @@ const removeTournamentParticipant = async (
  * @throws {Error} Throws an error if the search fails.
  */
 const searchTournamentParticipants = async (
-    tournamentID = null,
-    teamID = null,
-    teamName = null,
-    teamLeaderID = null,
-    teamLeaderName = null,
-    round = null,
-    byes = null,
-    status = null,
-    bracketSide = null,
-    nextMatchID = null,
-    universityID = null,
-    universityName = null,
+    tournamentID,
+    teamID,
+    teamName,
+    teamLeaderID,
+    teamLeaderName,
+    round,
+    byes,
+    status,
+    bracketSide,
+    nextMatchID,
+    universityID,
+    universityName,
     isApproved = true,
-    sortBy = null,
+    sortBy,
     sortAsDescending = false
 ) => {
     try {
@@ -707,14 +699,14 @@ const searchTournamentParticipants = async (
  * @throws {Error} Throws an error if the update fails.
  */
 const updateTournamentParticipant = async (
-    tournamentID = null,
-    teamID = null,
-    round = null,
-    byes = null,
-    status = null,
-    bracketSide = null,
-    nextMatchID = null,
-    bracketOrder = null
+    tournamentID,
+    teamID,
+    round,
+    byes,
+    status,
+    bracketSide,
+    nextMatchID,
+    bracketOrder
 ) => {
     try {
         const participant = await TournamentModel.updateTournamentParticipant(
@@ -748,15 +740,15 @@ const updateTournamentParticipant = async (
  * @throws {Error} Throws an error if the update fails.
  */
 const disqualifyTournamentParticipant = async (
-    uid = null,
-    tournamentID = null,
-    teamID = null,
-    round = null,
-    byes = null,
-    status = null,
-    bracketSide = null,
-    nextMatchID = null,
-    bracketOrder = null
+    uid,
+    tournamentID,
+    teamID,
+    round,
+    byes,
+    status,
+    bracketSide,
+    nextMatchID,
+    bracketOrder
 ) => {
     try {
         const user = await userModel.getUserByFirebaseId(uid);
@@ -794,11 +786,7 @@ const disqualifyTournamentParticipant = async (
  * @returns {Promise<void>}
  * @throws {Error} Throws an error if the facilitator already exists or if the operation fails.
  */
-const addTournamentFacilitator = async (
-    uid,
-    tournamentID = null,
-    userID = null
-) => {
+const addTournamentFacilitator = async (uid, tournamentID, userID) => {
     try {
         const user = await userModel.getUserByFirebaseId(uid);
         if (
@@ -833,11 +821,7 @@ const addTournamentFacilitator = async (
  * @returns {Promise<void>}
  * @throws {Error} Throws an error if the facilitator is not found or if the removal fails.
  */
-const removeTournamentFacilitator = async (
-    uid,
-    tournamentID = null,
-    userID = null
-) => {
+const removeTournamentFacilitator = async (uid, tournamentID, userID) => {
     try {
         const user = await userModel.getUserByFirebaseId(uid);
         if (
@@ -875,11 +859,11 @@ const removeTournamentFacilitator = async (
  * @throws {Error} Throws an error if the search fails.
  */
 const searchTournamentFacilitators = async (
-    tournamentID = null,
-    userID = null,
-    name = null,
-    email = null,
-    universityID = null
+    tournamentID,
+    userID,
+    name,
+    email,
+    universityID
 ) => {
     try {
         const tournament = await TournamentModel.searchTournamentFacilitators(
