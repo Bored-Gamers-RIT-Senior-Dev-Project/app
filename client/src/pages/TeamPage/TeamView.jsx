@@ -4,23 +4,35 @@ import PropTypes from "prop-types";
 
 const TeamView = ({ teamName, teamSummary, teamImage, enterEditMode }) => {
     return (
-        <Box>
+        <Box
+            sx={{
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                flexDirection: "column",
+                gap: 1,
+            }}
+        >
+            <IconButton
+                onClick={enterEditMode}
+                sx={{ position: "absolute", right: 0 }}
+            >
+                <EditIcon sx={{ color: "blue" }} />
+            </IconButton>
+
             <Avatar
                 src={teamImage}
                 alt={teamName}
-                sx={{ height: "5em", width: "5em" }}
+                sx={{ height: "7em", width: "7em" }}
             />
-            <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                sx={{ mb: 2 }}
+            <Typography variant="h4">{teamName}</Typography>
+
+            <IconButton
+                onClick={enterEditMode}
+                sx={{ position: "absolute", right: 0 }}
             >
-                <Typography variant="h4">{teamName}</Typography>
-                <IconButton onClick={enterEditMode}>
-                    <EditIcon sx={{ color: "blue" }} />
-                </IconButton>
-            </Box>
+                <EditIcon sx={{ color: "blue" }} />
+            </IconButton>
 
             <Box sx={{ mb: 2 }}>
                 <Typography variant="body1">{teamSummary}</Typography>

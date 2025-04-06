@@ -1,5 +1,12 @@
 import { Save as SaveIcon, Upload as UploadIcon } from "@mui/icons-material";
-import { Avatar, Box, Button, IconButton, TextField } from "@mui/material";
+import {
+    Avatar,
+    Box,
+    Button,
+    IconButton,
+    TextField,
+    Typography,
+} from "@mui/material";
 import PropTypes from "prop-types";
 import { useState } from "react";
 import { usePostSubmit } from "../../hooks/usePostSubmit";
@@ -18,57 +25,75 @@ const TeamEditor = ({ teamName, teamSummary, teamImage, exitEditMode }) => {
     };
 
     return (
-        <Box>
-            <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="flex-end"
-                sx={{ mb: 2 }}
+        <Box
+            sx={{
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                flexDirection: "column",
+                width: "100%",
+                gap: 1,
+            }}
+        >
+            <IconButton
+                onClick={handleSave}
+                sx={{ position: "absolute", right: 0 }}
             >
+                <SaveIcon sx={{ color: "blue" }} />
+            </IconButton>
+            <Box sx={{ position: "relative" }}>
                 <Avatar
                     src={imageUrl ?? teamImage}
                     alt={name ?? teamName}
-                    sx={{ height: "5em", width: "5em", margin: "auto" }}
+                    sx={{ height: "7em", width: "7em" }}
                 />
                 <Button
                     component="label"
                     variant="contained"
                     size="small"
                     startIcon={<UploadIcon />}
+                    sx={{
+                        position: "absolute",
+                        bottom: 0,
+                        minWidth: "100%",
+                    }}
                 >
-                    Update Team Image
+                    Upload
                     <input type="file" hidden />
                 </Button>
             </Box>
-
-            <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                sx={{ mb: 2 }}
-            >
+            <Typography variant="h4" sx={{ width: "100%" }}>
                 <TextField
                     value={name ?? teamName}
                     onChange={(e) => setName(e.target.value)}
                     variant="outlined"
                     autoFocus
                     fullWidth
+                    slotProps={{
+                        htmlInput: {
+                            sx: {
+                                textAlign: "center",
+                                padding: 0,
+                            },
+                        },
+                        input: {
+                            sx: {
+                                fontSize: "inherit",
+                                padding: 0,
+                            },
+                        },
+                    }}
+                    sx={{ textAlign: "center" }}
                 />
-                <IconButton onClick={handleSave}>
-                    <SaveIcon sx={{ color: "blue" }} />
-                </IconButton>
-            </Box>
-
-            <Box sx={{ mb: 2 }}>
-                <TextField
-                    fullWidth
-                    multiline
-                    rows={3}
-                    value={description ?? teamSummary}
-                    onChange={(e) => setDescription(e.target.value)}
-                    variant="outlined"
-                />
-            </Box>
+            </Typography>
+            <TextField
+                fullWidth
+                multiline
+                minRows={3}
+                value={description ?? teamSummary}
+                onChange={(e) => setDescription(e.target.value)}
+                variant="outlined"
+            />
         </Box>
     );
 };
