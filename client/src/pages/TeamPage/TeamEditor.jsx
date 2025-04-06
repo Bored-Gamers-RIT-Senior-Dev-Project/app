@@ -11,7 +11,7 @@ const TeamEditor = ({ teamName, teamSummary, teamImage, exitEditMode }) => {
     const submit = usePostSubmit();
 
     const handleSave = () => {
-        if (description || teamName || imageUrl) {
+        if (description || name || imageUrl) {
             submit({ teamName: name, description, profileImageUrl: imageUrl });
         }
         exitEditMode();
