@@ -34,7 +34,7 @@ app.use("/api", index);
 app.use("/api/users", users);
 app.use("/api/university", university);
 app.use("/api/teams", teams);
-app.use("/api", test);
+// app.use("/api", test);
 app.use("/user-images", express.static(__dirname + "/user-images"));
 
 //404 any routes not defined above
