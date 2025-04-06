@@ -8,7 +8,7 @@ import { Schedule } from "./Schedule";
 import { Search } from "./Search";
 import { TeamPage } from "./TeamPage";
 import { University } from "./University";
-import { UserManager } from "./UserManager";
+import { UniversityDashboard } from "./UniversityDashboard";
 import { UserSettings } from "./UserSettings";
 import { UserSignIn } from "./UserSignIn";
 import { UserSignUp } from "./UserSignUp";
@@ -24,7 +24,7 @@ export {
     Search,
     TeamPage,
     University,
-    UserManager,
+    UniversityDashboard,
     UserSettings,
     UserSignIn,
     UserSignUp,

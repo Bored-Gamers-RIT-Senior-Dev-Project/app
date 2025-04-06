@@ -11,7 +11,7 @@ import {
     Search,
     TeamPage,
     University,
-    UserManager,
+    UniversityDashboard,
     UserSettings,
     UserSignIn,
     UserSignUp,
@@ -127,20 +127,11 @@ const routes = [
                 ],
             },
             {
-                path: "/admin/reports",
-                element: <ReportView />,
-                loader: admin.getReports,
-            },
-            {
                 path: "/admin",
                 element: <AdminDashboard />,
-            },
-            {
-                path: "/admin",
-                element: <UserManager />,
                 children: [
                     {
-                        path: "/admin/users/addUser",
+                        path: "/admin/addUser",
                         element: <AddUserModal />,
                         loader: () =>
                             Promise.all([
@@ -150,7 +141,7 @@ const routes = [
                         action: makeAction(users.createUser),
                     },
                     {
-                        path: "/admin/users/editUser/:userId",
+                        path: "/admin/editUser/:userId",
                         element: <EditUserModal />,
                         loader: async ({ params }) => {
                             const { userId } = params;
@@ -175,7 +166,7 @@ const routes = [
                         action: makeAction(users.update),
                     },
                     {
-                        path: "/admin/users/deleteUser/:userId",
+                        path: "/admin/deleteUser/:userId",
                         element: <DeleteModal />,
                         loader: async ({ params }) => {
                             const { userId } = params;
@@ -214,8 +205,13 @@ const routes = [
                 loader: users.getList,
             },
             {
+                path: "/admin/reports",
+                element: <ReportView />,
+                loader: admin.getReports,
+            },
+            {
                 path: "/representative",
-                element: <AdminDashboard />,
+                element: <UniversityDashboard />,
                 loader: admin.getUniversityAdminTickets,
             },
             {
