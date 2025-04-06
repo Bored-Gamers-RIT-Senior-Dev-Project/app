@@ -21,7 +21,7 @@ import { AddUniversityModal } from "../pages/modals/AddUniversityModal";
 import { AddUserModal } from "../pages/modals/AddUserModal";
 import { DeleteModal } from "../pages/modals/DeleteModal";
 import { EditUserModal } from "../pages/modals/EditUserModal";
-import { admin, search, settings, teams, university, users } from "./api";
+import { admin, search, teams, university, users } from "./api";
 import { events } from "./events";
 
 /**
@@ -112,8 +112,7 @@ const routes = [
                     formData.delete("userId");
 
                     //Send to api to process updates.
-                    console.log(`Update user ID ${userId}: `, formData);
-                    // return users.updateSettings(formData);
+                    return users.updateSettings(userId, formData);
                 },
             },
             {

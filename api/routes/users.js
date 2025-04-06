@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const UserService = require("../services/userService");
+const multer = require("multer");
 const createHttpError = require("http-errors");
+
+const upload = multer();
 
 //Gets a user's profile information
 router.get("/profile", async (req, res, next) => {
@@ -133,8 +136,6 @@ router.post("", async (req, res, next) => {
 
 /**
  * PUT to Update a user.
- * TODO: Update this version to serve as our admin update user function and lock down to Admin roles.
- * TODO: Separate route to update a user profile accessible only to the user themselves (and possibly University Rep?)
  */
 router.put("/:userId", async (req, res, next) => {
     const uid = req.user?.uid;
@@ -143,7 +144,7 @@ router.put("/:userId", async (req, res, next) => {
         return res.status(401).send();
     }
     try {
-        const user = await UserService.updateUser(uid, userId, req.body);
+        const user = await UserService.adminUpdateUser(uid, userId, req.body);
         res.status(200).json({
             message: "User updated",
         });
@@ -151,6 +152,26 @@ router.put("/:userId", async (req, res, next) => {
         next(error);
     }
 });
+
+router.put(
+    "/:userId/settings",
+    upload.single("image"),
+    async (req, res, next) => {
+        const uid = req.user?.uid;
+        const { userId } = req.params;
+        if (!uid) {
+            return res.status(401).send();
+        }
+        try {
+            const { body, file } = req;
+            console.debug("FormData received:", body);
+            console.debug("File Received: ", file);
+            return res.status(200).send();
+        } catch (e) {
+            next(e);
+        }
+    }
+);
 
 /**
  * DELETE to delete a user.

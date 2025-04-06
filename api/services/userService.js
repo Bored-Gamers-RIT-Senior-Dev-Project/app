@@ -144,7 +144,7 @@ const createUser = async (
  * @param {*} body The information to update.
  * @returns The updated user object.
  */
-const updateUser = async (uid, userId, body) => {
+const adminUpdateUser = async (uid, userId, body) => {
     if (!User.userHasRole(uid, "Super Admin")) {
         throw createHttpError(403);
     }
@@ -187,5 +187,5 @@ module.exports = {
     getUserByUserId,
     googleSignIn,
     signUp,
-    updateUser,
+    adminUpdateUser,
 };
