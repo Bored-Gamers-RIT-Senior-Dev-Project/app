@@ -40,6 +40,24 @@ const UserIds = Object.freeze({
 });
 
 /**
+ * @typedef {"Spectator"|"Super Admin"|"Aardvark Games Employee"|"Marketing Staff"|"Tournament Facilitator"|"Team Captain"|"Student/Player"|"College Admin"} RoleName
+ */
+/**
+ * @readonly
+ * @enum {RoleName}
+ */
+const Roles = Object.freeze({
+    SPECTATOR: "Spectator",
+    ADMIN: "Super Admin",
+    EMPLOYEE: "Aardvark Games Employee",
+    MARKETING: "Marketing Staff",
+    FACILITATOR: "Tournament Facilitator",
+    CAPTAIN: "Team Captain",
+    STUDENT: "Student/Player",
+    UNIVERSITY_ADMIN: "College Admin",
+});
+
+/**
  * Creates a user in the database.
  * @param {string} firebaseUID The firebase UID of the user.  Should be validated from a token.
  * @param {string} email The email of the user.
@@ -358,6 +376,7 @@ const grantRole = async (userId, roleName, identifier = UserIds.LOCAL) => {
 
 module.exports = {
     UserIds,
+    Roles,
     createUser,
     getUserList,
     getUserByUserId,
