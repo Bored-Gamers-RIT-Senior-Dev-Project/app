@@ -1,11 +1,15 @@
 import {
     createUserWithEmailAndPassword,
+    EmailAuthProvider,
     getAdditionalUserInfo,
     getAuth,
     GoogleAuthProvider,
     onAuthStateChanged,
+    reauthenticateWithCredential,
+    reauthenticateWithPopup,
     signInWithEmailAndPassword,
     signInWithPopup,
+    updatePassword,
 } from "firebase/auth";
 import { events } from "../events";
 import { MessageData, Severity } from "../messageData";
@@ -13,18 +17,18 @@ import { app } from "./config";
 
 // Firebase Authentication
 const auth = getAuth(app);
-const authProvider = new GoogleAuthProvider();
+const googleAuthProvider = new GoogleAuthProvider();
 
 //Add scope for the user's email address, username, and profile picture to the Auth request
-authProvider.addScope("email");
-authProvider.addScope("profile");
+googleAuthProvider.addScope("email");
+googleAuthProvider.addScope("profile");
 
 /**
  * Runs the Google sign-in flow and returns the user's information.
  * @returns {Promise<*>} The user's information and additional user info from Firebase.
  */
 const signInWithGoogle = async () => {
-    const result = await signInWithPopup(auth, authProvider);
+    const result = await signInWithPopup(auth, googleAuthProvider);
     const additionalUserInfo = getAdditionalUserInfo(result);
     return { ...result, additionalUserInfo };
 };
@@ -83,7 +87,32 @@ const getIdToken = async () => {
     return await auth.currentUser.getIdToken();
 };
 
+/**
+ * Updates a user's password
+ * @param {string} oldPassword User's current password
+ * @param {string} newPassword User's new password
+ */
+const changePassword = async (oldPassword, newPassword) => {
+    const user = auth.currentUser;
+
+    //If the user has defined google SSO, use reauthenticate with a google pop-up.
+    const providers = user.providerData.map((provider) => provider.providerId);
+    if (providers.includes("google.com")) {
+        await reauthenticateWithPopup(user, googleAuthProvider);
+    } else {
+        //If the user hasn't defined google SSO, reauthenticate with their old password (from the form.)
+        await reauthenticateWithCredential(
+            EmailAuthProvider.credential(user.email, oldPassword)
+        );
+    }
+
+    await updatePassword(user, newPassword).catch((e) => {
+        console.error("Error Updating Password: ", e);
+    });
+};
+
 export {
+    changePassword,
     getIdToken,
     observeAuthState,
     // googleAuthProvider as authProvider,
