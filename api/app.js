@@ -13,6 +13,7 @@ const index = require("./routes");
 const users = require("./routes/users");
 const university = require("./routes/university");
 const teams = require("./routes/teams");
+const tournament = require("./routes/tournament");
 const createError = require("http-errors");
 
 //Initialize Express
@@ -32,6 +33,7 @@ app.use("/api", index);
 app.use("/api/users", users);
 app.use("/api/university", university);
 app.use("/api/teams", teams);
+app.use("/api/tournament", tournament);
 
 //404 any routes not defined above
 app.use((_req, _res, next) => {
