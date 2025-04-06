@@ -17,12 +17,17 @@ const VisuallyHiddenInput = styled("input")({
     width: 1,
 });
 
-const ImageUploader = ({ label = "Upload New Image", onUpload }) => {
+const ImageUploader = ({
+    label = "Upload New Image",
+    onUpload = (x) => console.log(x),
+    ...props
+}) => {
     return (
         <Button
             component="label"
             variant="contained"
             startIcon={<CloudUpload />}
+            {...props}
         >
             {label}
             <VisuallyHiddenInput

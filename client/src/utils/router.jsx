@@ -103,7 +103,18 @@ const routes = [
             {
                 path: "/settings",
                 element: <UserSettings />,
-                action: makeAction(settings.saveProfilePicture),
+                action: async ({ request }) => {
+                    //Read formData in request
+                    const formData = await request.formData();
+
+                    //Get the userid back from the formdata and remove it
+                    const userId = formData.get("userId");
+                    formData.delete("userId");
+
+                    //Send to api to process updates.
+                    console.log(`Update user ID ${userId}: `, formData);
+                    // return users.updateSettings(formData);
+                },
             },
             {
                 path: "/rules",
