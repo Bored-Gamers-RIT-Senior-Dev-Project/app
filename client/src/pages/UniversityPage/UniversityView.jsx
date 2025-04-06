@@ -20,6 +20,8 @@ const UniversityView = ({
                     minHeight: "12em",
                     background: "lightgray",
                     backgroundImage: `url(${universityBanner})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
                     padding: 1,
                 }}
             />
