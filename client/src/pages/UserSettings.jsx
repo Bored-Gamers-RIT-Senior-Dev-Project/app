@@ -26,19 +26,6 @@ const universityList = [
 ];
 
 const UserSettings = () => {
-    const [selectedNotifications, setSelectedNotifications] = useState([]);
-    const [selectedRole, setSelectedRole] = useState("");
-    const [selectedTeamOption, setSelectedTeamOption] = useState("");
-    const [selectedUniversity, setSelectedUniversity] = useState(null);
-
-    const handleNotificationChange = (event) => {
-        const value = event.target.name;
-        setSelectedNotifications((prev) =>
-            prev.includes(value)
-                ? prev.filter((item) => item !== value)
-                : [...prev, value]
-        );
-    };
     const { user } = useAuth();
     const navigate = useNavigate(); //React router useNavigate hook
     useEffect(() => {
@@ -47,12 +34,8 @@ const UserSettings = () => {
             navigate("/signin");
         }
     }, [user, navigate]);
-    if (!user) {
-        console.error(`UserSettings: user is ${user}!`);
-        return;
-    }
 
-    const emailEncoded = encodeURI(user.email);
+    const [image, setImage] = useState(null); // State to hold the uploaded image
 
     const submit = usePostSubmit();
 
@@ -60,6 +43,12 @@ const UserSettings = () => {
         e.preventDefault();
         // TODO: Finish this function
     };
+
+    if (!user) {
+        console.error(`UserSettings: user is ${user}!`);
+        return <Box></Box>;
+    }
+    const emailEncoded = encodeURI(user.email);
 
     return (
         <Paper sx={{ padding: 3, maxWidth: 800, margin: "auto" }}>
