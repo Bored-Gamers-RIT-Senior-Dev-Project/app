@@ -1,8 +1,8 @@
 import { Card, CardContent, Typography } from "@mui/material";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
-import { AgGridReact } from "ag-grid-react";
 import PropTypes from "prop-types";
+import { Grid } from "./Grid";
 
 //Component Layout created by chatGPT https://chatgpt.com/canvas/shared/67e2c89cbeb88191b49c51fc7d74c8f8
 const ReportGridOne = ({ data, totals }) => {
@@ -62,18 +62,13 @@ const ReportGridOne = ({ data, totals }) => {
 
     return (
         <div>
-            <div
-                className="ag-theme-alpine"
-                style={{ height: 600, width: "100%" }}
-            >
-                <AgGridReact
-                    rowData={data}
-                    columnDefs={columnDefs}
-                    defaultColDef={{ flex: 1 }}
-                    pagination={true}
-                    paginationPageSize={10}
-                />
-            </div>
+            <Grid
+                rowData={data}
+                columnDefs={columnDefs}
+                defaultColDef={{ flex: 1 }}
+                pagination={true}
+                paginationPageSize={10}
+            />
             <Card variant="outlined" style={{ marginTop: 20 }}>
                 <CardContent>
                     <Typography variant="h6">Totals</Typography>
