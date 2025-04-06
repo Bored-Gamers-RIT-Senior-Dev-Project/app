@@ -7,7 +7,7 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { ImageUploader } from "../components/ImageUploader";
 import { useAuth } from "../hooks/useAuth/index";
@@ -18,7 +18,6 @@ const UserSettings = () => {
     const { user } = useAuth();
     const navigate = useNavigate(); //React router useNavigate hook
     const [error, setError] = useState("");
-    const [imageUrl, setImageUrl] = useState("");
     const [userForm, setUserForm] = useState({
         username: "",
         bio: "",
@@ -31,7 +30,6 @@ const UserSettings = () => {
             //User is 'undefined' before Firebase inits, 'null' if user is not logged in.
             navigate("/signin");
         } else if (user) {
-            setImageUrl(user.profileImageUrl);
             setUserForm((current) => ({
                 ...current,
                 username: user.username,
@@ -41,11 +39,12 @@ const UserSettings = () => {
         }
     }, [user, navigate]);
 
-    useEffect(() => {
+    const imageUrl = useMemo(() => {
         if (userForm.image) {
-            setImageUrl(URL.createObjectURL(userForm.image)); // Create a URL for the uploaded image
+            return URL.createObjectURL(userForm.image); // Create a URL for the uploaded image
         }
-    }, [userForm.image]);
+        return user.profileImageUrl;
+    }, [user.profileImageUrl, userForm.image]);
 
     const submit = usePostSubmit();
 
