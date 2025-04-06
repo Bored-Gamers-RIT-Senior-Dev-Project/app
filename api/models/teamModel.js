@@ -144,7 +144,13 @@ const getTeamsByUniversityId = async (universityId, approvedOnly = true) => {
     return query[0];
 };
 
-//TODO: JSdocs
+/**
+ * Gets a team's information based on its ide
+ * @param {number} teamId The Id to search for
+ * @param {boolean} showUnapproved Whether or not the information should include unapproved teams
+ * @param {boolean} showPendingChanges Whether or not to retrieve pending changes to the team's information
+ * @returns
+ */
 const getTeamById = async (teamId, showUnapproved, showPendingChanges) => {
     const sql = `SELECT 
     t.TeamID AS id,
@@ -175,7 +181,13 @@ WHERE
     return result[0][0];
 };
 
-//TODO: Jsdocs
+/**
+ * Create a new team in the database
+ * @param {number} universityId The ID of the university the team belongs to.
+ * @param {string} teamName The name of the newly created team
+ * @param {number} userId The UserID value of the creator, used to make them the team's captain.
+ * @returns {number} The newly created team's ID
+ */
 const createTeam = async (universityId, teamName, userId) => {
     const sql = `INSERT INTO teams (UniversityId, TeamName, TeamLeaderID) VALUES (?, ?, ?)`;
     const [resultSetHeader] = await db.query(sql, [
@@ -187,11 +199,12 @@ const createTeam = async (universityId, teamName, userId) => {
 };
 
 /**
- * TODO: JSDocs
- * @param {} teamId
- * @param {*} teamName
- * @param {*} description
- * @param {*} profileImageUrl
+ * Creates a Team Update Request in the team_update table for admin review
+ * @param {number} teamId The ID of the team being updated
+ * @param {string|null} teamName The team's new name (will be null if the team leader did not specify a new team name)
+ * @param {string|null} description The team's newly defined description
+ * @param {string|null} profileImageUrl The URL of the team's profile image
+ * @returns {Promise<boolean>} True of the update request is created successfully, false if something went wrong.
  */
 const teamUpdateRequest = async (
     teamId,
