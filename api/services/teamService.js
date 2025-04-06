@@ -175,8 +175,11 @@ const postUpdateRequest = async (
     description,
     profileImageUrl
 ) => {
-    //TODO: Verify user is captain(/team member?) using uid
-    //TODO: Here or in teamModel, check if team has an existing update request and update that instead of creating a new one if it does.
+    const user = await userModel.getUserByFirebaseId(uid);
+    if (user.roleName != userModel.Roles.CAPTAIN || user.teamId != teamId) {
+        throw createError(403);
+    }
+
     return await teamModel.teamUpdateRequest(
         teamId,
         teamName,
