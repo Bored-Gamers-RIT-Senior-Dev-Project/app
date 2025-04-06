@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useLoaderData } from "react-router";
-import { InfoElement } from "../components/InfoElement";
+import { InfoElement } from "../../components/InfoElement";
 
 /**
  * The University page component.
