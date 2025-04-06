@@ -52,9 +52,15 @@ const UniversityView = ({
                 <Typography variant="h4">{universityName}</Typography>
                 <Typography variant="h5">{universityLocation}</Typography>
                 <Box sx={{ mb: 2 }}>
-                    <Typography variant="body1">
-                        {universityDescription}
-                    </Typography>
+                    {universityDescription.split("\n").map((p, index) => (
+                        <Typography
+                            key={index}
+                            variant="body1"
+                            sx={{ minHeight: "1em" }}
+                        >
+                            {p}
+                        </Typography>
+                    ))}
                 </Box>
             </Box>
         </Box>
