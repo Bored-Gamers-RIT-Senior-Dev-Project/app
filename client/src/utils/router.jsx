@@ -197,7 +197,7 @@ const routes = [
                         },
                     },
                     {
-                        path: "/admin/users/addUniversity",
+                        path: "/admin/addUniversity",
                         element: <AddUniversityModal />,
                         action: makeAction(university.addUniversity),
                     },
