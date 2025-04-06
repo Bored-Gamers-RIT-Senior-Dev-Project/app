@@ -13,6 +13,7 @@ import {
     TeamPage,
     University,
     UniversityDashboard,
+    UniversityPage,
     UserSettings,
     UserSignIn,
     UserSignUp,
@@ -80,6 +81,26 @@ const routes = [
             {
                 path: "/university/:universityId",
                 element: <University />,
+                loader: async ({ params }) => {
+                    const { universityId } = params;
+                    try {
+                        if (isNaN(Number(universityId))) {
+                            const error = new Error("Bad Request");
+                            error.status = 404;
+                            throw error;
+                        }
+                        return await university.getInfo(universityId);
+                    } catch (e) {
+                        if (e.status === 404) {
+                            return redirect("/notfound");
+                        }
+                        throw e;
+                    }
+                },
+            },
+            {
+                path: "/university/new/:universityId",
+                element: <UniversityPage />,
                 loader: async ({ params }) => {
                     const { universityId } = params;
                     try {

@@ -9,6 +9,7 @@ import { Search } from "./Search";
 import { Faq } from "./Faq";
 import { TeamPage } from "./TeamPage";
 import { UniversityDashboard } from "./UniversityDashboard";
+import { UniversityPage } from "./UniversityPage";
 import { University } from "./UniversityPage/University";
 import { UserSettings } from "./UserSettings";
 import { UserSignIn } from "./UserSignIn";
@@ -27,6 +28,7 @@ export {
     TeamPage,
     University,
     UniversityDashboard,
+    UniversityPage,
     UserSettings,
     UserSignIn,
     UserSignUp,

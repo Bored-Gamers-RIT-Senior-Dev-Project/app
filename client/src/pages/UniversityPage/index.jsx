@@ -1,19 +1,19 @@
 import { useState } from "react";
 import { useLoaderData } from "react-router";
-import { TeamEditor } from "./TeamEditor";
-import { TeamView } from "./TeamView";
+import { UniversityEditor } from "./UniversityEditor";
+import { UniversityView } from "./UniversityView";
 
 import { Box, Paper } from "@mui/material";
 import { useAuth } from "../../hooks/useAuth";
 import { pageWidth } from "../../utils/theme";
-import { MemberList } from "./MemberList";
 
-const TeamPage = () => {
-    const team = useLoaderData();
+const UniversityPage = () => {
+    const university = useLoaderData();
     const { user } = useAuth();
     const [editMode, setEditMode] = useState(false);
 
-    const isCaptain = user?.userId == team.captainId;
+    const isUniversityAdmin =
+        user?.roleId == 8 && user?.universityId == university.universityId;
 
     return (
         <Box
@@ -26,32 +26,37 @@ const TeamPage = () => {
         >
             <Paper
                 sx={{
-                    padding: { xs: 2, md: 4 },
                     width: "100%",
                     height: "100%",
                     maxWidth: "1200px",
                     margin: "auto",
+                    overflow: "hidden",
                 }}
             >
-                {editMode && isCaptain ? (
-                    <TeamEditor
-                        teamName={team.teamName}
-                        teamDescription={team.summary}
+                {editMode && isUniversityAdmin ? (
+                    <UniversityEditor
+                        universityName={university.universityName}
+                        universityDescription={university.description}
+                        universityLocation={university.location}
+                        universityLogo={university.logoUrl}
+                        universityBanner={university.bannerUrl}
                         exitEditMode={() => setEditMode(false)}
                     />
                 ) : (
-                    <TeamView
-                        showEditButton={isCaptain}
-                        teamName={team.teamName}
-                        teamSummary={team.description}
-                        members={team.members}
+                    <UniversityView
+                        showEditButton={isUniversityAdmin}
+                        universityName={university.universityName}
+                        universityDescription={university.description}
+                        universityLocation={university.location}
+                        universityLogo={university.logoUrl}
+                        universityBanner={university.bannerUrl}
                         enterEditMode={() => setEditMode(true)}
                     />
                 )}
-                <MemberList members={team.members} captainId={team.captainId} />
+                {/* <TeamList members={team.members} captainId={team.captainId} /> */}
             </Paper>
         </Box>
     );
 };
 
-export { TeamPage };
+export { UniversityPage };
