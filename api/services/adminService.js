@@ -34,7 +34,7 @@ const getUniversityAdminTickets = async (uid) => {
     console.log("User is ", user);
     //TODO: Permissions and validation
 
-    await Admin.getUniversityAdminTickets(user.universityId);
+    return await Admin.getUniversityAdminTickets(user.universityId);
 };
 
 module.exports = { generateReports, getRoleList, getUniversityAdminTickets };
