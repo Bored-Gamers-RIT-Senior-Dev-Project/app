@@ -15,13 +15,6 @@ import { useAuth } from "../hooks/useAuth/index";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { changePassword } from "../utils/firebase/auth";
 
-const universityList = [
-    "Rochester Institute of Technology",
-    "Harvard University",
-    "MIT",
-    "Stanford University",
-];
-
 const UserSettings = () => {
     const { user } = useAuth();
     const navigate = useNavigate(); //React router useNavigate hook
