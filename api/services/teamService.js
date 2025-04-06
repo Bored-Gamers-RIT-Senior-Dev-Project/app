@@ -162,11 +162,12 @@ const addUserToTeam = async (uid, teamId, universityId) => {
 };
 
 /**
- * TODO: JSdocs
- * @param {*} uid
- * @param {*} teamName
- * @param {*} description
- * @param {*} profileImageUrl
+ * Posts an update request to the DB if the user editing is captain of the team.
+ * @param {string} uid UID of the user posting the update
+ * @param {string|null} teamName The updated team name, null if the team name has not been updated
+ * @param {string|null} description The updated team description, null if the description has not been updated
+ * @param {string|null} profileImageUrl The url to a newly uploaded profile image, null if no image was uploaded.
+ * @returns {Promise<boolean>} True if successful, false if something went wrong
  */
 const postUpdateRequest = async (
     uid,

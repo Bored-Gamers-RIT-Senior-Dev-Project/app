@@ -129,10 +129,14 @@ const teams = Object.freeze({
         return data;
     },
     /**
-     * TODO: Jsdocs for this function
-     * @param {*} param0
-     * @param {*} param1
-     * @returns
+     * Post an update to the user db
+     * @param {object} data The form data for the update.
+     * @param {string|null} data.teamName The updated team name.
+     * @param {string|null} data.description The updated team description
+     * @param {string|null} data.profileImageUrl A URL to a newly uploaded profile image.
+     * @param {object} params The params of the route.
+     * @param {number} params.teamId The ID of the team being updated (gotten from route)
+     * @returns {Promise<boolean>} True on a successful update post.
      */
     update: async ({ teamName, description, profileImageUrl }, { teamId }) => {
         const { data } = await api.post(`teams/${teamId}/update`, {
