@@ -46,6 +46,26 @@ const getTeams = async (uid, universityId = null, showUnapproved = false) => {
 };
 
 /**
+ * Checks if user has the correct permissions to view pending changes
+ * @param {object} user User Information from the DB
+ * @param {object} team Team Information from the DB
+ * @returns {boolean} true if the user can, false if they can't.
+ */
+const userCanViewPendingChanges = (user, team) => {
+    switch (user.roleName) {
+        case userModel.Roles.ADMIN:
+            return true;
+        case userModel.Roles.CAPTAIN:
+        case userModel.Roles.STUDENT:
+            return user.teamId == team.teamId;
+        case userModel.Roles.UNIVERSITY_ADMIN:
+            return user.universityId == team.universityId;
+        default:
+            return false;
+    }
+};
+
+/**
  * Gets team information based on a team's ID
  * @param {string} uid Firebase UID provided by auth
  * @param {number} teamId Team ID to search for
@@ -53,16 +73,19 @@ const getTeams = async (uid, universityId = null, showUnapproved = false) => {
  * @returns {Promise<object>} Team information
  */
 const getTeam = async (uid, teamId, showPendingChanges = false) => {
-    const [team, members] = await Promise.all([
+    const [user, team, members] = await Promise.all([
+        userModel.getUserByFirebaseId(uid),
         teamModel.getTeam(teamId),
         teamModel.getMembers(teamId, showPendingChanges),
     ]);
     team.members = members;
 
-    //TODO: Role validation & Logic to get Pending  updates.
-    const pendingChanges = null;
-    if (pendingChanges) {
-        team.pendingChanges = pendingChanges;
+    if (showPendingChanges && userCanViewPendingChanges(user, team)) {
+        let pendingChanges = null;
+
+        if (pendingChanges) {
+            team.pendingChanges = pendingChanges;
+        }
     }
 
     return makeObjectCamelCase(team);
