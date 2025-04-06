@@ -12,6 +12,8 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 
+const ScorePopup = () => {};
+
 const Schedule = () => {
     const [matches, setMatches] = useState([
         {
@@ -20,8 +22,8 @@ const Schedule = () => {
             team2: "Team 2",
             dateTime: "Feb 10, 2025 - 3:00 PM",
             location: "Stadium A",
-            score: "2/1",
-            winner: "Team 2",
+            team1_score: 1,
+            team2_score: 3,
         },
         {
             id: 2,
@@ -29,8 +31,8 @@ const Schedule = () => {
             team2: "Team 3",
             dateTime: "Feb 12, 2025 - 4:30 PM",
             location: "Stadium B",
-            score: "-",
-            winner: "Pending",
+            team1_score: 0,
+            team2_score: 0,
         },
         {
             id: 3,
@@ -38,10 +40,28 @@ const Schedule = () => {
             team2: "Team 3",
             dateTime: "Feb 15, 2025 - 6:00 PM",
             location: "Stadium C",
-            score: "-",
-            winner: "Pending",
+            team1_score: 0,
+            team2_score: 0,
         },
     ]);
+    /**
+     * Figure out who won a match
+     * (hopefully no one names their team "Tie" - this is just for visual
+     * purposes so nothing serious will break if they do)
+     * @param {*} match the match data, with the keys team1, team2, team1_score,
+     * and team2_score
+     * @returns team1 if team1 won, team2 if team 2 won, or "Tie" if the scores
+     * are equal
+     */
+    const winner = (match) => {
+        if (match.team1_score > match.team2_score) {
+            return match.team1;
+        }
+        if (match.team1_score < match.team2_score) {
+            return match.team2;
+        }
+        return "Tie";
+    };
 
     return (
         <Box sx={{ maxWidth: "900px", margin: "auto", padding: 2 }}>
@@ -111,16 +131,15 @@ const Schedule = () => {
                             </Box>
 
                             <Box textAlign="center" mt={2}>
-                                {match.score !== "-" ? (
-                                    <Typography variant="body1">
-                                        Final Score: {match.score} <br />
-                                        Winner: {match.winner}
-                                    </Typography>
-                                ) : (
-                                    <Button variant="contained" size="small">
-                                        Update Scores
-                                    </Button>
-                                )}
+                                <Typography variant="body1">
+                                    Score:{" "}
+                                    {`${match.team1_score} : ${match.team2_score}`}{" "}
+                                    <br />
+                                    Winner: {winner(match)}
+                                </Typography>
+                                <Button variant="contained" size="small">
+                                    Update Scores
+                                </Button>
                             </Box>
                         </CardContent>
                     </Card>
