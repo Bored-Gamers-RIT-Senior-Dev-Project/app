@@ -47,11 +47,6 @@ const buildNavLinks = (user) => {
                         text: "Reports View",
                         path: "/admin/reports",
                     },
-                    {
-                        key: "adminUserManager",
-                        text: "User Manager",
-                        path: "/admin/users",
-                    },
                 ],
             });
             break;
