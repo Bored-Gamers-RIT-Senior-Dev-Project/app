@@ -1,6 +1,19 @@
 const Firebase = require("../config/firebase");
 const User = require("../models/userModel");
-const { createHttpError } = require("http-errors");
+const createHttpError = require("http-errors");
+
+/**
+ * Gets a list of all users
+ * @param {string} uid Requestor's UID, validated from their request token.
+ * @returns {Promise<List<object>>} A list of all users.
+ * @throws {HttpError} 403 error if the requestor isn't a Super Admin.
+ */
+const getUserList = async (uid) => {
+    if (!(await User.userHasRole(uid, "Super Admin"))) {
+        throw createHttpError(403);
+    }
+    return await User.getUserList();
+};
 
 /**
  * An alias for User.getUserByFirebaseId()
@@ -95,19 +108,19 @@ const createUser = async (
     firstName,
     lastName,
     username,
+    password,
     email,
-    profileImageUrl,
     roleId,
     universityId
 ) => {
-    const user = await getUser(requestUid);
-    if (user.role !== "Super Admin") {
+    const user = await User.getUserByFirebaseId(requestUid);
+    if (user.roleName !== "Super Admin") {
         throw createHttpError(403);
     }
-    //TODO: Validate and sanitize inputs
-
     //Create user record in Firebase Authentication and get UID
     const createdUser = await Firebase.createUser(email, password);
+
+    username = await User.checkUsername(username);
 
     //Create user record in local database using UID from Firebase Authentication
     const userRecord = await User.createUser(
@@ -116,7 +129,7 @@ const createUser = async (
         firstName,
         lastName,
         username,
-        profileImageUrl,
+        undefined,
         roleId,
         universityId
     );
@@ -131,22 +144,37 @@ const createUser = async (
  * @param {*} body The information to update.
  * @returns The updated user object.
  */
-const updateUser = async (uid, body) => {
-    const user = await User.updateUser(uid, body);
+const updateUser = async (uid, userId, body) => {
+    if (!User.userHasRole(uid, "Super Admin")) {
+        throw createHttpError(403);
+    }
+    const targetUser = await User.getUserByUserId(userId);
+    if (body.password) {
+        await Firebase.updatePassword(targetUser.firebaseUid, body.password);
+    }
+    if (targetUser.username == body.username) {
+        delete body.username;
+    }
+
+    const user = await User.updateUser(userId, body);
     return user;
 };
 
 const deleteUser = async (uid, userId) => {
-    const user = await getUser(uid);
-    if (user.role !== "Super Admin" /* && user.UserId !== userId */) {
+    const user = await getUserByFirebaseId(uid);
+    if (user.roleName !== "Super Admin" /* && user.UserId !== userId */) {
         throw createHttpError(403);
     }
 
     // Delete user from local database.  Get the firebase uid from the local database.
     const deletedUser = await User.deleteUser(userId);
 
-    //TODO: Delete user from Firebase Authentication.
-    await Firebase.deleteUser(deletedUser.firebaseUid);
+    if (!deletedUser) {
+        throw createHttpError(500);
+    }
+
+    //Delete user from Firebase Authentication.
+    await Firebase.deleteUser(deletedUser.firebaseID);
 
     return true;
 };
@@ -154,6 +182,7 @@ const deleteUser = async (uid, userId) => {
 module.exports = {
     createUser,
     deleteUser,
+    getUserList,
     getUserByFirebaseId,
     getUserByUserId,
     googleSignIn,

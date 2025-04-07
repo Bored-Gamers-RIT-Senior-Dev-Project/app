@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const UserService = require("../services/userService");
+const createHttpError = require("http-errors");
 
 //Gets a user's profile information
 router.get("/profile", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req.user?.uid;
     if (!uid) return res.status(401).send();
     try {
         const user = await UserService.getUserByFirebaseId(uid);
@@ -14,9 +15,33 @@ router.get("/profile", async (req, res, next) => {
     }
 });
 
+//Gets a list of all users
+router.get("", async (req, res, next) => {
+    const uid = req.user?.uid;
+    if (!uid) return res.status(401).send();
+    try {
+        const list = await UserService.getUserList(uid);
+        return res.status(200).json(list);
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get("/:userId", async (req, res, next) => {
+    const { userId } = req.params;
+    const uid = req.user?.uid;
+    if (!uid) return res.status(401).send();
+    try {
+        const user = await UserService.getUserByUserId(userId);
+        return res.status(200).json(user);
+    } catch (e) {
+        next(e);
+    }
+});
+
 //User sign-in, expects the sender to have authenticated with Firebase
 router.post("/register", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req.user?.uid;
     const { email, username, firstName, lastName } = req.body;
 
     if (!uid) {
@@ -46,9 +71,7 @@ router.post("/register", async (req, res, next) => {
 //Google sign-in, used to create local records of firebase sign-in
 router.post("/register/google", async (req, res, next) => {
     const { email, displayName, photoURL } = req.body;
-    const { uid } = req.user;
-    console.log(req.user);
-    console.log(req.body);
+    const uid = req.user?.uid;
     if (!uid) {
         return res.status(401).send();
     }
@@ -75,10 +98,34 @@ router.post("/register/google", async (req, res, next) => {
  * Requires admin role.
  */
 router.post("", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req.user?.uid;
+    const {
+        email,
+        firstName,
+        lastName,
+        username,
+        password,
+        roleId,
+        universityId,
+    } = req.body;
+
+    if (!email || !password || !username) {
+        return res.status(400).send();
+    }
+
     if (!uid) return res.status(401).send();
     try {
-        //userService create user
+        const user = await UserService.createUser(
+            uid,
+            firstName,
+            lastName,
+            username,
+            password,
+            email,
+            roleId,
+            universityId
+        );
+        return res.json(user);
     } catch (error) {
         next(error);
     }
@@ -90,12 +137,13 @@ router.post("", async (req, res, next) => {
  * TODO: Separate route to update a user profile accessible only to the user themselves (and possibly University Rep?)
  */
 router.put("/:userId", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req.user?.uid;
+    const { userId } = req.params;
     if (!uid) {
         return res.status(401).send();
     }
     try {
-        const user = await UserService.updateUser(uid, req.body);
+        const user = await UserService.updateUser(uid, userId, req.body);
         res.status(200).json({
             message: "User updated",
         });
@@ -109,14 +157,14 @@ router.put("/:userId", async (req, res, next) => {
  * Requires admin role, or matching user ID (?).
  */
 router.delete("/:userId", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req.user?.uid;
     const { userId } = req.params;
     if (!uid) {
         return res.status(401).send();
     }
     try {
         //userService delete user
-        // const status = await userService.deleteUser(uid, userId);
+        await UserService.deleteUser(uid, userId);
         return res.status(200).json({ message: "User deleted successfully." });
     } catch (error) {
         next(error);

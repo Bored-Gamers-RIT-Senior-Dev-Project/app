@@ -3,6 +3,7 @@ const router = express.Router();
 const { makeObjectCamelCase } = require("../utils");
 const teamService = require("../services/teamService");
 const universityService = require("../services/universityService");
+const adminService = require("../services/adminService");
 
 router.post("/test", async (req, res) => {
     await new Promise((resolve) => {
@@ -37,6 +38,40 @@ router.post("/search", async (req, res, next) => {
         });
     } catch (e) {
         console.error("Search Error: ", e.message);
+        next(e);
+    }
+});
+
+router.get("/roles", async (req, res, next) => {
+    try {
+        const uid = req.user?.uid;
+        if (!uid) return res.status(401).send();
+
+        const roles = await adminService.getRoleList(uid);
+        return res.json(roles);
+    } catch (e) {
+        next(e);
+    }
+});
+
+router.get("/reports", async (req, res, next) => {
+    const uid = req.user?.uid;
+    if (!uid) return res.status(401).send();
+    try {
+        const report = await adminService.generateReports(uid);
+        return res.json(report);
+    } catch (e) {
+        next(e);
+    }
+});
+
+router.get("/representative", async (req, res, next) => {
+    const uid = req.user?.uid;
+    if (!uid) return res.status(401).send();
+    try {
+        const tickets = await adminService.getUniversityAdminTickets(uid);
+        return res.json(tickets);
+    } catch (e) {
         next(e);
     }
 });

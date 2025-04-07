@@ -64,7 +64,7 @@ const createUniversity = async (
     description,
     websiteUrl
 ) => {
-    const insert = await db.query(
+    const [resultSetHeader] = await db.query(
         `
         INSERT INTO
             universities (UniversityName, Location, LogoURL, BannerURL, Description, WebsiteURL)
@@ -73,9 +73,7 @@ const createUniversity = async (
         [universityName, location, logoUrl, bannerUrl, description, websiteUrl]
     );
 
-    //TODO: figure out a way to get the inserted value here when we don't know any unique values until after it's created :/
-
-    return true;
+    return resultSetHeader.insertId;
 };
 
 const VALID_KEYS = {

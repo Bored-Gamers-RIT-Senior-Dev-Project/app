@@ -2,6 +2,11 @@ const camelCase = require("lodash/camelCase");
 const makeObjectCamelCase = (object) => {
     if (!object) return null;
 
+    // If the object is a Date, return it directly (or format it as a string)
+    if (object instanceof Date) {
+        return object; // Or return object.toISOString() or a custom format
+    }
+
     const newObject = {};
 
     // If the object is an array, make each entry camel case.
@@ -14,9 +19,9 @@ const makeObjectCamelCase = (object) => {
         // Using lodash, convert each key to camelCase.
         const camelCaseKey = camelCase(key);
 
-        // Apply transformation recursively
+        // Apply transformation recursively, but skip Date objects
         let transformedValue = value;
-        if (value && typeof value === "object") {
+        if (value && typeof value === "object" && !(value instanceof Date)) {
             transformedValue = makeObjectCamelCase(value);
         }
 
