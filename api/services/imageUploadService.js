@@ -60,4 +60,12 @@ const saveImage = async (name, image) => {
     });
 };
 
-module.exports = { encodeImage, hash, saveImage };
+/**
+ * Save an image for a user - save the image to the disk after transcoding to
+ * WEBP, and request a user update for that image
+ * @param {Buffer} file the file to try to use as an image
+ * @param {number} uid the user's id
+ */
+const uploadUserImage = async (file, uid) => {};
+
+module.exports = { encodeImage, hash, saveImage, uploadUserImage };
