@@ -1,3 +1,4 @@
+import { ArrowBack } from "@mui/icons-material";
 import {
     Box,
     Button,
@@ -12,7 +13,7 @@ import {
 } from "@mui/material";
 import { formatDistanceToNow } from "date-fns";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { api_url } from "../utils/api";
 
 const TournamentInformation = () => {
@@ -27,6 +28,8 @@ const TournamentInformation = () => {
         sortBy: "",
         dateRange: [null, null],
     });
+
+    const navigate = useNavigate();
 
     // Dropdown state for Match Filters
     const [anchorEl, setAnchorEl] = useState(null);
@@ -164,17 +167,17 @@ const TournamentInformation = () => {
             </Box>
         );
     }
-
     return (
         <Box sx={{ maxWidth: "900px", margin: "auto", padding: 2 }}>
             {/* Match Filters Dropdown Button */}
 
             <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
                 <Button
+                    onClick={() => navigate(-1)}
                     variant="contained"
-                    onClick={() => window.history.back()}
+                    startIcon={<ArrowBack />}
                 >
-                    Back
+                    Go Back
                 </Button>
             </Box>
 
