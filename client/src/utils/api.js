@@ -196,7 +196,7 @@ const users = Object.freeze({
      * @param {*} params The keys to update in the user profile.  //TODO: This function should be further locked down or specified to what the front-end can do once we have the dashboard
      * @returns {Promise<*>} A confirmation of the update
      */
-    update: async (userId, params) => {
+    update: async (params, { userId }) => {
         const { data } = await api.put(`users/${userId}`, params);
         return data;
     },
@@ -252,6 +252,11 @@ const university = Object.freeze({
      */
     addUniversity: async (params) => {
         const { data } = await api.post("university", params);
+        return data;
+    },
+
+    update: async (universityId, formData) => {
+        const { data } = await api.put(`university/${universityId}`, formData);
         return data;
     },
 });

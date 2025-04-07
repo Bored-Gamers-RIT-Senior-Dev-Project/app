@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const { makeObjectCamelCase } = require("../utils");
 const universityService = require("../services/universityService");
+const multer = require("multer");
+
+const upload = multer();
 
 /**
  * GET a list of universities
@@ -83,40 +86,41 @@ router.delete("/:universityId", async (req, res, next) => {
  * PUT to update a university.
  * Requires: [Admin Role] or [University Rep Role & Matching University ID]
  */
-router.put("/:universityId", async (req, res, next) => {
-    const { uid } = req.user;
-    const { universityId } = req.params;
-    const {
-        universityName,
-        location,
-        logoURL,
-        bannerUrl,
-        description,
-        websiteUrl,
-    } = req.body;
-    if (!uid) {
-        return res.status(401).send();
-    }
-    try {
-        const result = await universityService.updateUniversity(
-            uid,
-            universityId,
-            {
+router.put(
+    "/:universityId",
+    upload.fields([
+        { name: "logoImage", maxCount: 1 },
+        { name: "bannerImage", maxCount: 1 },
+    ]),
+    async (req, res, next) => {
+        const uid = req.user?.uid;
+        if (!uid) {
+            return res.status(401).send();
+        }
+
+        const { universityId } = req.params;
+        const { universityName, location, description, websiteUrl } = req.body;
+        const { logoImage, bannerImage } = req.files;
+
+        try {
+            const result = await universityService.updateUniversity(
+                uid,
+                universityId,
                 universityName,
                 location,
-                logoURL,
-                bannerUrl,
                 description,
                 websiteUrl,
-            }
-        );
-        return res.status(200).json({
-            message: "University updated successfully.",
-            university: result,
-        });
-    } catch (e) {
-        return next(e);
+                logoImage,
+                bannerImage
+            );
+            return res.status(200).json({
+                message: "University updated successfully.",
+                university: result,
+            });
+        } catch (e) {
+            return next(e);
+        }
     }
-});
+);
 
 module.exports = router;

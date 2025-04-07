@@ -96,6 +96,13 @@ const routes = [
                         throw e;
                     }
                 },
+                action: async ({ request, params }) => {
+                    const formData = await request.formData();
+                    return await university.update(
+                        params.universityId,
+                        formData
+                    );
+                },
             },
             {
                 path: "/about",
