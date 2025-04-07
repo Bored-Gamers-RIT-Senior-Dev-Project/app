@@ -81,9 +81,9 @@ const getReportOneTotals = async () => {
  * @returns {List<object>} An array of all events that need to be evaluated.
  */
 const getUniversityAdminTickets = async (universityId) => {
-    const newTeamsQuery = `SELECT *, "newTeam" type FROM teams WHERE IsApproved = false`;
+    const newTeamsQuery = `SELECT *, "newTeam" type FROM teams WHERE IsApproved = false AND UniversityID = ?`;
 
-    const newUsersQuery = `SELECT *, "newUser" type FROM users WHERE IsValidated = false`;
+    const newUsersQuery = `SELECT *, "newUser" type FROM users WHERE IsValidated = false AND UniversityID = ?`;
 
     const teamEditsQuery = `SELECT upd.*, "teamEdit" type
         FROM team_update upd
