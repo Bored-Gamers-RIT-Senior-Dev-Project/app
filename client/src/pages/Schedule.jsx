@@ -243,7 +243,7 @@ const Schedule = () => {
                 </Box>
             ) : (
                 filteredTournaments.map((tournament) => (
-                    <Accordion key={tournament.tournamentId} defaultExpanded>
+                    <Accordion key={tournament.tournamentId} sx={{ mb: 2 }}>
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                             <Box width="100%">
                                 <Typography
