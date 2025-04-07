@@ -185,14 +185,13 @@ const TournamentInformation = () => {
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
                 onClose={handleMenuClose}
+                disableScrollLock
                 keepMounted
             >
-                <Paper sx={{ padding: 3, borderRadius: "10px", m: 1 }}>
-                    <Typography variant="h6" gutterBottom>
-                        Match Filters
-                    </Typography>
+                <Paper sx={{ padding: 1, borderRadius: "10px", m: 1 }}>
+                    <Typography gutterBottom>Match Filters</Typography>
                     <Grid container spacing={2}>
-                        <Grid item xs={24} sm={12}>
+                        <Grid item xs={18} sm={6}>
                             <TextField
                                 fullWidth
                                 label="Match Team Name"
