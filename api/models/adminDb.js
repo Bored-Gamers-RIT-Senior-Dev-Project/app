@@ -85,12 +85,19 @@ const getUniversityAdminTickets = async (universityId) => {
 
     const newUsersQuery = `SELECT *, "newUser" type FROM users WHERE IsValidated = false AND UniversityID = ?`;
 
-    const teamEditsQuery = `SELECT upd.*, "teamEdit" type
+    const teamEditsQuery = `SELECT upd.*,
+            t.TeamName CurrentTeamName,
+            "teamEdit" type
         FROM team_update upd
         JOIN teams t ON upd.UpdatedTeamID = t.TeamId
         WHERE t.UniversityId = ?`;
 
-    const userEditsQuery = `SELECT upd.*, "userEdit" type
+    const userEditsQuery = ` SELECT upd.*,
+            u.Email CurrentEmail,
+            u.Username CurrentUsername,
+            u.FirstName CurrentFirstName,
+            u.LastName CurrentLastName,
+            "userEdit" type
         FROM user_update upd
         JOIN users u ON upd.UpdatedUserID = u.TeamId
         WHERE u.UniversityId = ?`;

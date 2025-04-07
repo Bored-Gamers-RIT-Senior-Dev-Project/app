@@ -277,10 +277,6 @@ const UserEditCard = ({ userEdit }) => {
                     {userEdit.Bio ?? "No Bio"}
                 </Typography>
             </Paper>
-            <Button variant="contained" color="secondary">
-                Deny
-            </Button>
-            <Button variant="contained">Approve</Button>
         </Box>
     );
 };
@@ -299,23 +295,52 @@ const TeamEditCard = ({ teamEdit }) => {
                 sx={{
                     display: "flex",
                     alignItems: "center",
-                    position: "relative",
                     width: "100%",
                     padding: 1,
                 }}
             >
-                <Avatar
-                    sx={{ width: "5em", height: "5em", mr: 2 }}
-                    alt={`${teamEdit.TeamName}`}
-                    src={teamEdit.ProfileImageURL}
-                />
-                <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="h6">{teamEdit.TeamName}</Typography>
-                    <Typography variant="body2">
-                        {/* Email: {userEdit.Email} */}
-                    </Typography>
-                    <Typography variant="body2">
-                        {/* Username: {userEdit.Username} */}
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        width: "100%",
+                        padding: 1,
+                    }}
+                >
+                    <Avatar
+                        sx={{ width: "5em", height: "5em", mr: 2 }}
+                        alt={`${teamEdit.TeamName}`}
+                        src={teamEdit.ProfileImageURL}
+                    />
+                    <Box sx={{ flexGrow: 1 }}>
+                        <Typography variant="h6">
+                            Current Name: {teamEdit.CurrentTeamName}
+                        </Typography>
+                        {teamEdit.TeamName && (
+                            <Typography variant="h6">
+                                New Name: {teamEdit.TeamName}
+                            </Typography>
+                        )}
+                        <Typography variant="body2">
+                            {/* Email: {userEdit.Email} */}
+                        </Typography>
+                        <Typography variant="body2">
+                            {/* Username: {userEdit.Username} */}
+                        </Typography>
+                    </Box>
+                    <Typography
+                        variant="body2"
+                        sx={(theme) => ({
+                            fontStyle: "italic",
+                            borderRadius: 2,
+                            border: `1px solid ${theme.palette.grey[400]}`,
+                            flexGrow: 3,
+                            height: "100%",
+                            display: "block",
+                        })}
+                    >
+                        {teamEdit.Description ??
+                            "No changes to team description."}
                     </Typography>
                 </Box>
             </Paper>
