@@ -1,5 +1,6 @@
 import { Box, Paper, Typography, Stack } from "@mui/material";
 import { ImageHolder } from "../components/ImageHolder";
+import setupimg from "../assets/rules/setup.jpg";  
 
 const Rules = () => {
   return (
@@ -32,7 +33,7 @@ const Rules = () => {
           {/* Image Section */}
           <Box sx={{ padding: "5px 10px" }}>
             <ImageHolder
-              src="https://placehold.co/600x300"
+              src={setupimg}
               alt="Setup Guide"
               sx={{
                 width: "100%",
