@@ -1,5 +1,5 @@
 # Latest LTS version of Node.js (at the time of writing this, v22)
-FROM node:lts-alpine
+FROM node:lts-slim
 
 # Set the working directory inside the container
 WORKDIR /app
