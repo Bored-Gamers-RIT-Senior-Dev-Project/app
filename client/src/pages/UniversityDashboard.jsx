@@ -7,8 +7,6 @@ import {
     FormControl,
     InputAdornment,
     InputLabel,
-    MenuItem,
-    Select,
     TextField,
     Typography,
 } from "@mui/material";
@@ -17,6 +15,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { useCallback, useMemo, useState } from "react";
+import { useLoaderData } from "react-router";
+import { DynamicSelect } from "../components/DynamicSelect";
 import PropTypes from "../utils/propTypes";
 // JDOC Was done with the help of my friend @sp5442@g.rit.edu
 
@@ -64,6 +64,35 @@ const adminItems = [
         buttonText: "REVIEW TICKET",
     },
 ];
+
+const getTicketDate = (ticket) => {
+    switch (ticket.type) {
+        case "newUser":
+        case "newTeam":
+            return dayjs(ticket.CreatedAt);
+        case "teamEdit":
+        case "userEdit":
+            return dayjs(ticket.RequestedDate);
+    }
+};
+
+const searchTicket = (ticket, searchTerm) => {
+    searchTerm = searchTerm.toLowerCase();
+    switch (ticket.type) {
+        case "newUser":
+        case "userEdit":
+            return (
+                ticket.FirstName?.toLowerCase().includes(searchTerm) ||
+                ticket.LastName?.toLowerCase().includes(searchTerm) ||
+                ticket.Username?.toLowerCase().includes(searchTerm) ||
+                ticket.Email?.toLowerCase().includes(searchTerm)
+            );
+        case "newTeam":
+        case "teamEdit":
+            console.log(ticket);
+            return (ticket.TeamName ?? "").toLowerCase().includes(searchTerm);
+    }
+};
 
 /**
  * Component for displaying an admin item card.
@@ -121,6 +150,9 @@ const UniversityDashboard = () => {
     const [search, setSearch] = useState("");
     const [ticketType, setTicketType] = useState("All");
 
+    const tickets = useLoaderData();
+    console.log(tickets);
+
     /**
      * Handles the search input change.
      * @param {React.ChangeEvent<HTMLInputElement>} e - The event object.
@@ -144,8 +176,8 @@ const UniversityDashboard = () => {
      * @returns {AdminItem[]} The filtered list of admin items.
      */
     const getFilteredItems = useCallback(() => {
-        return adminItems.filter((item) => {
-            const submittedDate = dayjs(item.submitted);
+        return tickets.filter((item) => {
+            const submittedDate = getTicketDate(item);
             const isWithinDateRange =
                 (!startDate ||
                     submittedDate.isAfter(startDate) ||
@@ -154,12 +186,9 @@ const UniversityDashboard = () => {
                     submittedDate.isBefore(endDate) ||
                     submittedDate.isSame(endDate));
 
-            const matchesSearch =
-                item.title.toLowerCase().includes(search.toLowerCase()) ||
-                item.details.toLowerCase().includes(search.toLowerCase());
+            const matchesSearch = searchTicket(item, search);
 
-            const matchesType =
-                ticketType === "All" || item.title.includes(ticketType);
+            const matchesType = ticketType === "All" || item.type == ticketType;
             return isWithinDateRange && matchesSearch && matchesType;
         });
     }, [search, ticketType, startDate, endDate]);
@@ -168,7 +197,13 @@ const UniversityDashboard = () => {
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Box p={3} sx={{ maxWidth: "900px", margin: "auto" }}>
+            <Box
+                p={3}
+                sx={{
+                    maxWidth: "900px",
+                    margin: "auto",
+                }}
+            >
                 <Typography variant="h4" gutterBottom textAlign="center">
                     Admin Dashboard
                 </Typography>
@@ -196,32 +231,38 @@ const UniversityDashboard = () => {
                         value={endDate}
                         onChange={setEndDate}
                     />
-                    <FormControl sx={{ minWidth: 160 }}>
-                        <InputLabel>Ticket Type</InputLabel>
-                        <Select
+                    <FormControl>
+                        <InputLabel htmlFor="ticketType" id="ticketTypeLabel">
+                            Sort By
+                        </InputLabel>
+                        <DynamicSelect
                             value={ticketType}
-                            onChange={handleTicketTypeChange}
-                        >
-                            <MenuItem value="All">All Types</MenuItem>
-                            <MenuItem value="Team Page">Team Page</MenuItem>
-                            <MenuItem value="Reported User">
-                                Report User
-                            </MenuItem>
-                            <MenuItem value="Support Ticket">
-                                Support Ticket
-                            </MenuItem>
-                        </Select>
+                            onChange={(event) =>
+                                setTicketType(event.target.value)
+                            }
+                            id="ticketType"
+                            label="Ticket Type"
+                            options={{
+                                All: "All Types",
+                                newUser: "New User",
+                                userEdit: "Edited User",
+                                newTeam: "New Team",
+                                teamEdit: "Edited Team",
+                            }}
+                        />
                     </FormControl>
                     <TextField
                         label="Search"
                         value={search}
                         onChange={handleSearchChange}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon />
-                                </InputAdornment>
-                            ),
+                        slotProps={{
+                            input: {
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon />
+                                    </InputAdornment>
+                                ),
+                            },
                         }}
                         sx={{ width: 200 }}
                     />
