@@ -1,4 +1,4 @@
-import { redirect } from "react-router";
+import { Navigate, redirect } from "react-router";
 import App from "../App";
 import {
     About,
@@ -10,18 +10,19 @@ import {
     Rules,
     Schedule,
     Search,
-    TeamsPage,
+    TeamPage,
     University,
-    UserManager,
+    UniversityDashboard,
     UserSettings,
     UserSignIn,
     UserSignUp,
 } from "../pages";
+import { JoinTeamPage } from "../pages/JoinTeamPage";
 import { AddUniversityModal } from "../pages/modals/AddUniversityModal";
 import { AddUserModal } from "../pages/modals/AddUserModal";
 import { DeleteModal } from "../pages/modals/DeleteModal";
 import { EditUserModal } from "../pages/modals/EditUserModal";
-import { admin, search, university, users } from "./api";
+import { admin, search, teams, university, users } from "./api";
 import { events } from "./events";
 
 /**
@@ -31,13 +32,13 @@ import { events } from "./events";
  */
 const makeAction =
     (action, spinner = true) =>
-    async (params) => {
+    async ({ request, params }) => {
         if (spinner) {
             events.publish("spinner.open");
         }
         try {
-            const data = await params.request.json();
-            const response = await action(data);
+            const data = await request.json();
+            const response = await action(data, params);
             return response;
         } finally {
             if (spinner) {
@@ -71,8 +72,10 @@ const routes = [
                 loader: () => search({ value: "" }),
             },
             {
-                path: "/teamspage",
-                element: <TeamsPage />,
+                path: "/teams/:teamId",
+                element: <TeamPage />,
+                loader: ({ params }) => teams.getInfo({ id: params.teamId }),
+                action: makeAction(teams.update),
             },
             {
                 path: "/university/:universityId",
@@ -115,20 +118,25 @@ const routes = [
                 element: <Schedule />,
             },
             {
-                path: "/admin/reports",
-                element: <ReportView />,
-                loader: admin.getReports,
+                path: "/join",
+                element: <JoinTeamPage />,
+                loader: () =>
+                    Promise.all([university.getList(), teams.getList(true)]),
+                action: makeAction(teams.join),
+                children: [
+                    {
+                        path: "/join/newTeam",
+                        action: makeAction(teams.create),
+                        element: <Navigate to="/join" />,
+                    },
+                ],
             },
             {
                 path: "/admin",
                 element: <AdminDashboard />,
-            },
-            {
-                path: "/admin/users",
-                element: <UserManager />,
                 children: [
                     {
-                        path: "/admin/users/addUser",
+                        path: "/admin/addUser",
                         element: <AddUserModal />,
                         loader: () =>
                             Promise.all([
@@ -138,7 +146,7 @@ const routes = [
                         action: makeAction(users.createUser),
                     },
                     {
-                        path: "/admin/users/editUser/:userId",
+                        path: "/admin/editUser/:userId",
                         element: <EditUserModal />,
                         loader: async ({ params }) => {
                             const { userId } = params;
@@ -160,22 +168,10 @@ const routes = [
                                 throw e;
                             }
                         },
-                        action: async ({ request, params }) => {
-                            events.publish("spinner.open");
-                            try {
-                                const data = await request.json();
-                                const response = await users.update(
-                                    params.userId,
-                                    data
-                                );
-                                return response;
-                            } finally {
-                                events.publish("spinner.close");
-                            }
-                        },
+                        action: makeAction(users.update),
                     },
                     {
-                        path: "/admin/users/deleteUser/:userId",
+                        path: "/admin/deleteUser/:userId",
                         element: <DeleteModal />,
                         loader: async ({ params }) => {
                             const { userId } = params;
@@ -206,12 +202,22 @@ const routes = [
                         },
                     },
                     {
-                        path: "/admin/users/addUniversity",
+                        path: "/admin/addUniversity",
                         element: <AddUniversityModal />,
                         action: makeAction(university.addUniversity),
                     },
                 ],
                 loader: users.getList,
+            },
+            {
+                path: "/admin/reports",
+                element: <ReportView />,
+                loader: admin.getReports,
+            },
+            {
+                path: "/representative",
+                element: <UniversityDashboard />,
+                loader: admin.getUniversityAdminTickets,
             },
             {
                 path: "*",

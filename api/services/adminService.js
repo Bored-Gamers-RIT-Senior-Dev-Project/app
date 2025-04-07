@@ -25,4 +25,16 @@ const generateReports = async (uid) => {
     return rv;
 };
 
-module.exports = { generateReports, getRoleList };
+/**
+ * Gets all university admin tickets for a team
+ * @param {string} uid The requesting user's UID from their auth header.
+ */
+const getUniversityAdminTickets = async (uid) => {
+    const user = await User.getUserByFirebaseId(uid);
+    console.log("User is ", user);
+    //TODO: Permissions and validation (I'll deal with this one when I implement more Admin functionality)
+
+    return await Admin.getUniversityAdminTickets(user.universityId);
+};
+
+module.exports = { generateReports, getRoleList, getUniversityAdminTickets };

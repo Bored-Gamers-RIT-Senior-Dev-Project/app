@@ -28,6 +28,36 @@ const SQL_SELECTOR = `SELECT
             JOIN roles AS role ON user.RoleId = role.RoleId`;
 
 /**
+ *@typedef {"FirebaseUID"|"UserID"} UserIdentifier
+ */
+/**
+ * @readonly
+ * @enum {UserIdentifier}
+ */
+const UserIds = Object.freeze({
+    FIREBASE: "FirebaseUID",
+    LOCAL: "UserID",
+});
+
+/**
+ * @typedef {"Spectator"|"Super Admin"|"Aardvark Games Employee"|"Marketing Staff"|"Tournament Facilitator"|"Team Captain"|"Student/Player"|"College Admin"} RoleName
+ */
+/**
+ * @readonly
+ * @enum {RoleName}
+ */
+const Roles = Object.freeze({
+    SPECTATOR: "Spectator",
+    ADMIN: "Super Admin",
+    EMPLOYEE: "Aardvark Games Employee",
+    MARKETING: "Marketing Staff",
+    FACILITATOR: "Tournament Facilitator",
+    CAPTAIN: "Team Captain",
+    STUDENT: "Student/Player",
+    UNIVERSITY_ADMIN: "College Admin",
+});
+
+/**
  * Creates a user in the database.
  * @param {string} firebaseUID The firebase UID of the user.  Should be validated from a token.
  * @param {string} email The email of the user.
@@ -118,7 +148,7 @@ const getUser = async (column, value) => {
  * @return {Promise<object>} The user object from the database.
  * @throws {Error} If the user is not found.
  */
-const getUserByUserId = async (userId) => getUser("user.userID", userId);
+const getUserByUserId = async (userId) => getUser("user.UserID", userId);
 
 /**
  * Retrieve a user from the database by their Firebase UID.
@@ -126,15 +156,13 @@ const getUserByUserId = async (userId) => getUser("user.userID", userId);
  * @return {Promise<object>} The user object from the database.
  * @throws {Error} If the user is not found.
  */
-const getUserByFirebaseId = async (uid) => getUser("user.firebaseUID", uid);
+const getUserByFirebaseId = async (uid) => getUser("user.FirebaseUID", uid);
 
-const VALID_KEYS = {
-    USERID: "UserID",
+const VALID_KEYS = Object.freeze({
     FIRSTNAME: "FirstName",
     LASTNAME: "LastName",
     USERNAME: "Username",
     EMAIL: "Email",
-    FIREBASEUID: "FirebaseUID",
     ProfileImageURL: "ProfileImageURL",
     BIO: "Bio",
     CreatedAt: "CreatedAt",
@@ -143,10 +171,15 @@ const VALID_KEYS = {
     ROLEID: "RoleId",
     UNIVERSITYID: "UniversityID",
     ISVALIDATED: "IsValidated",
-    // "UniversityName",
-    // "TeamName",
-};
-const updateUser = async (userId, body) => {
+});
+/**
+ * Updates user entry
+ * @param {number|string} userId  Id of the user to update
+ * @param {object} body
+ * @param {UserIdentifier|undefined} identifier Determines if DB should check
+ * @returns
+ */
+const updateUser = async (userId, body, identifier = UserIds.LOCAL) => {
     if (body.username) body.username = await generateUsername(body.username);
     const updates = [];
     let wildCards = [];
@@ -176,9 +209,9 @@ const updateUser = async (userId, body) => {
         `
         UPDATE users 
         SET ${keys} 
-        WHERE UserID = ?
+        WHERE ?? = ?
         `,
-        [...wildCards, userId]
+        [...wildCards, identifier, userId]
     );
 
     if (rows.affectedRows === 0) {
@@ -212,7 +245,8 @@ const deleteUser = async (userId) => {
     ]);
 
     if (result[0].affectedRows === 0) {
-        throw createHttpError(404);
+        console.error("Error deleting user from the database.");
+        throw createHttpError(500);
     }
 
     return user;
@@ -231,7 +265,7 @@ const getSharedUsernames = async (username) => {
             [username + "%"]
         );
         //Return those rows.
-        return rows.map((row) => row.Username);
+        return rows.map((row) => row.Username.toLowerCase());
     } catch (error) {
         console.error("Error checking username:", error.message);
         throw error;
@@ -248,7 +282,7 @@ const generateUsername = async (username, sharedUsernames = null) => {
     if (!sharedUsernames) sharedUsernames = await getSharedUsernames(username);
 
     // If the username is not taken, return it
-    if (!sharedUsernames.includes(username)) {
+    if (!sharedUsernames.includes(username.toLowerCase())) {
         return username;
     }
 
@@ -256,13 +290,14 @@ const generateUsername = async (username, sharedUsernames = null) => {
     let i = 1;
     while (sharedUsernames.includes(`${username}-${i}`)) {
         i++;
-        if (i > 100)
+        if (i > 100) {
             console.error(
                 `Error reserving username ${username}.  An unreasonable number of usernames were found with that prefix.`
             );
-        throw new Error(
-            "Error reserving a username based on the information provided."
-        );
+            throw new Error(
+                "Error reserving a username based on the information provided."
+            );
+        }
     }
     return `${username}-${i}`;
 };
@@ -284,11 +319,12 @@ const checkUsername = async (username, strict = false) => {
 
 /**
  *
- * @param {string|number} userId A unique identifier for the user: either their Firebase UID or UserId (both are checked)
+ * @param {string|number} userId A unique identifier for the user
  * @param {string} roleName The name of the role to check.
+ * @param {UserIdentifier|undefined} identifier what column is used to identify the user
  * @returns {Promise<boolean>} true if the user has the specified role. Otherwise false.
  */
-const userHasRole = async (userId, roleName) => {
+const userHasRole = async (userId, roleName, identifier = UserIds.FIREBASE) => {
     try {
         const [rows] = await db.query(
             `
@@ -297,9 +333,9 @@ const userHasRole = async (userId, roleName) => {
             LEFT JOIN roles role ON user.RoleId = role.RoleId
             WHERE
                 LOWER(role.RoleName) = LOWER(?)
-                AND (user.UserId = ? OR user.FirebaseUid = ?);
+                AND ?? = ?;
             `,
-            [roleName, userId, userId]
+            [roleName, `user.${identifier}`, userId]
         );
         if (rows.length == 0) {
             return false;
@@ -311,7 +347,36 @@ const userHasRole = async (userId, roleName) => {
     }
 };
 
+/**
+ *
+ * @param {number|string} userId User's ID: Either numeric Primary Key from the Local Database or UID from Firebase.
+ * @param {string} roleName The Name of the role to grant.
+ * @param {UserIdentifier} identifier The ID to check
+ * @returns {Promise<boolean>} Resolves to true if the role is successfully granted.
+ */
+const grantRole = async (userId, roleName, identifier = UserIds.LOCAL) => {
+    // Check if the roleName exists in the Roles table
+    const [roleRows] = await db.query(
+        `SELECT RoleID FROM roles WHERE RoleName = ?`,
+        [roleName]
+    );
+
+    if (roleRows.length === 0) {
+        console.error(`Role "${roleName}" does not exist.`);
+        throw createHttpError(500);
+    }
+
+    // Proceed with updating the user's role
+    const sql = `UPDATE users
+        SET RoleID = ?
+        WHERE ?? = ?;`;
+    await db.query(sql, [roleRows[0].RoleID, identifier, userId]);
+    return true;
+};
+
 module.exports = {
+    UserIds,
+    Roles,
     createUser,
     getUserList,
     getUserByUserId,
@@ -320,4 +385,5 @@ module.exports = {
     deleteUser,
     checkUsername,
     userHasRole,
+    grantRole,
 };

@@ -1,7 +1,8 @@
 import axios from "axios";
+import { events } from "./events";
 import { getIdToken } from "./firebase/auth";
 
-const API_URL = "http://localhost:3000/api";
+const API_URL = import.meta.env.API_URL || "http://localhost:3000/api";
 
 /**
  * Constructs the full API URL for a given path.
@@ -78,6 +79,71 @@ const admin = Object.freeze({
     },
     getReports: async () => {
         const { data } = await api.get("reports");
+        return data;
+    },
+    getUniversityAdminTickets: async () => {
+        const { data } = await api.get("representative");
+        return data;
+    },
+});
+
+const teams = Object.freeze({
+    /**
+     * Gets a list of existing teams.
+     * @returns {Promise<Array<object>>}
+     */
+    getList: async (getUnapproved = false) => {
+        let uri = "teams";
+        if (getUnapproved) uri += "?showUnapproved=true";
+        const { data } = await api.get(uri);
+        return data;
+    },
+    /**
+     * Gets information on a certain team (team page)
+     * @param {number} params.id TeamID to
+     * @returns The team information
+     */
+    getInfo: async ({ id }) => {
+        const { data } = await api.get(`teams/${id}`);
+        return data;
+    },
+    /**
+     * Create a new team, captained by the currently signed in user
+     * @param {number} params.universityId The university hosting the team.
+     * @param {string} params.teamName The name of the team being created.
+     * @returns Confirmation that the team has been created.
+     */
+    create: async ({ universityId, teamName }) => {
+        const { data } = await api.post(`teams`, { teamName, universityId });
+        events.publish("refreshAuth"); //Refresh the user profile to load the user's team data.
+        return data;
+    },
+    /**
+     * When successful, causes the current user to join the specified team.
+     * @param {number} teamId Team ID to join.
+     * @returns Confirmation of action result
+     */
+    join: async ({ teamId }) => {
+        const { data } = await api.put(`teams/${teamId}/join`);
+        events.publish("refreshAuth"); //Refresh the user profile to load the user's team data.
+        return data;
+    },
+    /**
+     * Post an update to the user db
+     * @param {object} data The form data for the update.
+     * @param {string|null} data.teamName The updated team name.
+     * @param {string|null} data.description The updated team description
+     * @param {string|null} data.profileImageUrl A URL to a newly uploaded profile image.
+     * @param {object} params The params of the route.
+     * @param {number} params.teamId The ID of the team being updated (gotten from route)
+     * @returns {Promise<boolean>} True on a successful update post.
+     */
+    update: async ({ teamName, description, profileImageUrl }, { teamId }) => {
+        const { data } = await api.post(`teams/${teamId}/update`, {
+            teamName,
+            description,
+            profileImageUrl,
+        });
         return data;
     },
 });
@@ -183,4 +249,4 @@ const combine = (...calls) => {
     return () => Promise.all(calls);
 };
 
-export { admin, combine, search, university, users };
+export { admin, combine, search, teams, university, users };

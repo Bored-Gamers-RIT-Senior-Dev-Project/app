@@ -1,6 +1,56 @@
 const db = require("../config/db");
 
 /**
+ * Gets a team by its teamID
+ * @param {number} teamId The team's ID in the database
+ * @returns {object} The team columns if found, null if no team is found
+ */
+const getTeam = async (teamId) => {
+    const sql = `SELECT 
+    t.TeamID AS id,
+    t.TeamName AS teamName,
+    t.ProfileImageURL AS profileImageUrl,
+    t.UniversityID AS universityId,
+    u.UniversityName AS universityName,
+    t.Description AS description,
+    t.CreatedAt AS createdAt,
+    COUNT(DISTINCT teamMember.UserID) AS members,
+    CONCAT(captain.FirstName, ' ', captain.LastName) AS captainName,
+    captain.Email AS captainEmail,
+    captain.UserId AS captainId
+FROM
+    teams t
+        JOIN
+    users captain ON captain.UserID = t.TeamLeaderID
+        JOIN
+    users teamMember ON teamMember.TeamID = t.TeamId
+        JOIN
+    universities u ON t.UniversityID = u.UniversityID
+    WHERE t.TeamID = ?`;
+    const [rows] = await db.query(sql, [teamId]);
+    if (rows.length < 1) {
+        return null;
+    }
+
+    return rows[0];
+};
+
+/**
+ * Gets a list of all team members
+ * @param {number} teamId Team's ID
+ * @param {boolean} showUnapproved If members who haven't been confirmed by a University ID should be allowed.
+ * @returns {List<object>} List of users with the correct teamID.
+ */
+const getMembers = async (teamId, showUnapproved) => {
+    const sql = `
+        SELECT * FROM users WHERE TeamId = ?
+    `;
+    const [rows] = await db.query(sql, [teamId]);
+
+    return rows;
+};
+
+/**
  * Searches for teams based on the search term.
  *
  * @param {string} teamName - The team name to search for.
@@ -47,10 +97,28 @@ const searchTeams = async (
  * @returns The team list
  */
 const getTeams = async (approvedOnly = true) => {
-    let sql = `SELECT * FROM teams`;
-    if (approvedOnly) {
-        sql += ` WHERE approvedOnly = true`;
-    }
+    const sql = `SELECT 
+    t.TeamID AS id,
+    t.TeamName AS teamName,
+    t.ProfileImageURL AS profileImageUrl,
+    t.UniversityID AS universityId,
+    u.UniversityName AS universityName,
+    t.Description AS description,
+    t.CreatedAt AS createdAt,
+    COUNT(DISTINCT teamMember.UserID) AS members,
+    CONCAT(captain.FirstName, ' ', captain.LastName) AS captainName,
+    captain.Email AS captainEmail
+FROM
+    teams t
+        JOIN
+    users captain ON captain.UserID = t.TeamLeaderID
+        JOIN
+    users teamMember ON teamMember.TeamID = t.TeamId
+        JOIN
+    universities u ON t.UniversityID = u.UniversityID
+    ${approvedOnly ? " WHERE t.IsApproved = true" : ""}
+    GROUP BY t.TeamID
+`;
 
     const query = await db.query(sql);
     return query[0];
@@ -76,12 +144,36 @@ const getTeamsByUniversityId = async (universityId, approvedOnly = true) => {
     return query[0];
 };
 
+/**
+ * Gets a team's information based on its ide
+ * @param {number} teamId The Id to search for
+ * @param {boolean} showUnapproved Whether or not the information should include unapproved teams
+ * @param {boolean} showPendingChanges Whether or not to retrieve pending changes to the team's information
+ * @returns
+ */
 const getTeamById = async (teamId, showUnapproved, showPendingChanges) => {
-    const sql = `SELECT * FROM teams WHERE TeamID = ?`;
-    if (!showUnapproved) {
-        sql += " AND IsApproved = true";
-    }
-    //TODO: Logic to handle showPendingChanges once we've established how pending changes are stored.
+    const sql = `SELECT 
+    t.TeamID AS id,
+    t.TeamName AS teamName,
+    t.ProfileImageURL AS profileImageUrl,
+    t.UniversityID AS universityId,
+    u.UniversityName AS universityName,
+    t.Description AS description,
+    t.CreatedAt AS createdAt,
+    COUNT(DISTINCT teamMember.UserID) AS members,
+    CONCAT(captain.FirstName, ' ', captain.LastName) AS captainName,
+    captain.Email AS captainEmail
+FROM
+    teams t
+        JOIN
+    users captain ON captain.UserID = t.TeamLeaderID
+        JOIN
+    users teamMember ON teamMember.TeamID = t.TeamId
+        JOIN
+    universities u ON t.UniversityID = u.UniversityID
+WHERE
+    t.TeamId = ?
+    ${showUnapproved ? "" : " AND t.IsApproved = true"}`;
     const result = await db.query(sql, [teamId]);
     if (result[0].length === 0) {
         return null;
@@ -89,9 +181,58 @@ const getTeamById = async (teamId, showUnapproved, showPendingChanges) => {
     return result[0][0];
 };
 
+/**
+ * Create a new team in the database
+ * @param {number} universityId The ID of the university the team belongs to.
+ * @param {string} teamName The name of the newly created team
+ * @param {number} userId The UserID value of the creator, used to make them the team's captain.
+ * @returns {number} The newly created team's ID
+ */
+const createTeam = async (universityId, teamName, userId) => {
+    const sql = `INSERT INTO teams (UniversityId, TeamName, TeamLeaderID) VALUES (?, ?, ?)`;
+    const [resultSetHeader] = await db.query(sql, [
+        universityId,
+        teamName,
+        userId,
+    ]);
+    return resultSetHeader.insertId;
+};
+
+/**
+ * Creates a Team Update Request in the team_update table for admin review
+ * @param {number} teamId The ID of the team being updated
+ * @param {string|null} teamName The team's new name (will be null if the team leader did not specify a new team name)
+ * @param {string|null} description The team's newly defined description
+ * @param {string|null} profileImageUrl The URL of the team's profile image
+ * @returns {Promise<boolean>} True of the update request is created successfully, false if something went wrong.
+ */
+const teamUpdateRequest = async (
+    teamId,
+    teamName,
+    description,
+    profileImageUrl
+) => {
+    const sql = `
+        INSERT INTO team_update (UpdatedTeamID, TeamName, ProfileImageURL, Description)
+        VALUES (?, ?, ?, ?)
+    `;
+    const [result] = await db.query(sql, [
+        teamId,
+        teamName,
+        profileImageUrl,
+        description,
+    ]);
+
+    return result.affectedRows > 0;
+};
+
 module.exports = {
+    getTeam,
+    getMembers,
+    createTeam,
     getTeams,
     getTeamById,
     searchTeams,
     getTeamsByUniversityId,
+    teamUpdateRequest,
 };
