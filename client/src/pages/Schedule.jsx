@@ -21,17 +21,34 @@ const style = {
     transform: "translate(-50%, -50%)",
     width: 400,
     bgcolor: "background.paper",
-    border: "2px solid #000",
     boxShadow: 24,
     p: 4,
 };
 
 const ScorePopup = (props) => {
     return (
-        <Modal open={props.id !== null} onClose={props.handleClose}>
-            <Box sx={style}>
-                <Typography>Hello world!!</Typography>
-            </Box>
+        <Modal open={props.match !== null} onClose={props.handleClose}>
+            {props.match ? (
+                <Box sx={style}>
+                    <Typography align="center" variant="h4">
+                        Update Score
+                    </Typography>
+                    <Stack direction="row" alignItems="center">
+                        <Box>
+                            <Typography>{`${props.match.team1}`}</Typography>
+                            <input type="number"></input>
+                            <Button>Cancel</Button>
+                        </Box>
+                        <Box>
+                            <Typography>{`${props.match.team2}`}</Typography>
+                            <input type="number"></input>
+                            <Button>Submit</Button>
+                        </Box>
+                    </Stack>
+                </Box>
+            ) : (
+                <></>
+            )}
         </Modal>
     );
 };
@@ -66,7 +83,7 @@ const Schedule = () => {
             team2Score: 0,
         },
     ]);
-    const [openScorePopup, setOpenScorePopup] = useState(null); // openScorePopup is the id or null
+    const [openScorePopup, setOpenScorePopup] = useState(null); // openScorePopup is the match or null
 
     /**
      * Open the ScorePopup
@@ -184,7 +201,7 @@ const Schedule = () => {
                                     <Button
                                         variant="contained"
                                         size="small"
-                                        onClick={() => handleOpen(match.id)}
+                                        onClick={() => handleOpen(match)}
                                     >
                                         Update Scores
                                     </Button>
@@ -195,7 +212,7 @@ const Schedule = () => {
                 </Stack>
             </Box>
             <ScorePopup
-                id={openScorePopup}
+                match={openScorePopup}
                 handleClose={handleClose}
             ></ScorePopup>
         </>
