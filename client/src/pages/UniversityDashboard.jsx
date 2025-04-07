@@ -20,53 +20,8 @@ import dayjs from "dayjs";
 import { useCallback, useMemo, useState } from "react";
 import { useLoaderData } from "react-router";
 import { DynamicSelect } from "../components/DynamicSelect";
+import { usePostSubmit } from "../hooks/usePostSubmit";
 import PropTypes from "../utils/propTypes";
-// JDOC Was done with the help of my friend @sp5442@g.rit.edu
-
-/**
- * Sample admin items data.
- * @typedef {Object} AdminItem
- * @property {string} title - The title of the admin item.
- * @property {string} details - Additional details about the item.
- * @property {string} submitted - Submission date (YYYY-MM-DD format).
- * @property {string} lastUpdated - Last updated date (YYYY-MM-DD format).
- * @property {string} status - Current status of the item.
- * @property {string} buttonText - Text to display on the button.
- */
-const adminItems = [
-    {
-        title: "Team Page Edited",
-        details: "Team Name: The Best",
-        submitted: "2025-02-10",
-        lastUpdated: "2025-02-15",
-        status: "New",
-        buttonText: "REVIEW CHANGES",
-    },
-    {
-        title: "Reported User",
-        details: "User Name: badGuy123",
-        submitted: "2025-02-12",
-        lastUpdated: "2025-02-14",
-        status: "New",
-        buttonText: "REVIEW REPORT",
-    },
-    {
-        title: "Support Ticket",
-        details: "Subject: Can't find my friend!",
-        submitted: "2025-02-15",
-        lastUpdated: "2025-02-16",
-        status: "In Review",
-        buttonText: "REVIEW TICKET",
-    },
-    {
-        title: "Support Ticket",
-        details: "Subject: Can't find my friend!",
-        submitted: "2025-02-18",
-        lastUpdated: "2025-02-16",
-        status: "In Review",
-        buttonText: "REVIEW TICKET",
-    },
-];
 
 const getTicketDate = (ticket) => {
     switch (ticket.type) {
@@ -96,11 +51,24 @@ const searchTicket = (ticket, searchTerm) => {
     }
 };
 
+const getTicketID = (ticket) => {
+    switch (ticket.type) {
+        case "newUser":
+            return ticket.UserID;
+        case "newTeam":
+            return ticket.TeamID;
+        case "teamEdit":
+            return ticket.TeamUpdateId;
+        case "userEdit":
+            return ticket.UserUpdateId;
+    }
+};
+
 /**
  * Component for displaying an admin item card.
  * @param {AdminItem} props - Admin item properties.
  */
-const AdminItemCard = ({ ticket }) => {
+const AdminItemCard = ({ ticket, submit }) => {
     let cardContent;
     switch (ticket.type) {
         case "newUser":
@@ -137,13 +105,38 @@ const AdminItemCard = ({ ticket }) => {
             <CardActions
                 sx={{ display: "flex", flexDirection: "row-reverse", gap: 1 }}
             >
-                <Button variant="contained">Approve</Button>
-                <Button variant="contained" color="secondary">
+                <Button
+                    variant="contained"
+                    onClick={() =>
+                        submit({
+                            id: getTicketID(ticket),
+                            type: ticket.type,
+                            approved: true,
+                        })
+                    }
+                >
+                    Approve
+                </Button>
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() =>
+                        submit({
+                            id: getTicketID(ticket),
+                            type: ticket.type,
+                            approved: false,
+                        })
+                    }
+                >
                     Deny
                 </Button>
             </CardActions>
         </Card>
     );
+};
+AdminItemCard.propTypes = {
+    ticket: PropTypes.object.isRequired,
+    submit: PropTypes.func.isRequired,
 };
 
 const NewUserCard = ({ newUser }) => {
@@ -340,21 +333,13 @@ const UniversityDashboard = () => {
     const [ticketType, setTicketType] = useState("All");
 
     const tickets = useLoaderData();
+    const submit = usePostSubmit();
     /**
      * Handles the search input change.
      * @param {React.ChangeEvent<HTMLInputElement>} e - The event object.
      */
     const handleSearchChange = useCallback(
         (e) => setSearch(e.target.value),
-        []
-    );
-
-    /**
-     * Handles the ticket type selection change.
-     * @param {React.ChangeEvent<{ value: unknown }>} e - The event object.
-     */
-    const handleTicketTypeChange = useCallback(
-        (e) => setTicketType(e.target.value),
         []
     );
 
@@ -459,7 +444,11 @@ const UniversityDashboard = () => {
 
                 {filteredItems.length > 0 ? (
                     filteredItems.map((item, index) => (
-                        <AdminItemCard key={index} ticket={item} />
+                        <AdminItemCard
+                            key={index}
+                            ticket={item}
+                            submit={submit}
+                        />
                     ))
                 ) : (
                     <Typography textAlign="center" color="textSecondary">
