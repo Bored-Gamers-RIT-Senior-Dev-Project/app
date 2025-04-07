@@ -34,16 +34,26 @@ const ScorePopup = (props) => {
                         Update Score
                     </Typography>
                     <Stack direction="row" alignItems="center">
-                        <Box>
-                            <Typography>{`${props.match.team1}`}</Typography>
-                            <input type="number"></input>
+                        <Stack>
+                            <Typography align="center">{`${props.match.team1}`}</Typography>
+                            <input
+                                type="number"
+                                style={{ width: "50%", alignSelf: "center" }}
+                                min="0"
+                                value={props.match.team1Score}
+                            ></input>
                             <Button>Cancel</Button>
-                        </Box>
-                        <Box>
-                            <Typography>{`${props.match.team2}`}</Typography>
-                            <input type="number"></input>
+                        </Stack>
+                        <Stack alignItems="center">
+                            <Typography align="center">{`${props.match.team2}`}</Typography>
+                            <input
+                                type="number"
+                                style={{ width: "50%", alignSelf: "center" }}
+                                min="0"
+                                value={props.match.team2Score}
+                            ></input>
                             <Button>Submit</Button>
-                        </Box>
+                        </Stack>
                     </Stack>
                 </Box>
             ) : (
