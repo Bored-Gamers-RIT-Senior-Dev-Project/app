@@ -1,11 +1,11 @@
+import { Box, Paper } from "@mui/material";
 import { useState } from "react";
 import { useLoaderData } from "react-router";
-import { UniversityEditor } from "./UniversityEditor";
-import { UniversityView } from "./UniversityView";
-
-import { Box, Paper } from "@mui/material";
 import { useAuth } from "../../hooks/useAuth";
 import { pageWidth } from "../../utils/theme";
+import { TeamList } from "./TeamList";
+import { UniversityEditor } from "./UniversityEditor";
+import { UniversityView } from "./UniversityView";
 
 const UniversityPage = () => {
     const university = useLoaderData();
@@ -53,7 +53,7 @@ const UniversityPage = () => {
                         enterEditMode={() => setEditMode(true)}
                     />
                 )}
-                {/* <TeamList members={team.members} captainId={team.captainId} /> */}
+                <TeamList teams={university.teams} />
             </Paper>
         </Box>
     );
