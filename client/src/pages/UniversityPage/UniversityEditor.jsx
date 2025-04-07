@@ -14,6 +14,7 @@ import { usePostSubmit } from "../../hooks/usePostSubmit";
 const UniversityEditor = ({
     universityName,
     universityDescription,
+    universityUrl,
     universityBanner,
     universityLogo,
     universityLocation,
@@ -23,6 +24,7 @@ const UniversityEditor = ({
     const [bannerImage, setBannerImage] = useState(null);
     const [name, setName] = useState(null);
     const [location, setLocation] = useState(null);
+    const [url, setUrl] = useState(null);
     const [description, setDescription] = useState(null);
     const submit = usePostSubmit();
 
@@ -39,6 +41,7 @@ const UniversityEditor = ({
     const handleSave = () => {
         const formData = new FormData();
         if (name) formData.append("universityName", name);
+        if (url) formData.append("websiteUrl", url);
         if (description) formData.append("description", description);
         if (location) formData.append("location", location);
         if (logoImage) formData.append("logoImage", logoImage);
@@ -171,6 +174,28 @@ const UniversityEditor = ({
                     />
                 </Typography>
                 <TextField
+                    label="External URL"
+                    value={url ?? universityUrl}
+                    onChange={(e) => setUrl(e.target.value)}
+                    variant="outlined"
+                    fullWidth
+                    slotProps={{
+                        htmlInput: {
+                            sx: {
+                                textAlign: "center",
+                                padding: 0,
+                            },
+                        },
+                        input: {
+                            sx: {
+                                fontSize: "inherit",
+                                padding: 0,
+                            },
+                        },
+                    }}
+                    sx={{ textAlign: "center" }}
+                />
+                <TextField
                     fullWidth
                     multiline
                     minRows={3}
@@ -188,6 +213,7 @@ UniversityEditor.propTypes = {
     universityName: PropTypes.string.isRequired,
     universityBanner: PropTypes.string.isRequired,
     universityLogo: PropTypes.string.isRequired,
+    universityUrl: PropTypes.string.isRequired,
     universityLocation: PropTypes.string.isRequired,
     universityDescription: PropTypes.string.isRequired,
     exitEditMode: PropTypes.func.isRequired,

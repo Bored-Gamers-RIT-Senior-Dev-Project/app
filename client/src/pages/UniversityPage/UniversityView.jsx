@@ -1,10 +1,11 @@
-import { Edit as EditIcon } from "@mui/icons-material";
+import { Edit as EditIcon, Link } from "@mui/icons-material";
 import { Avatar, Box, IconButton, Typography } from "@mui/material";
 import PropTypes from "prop-types";
 
 const UniversityView = ({
     showEditButton,
     universityName,
+    universityUrl,
     universityDescription,
     universityBanner,
     universityLogo,
@@ -51,7 +52,25 @@ const UniversityView = ({
                     alt={universityName}
                     sx={{ height: "7em", width: "7em" }}
                 />
-                <Typography variant="h4">{universityName}</Typography>
+                <a
+                    href={universityUrl ? universityUrl : null}
+                    style={{ color: "unset" }}
+                >
+                    <Typography variant="h4" sx={{ position: "relative" }}>
+                        {universityName}
+                        {universityUrl && (
+                            <Link
+                                sx={{
+                                    position: "absolute",
+                                    left: "101%",
+                                    color: "blue",
+                                    top: "10%",
+                                    height: "80%",
+                                }}
+                            />
+                        )}
+                    </Typography>
+                </a>
                 <Typography variant="h5">{universityLocation}</Typography>
                 <Box sx={{ mb: 2 }}>
                     {universityDescription.split("\n").map((p, index) => (
@@ -74,6 +93,7 @@ UniversityView.propTypes = {
     showEditButton: PropTypes.bool.isRequired,
     universityName: PropTypes.string.isRequired,
     universityBanner: PropTypes.string.isRequired,
+    universityUrl: PropTypes.string.isRequired,
     universityLogo: PropTypes.string.isRequired,
     universityLocation: PropTypes.string.isRequired,
     universityDescription: PropTypes.string.isRequired,

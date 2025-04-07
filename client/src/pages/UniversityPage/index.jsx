@@ -36,6 +36,7 @@ const UniversityPage = () => {
                 {editMode && isUniversityAdmin ? (
                     <UniversityEditor
                         universityName={university.universityName}
+                        universityUrl={university.websiteUrl}
                         universityDescription={university.description}
                         universityLocation={university.location}
                         universityLogo={university.logoUrl}
@@ -46,6 +47,7 @@ const UniversityPage = () => {
                     <UniversityView
                         showEditButton={isUniversityAdmin}
                         universityName={university.universityName}
+                        universityUrl={university.websiteUrl}
                         universityDescription={university.description}
                         universityLocation={university.location}
                         universityLogo={university.logoUrl}
