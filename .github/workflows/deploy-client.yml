@@ -2,10 +2,18 @@ name: Build and Deploy Client to Staging Host
 
 on:
     # Trigger on push to the main branch
-    #  push:
-    #    branches:
-    #      - main
+    push:
+        branches:
+            - main
 
+    # Trigger on PRs being closed
+    pull_request:
+        types:
+            - closed
+        branches:
+            - main
+
+    # Allows manual execution from any branch
     workflow_dispatch:
         inputs:
             branch:
