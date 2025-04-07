@@ -4,28 +4,19 @@ import {
     Button,
     IconButton,
     InputAdornment,
-    LinearProgress,
     Paper,
     TextField,
     Typography,
 } from "@mui/material";
-import PropTypes from "prop-types";
-import { useDeferredValue, useEffect, useState } from "react";
-import { useActionData, useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router";
+import { GoogleSignIn } from "../components/GoogleSignIn";
+import { PasswordStrength } from "../components/PasswordStrength";
+import { useAuth } from "../hooks/useAuth";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { events } from "../utils/events";
 import { signUpWithEmail } from "../utils/firebase/auth";
-import { ErrorData, MessageData, Severity } from "../utils/messageData";
-
-// From https://zxcvbn-ts.github.io/zxcvbn/guide/framework-examples/#react:
-import { zxcvbnAsync, zxcvbnOptions } from "@zxcvbn-ts/core";
-/**
- * @import { ZxcvbnResult, Score } from "@zxcvbn-ts/core"
- */
-import * as zxcvbnCommonPackage from "@zxcvbn-ts/language-common";
-import * as zxcvbnEnPackage from "@zxcvbn-ts/language-en";
-import { translations } from "@zxcvbn-ts/language-en";
-import { useAuth } from "../hooks/useAuth";
+import { ErrorData, Severity } from "../utils/messageData";
 
 /**
  * Handle a sign up error from Firebase
@@ -47,126 +38,13 @@ const handleFirebaseSignUpError = (error) => {
         errorCodeLookup[error.code] ??
         new ErrorData("An unexpected error occurred");
 
-    events.publish("message", errorData);
-    console.error("Sign-in error:", error);
-};
-
-// From https://zxcvbn-ts.github.io/zxcvbn/guide/framework-examples/#react
-const options = {
-    // recommended
-    dictionary: {
-        ...zxcvbnCommonPackage.dictionary,
-        ...zxcvbnEnPackage.dictionary,
-    },
-    // recommended
-    graphs: zxcvbnCommonPackage.adjacencyGraphs,
-    // recommended
-    useLevenshteinDistance: true,
-};
-
-zxcvbnOptions.setOptions(options);
-
-/**
- * Score the given password
- * From https://zxcvbn-ts.github.io/zxcvbn/guide/framework-examples/#react
- * @param {string} password The password to score
- * @returns {ZxcvbnResult} zxcvbn's password scoring
- */
-const usePasswordStrength = (password) => {
-    const [result, setResult] = useState(null);
-    const deferredPassword = useDeferredValue(password);
-
-    useEffect(() => {
-        zxcvbnAsync(deferredPassword).then((response) => setResult(response));
-    }, [deferredPassword]);
-
-    return result;
-};
-/**
- * Based on the score, return an adjective describing that score
- * @param {Score} score the score of the password
- * @returns {string} an adjective: one of "Excellent", "Good", "OK" or "Bad"
- */
-const passwordAdjective = (score) => {
-    switch (score) {
-        case 0:
-        case 1:
-            return "Bad";
-        case 2:
-            return "OK";
-        case 3:
-            return "Good";
-        case 4:
-            return "Excellent";
-    }
-};
-/**
- * Given a zxcvbn score, return a color
- * @param {Score} score the score of the password
- * @returns {string} A color
- */
-const passwordColor = (score) => {
-    // https://coolors.co/ad1a24-5d5a0e-386141
-    switch (score) {
-        case 0:
-        case 1:
-            return "#AD1A24";
-        case 2:
-            // Yeah, not very many yellows work against a white background
-            return "#5D5A0E";
-        case 3:
-        case 4:
-            return "#386141";
-    }
-};
-/**
- * @typedef {Object} SignUpData
- * @property {string} email the email
- * @property {string} username the username
- * @property {string} password the password
- * @property {string} repeatPassword should be the same as the password, but might not be
- */
-
-/**
- * A component for the password bar
- * @param {Object} params
- * @param {SignUpData} params.signUpData
- * @returns the password strength component
- */
-const PasswordStrength = ({ signUpData }) => {
-    const result = usePasswordStrength(signUpData.password) ?? {
-        score: 0,
-    };
-    const score = result.score;
-    let reason = "";
-    if (result.feedback && result.feedback.suggestions) {
-        for (const item of result.feedback.suggestions) {
-            reason += translations.suggestions[item] + " ";
-        }
-    }
-    const color = passwordColor(score);
-    const adjective = passwordAdjective(score);
-    return (
-        <Box sx={{ width: "100%", color: color }}>
-            <Typography color="inherit">
-                Password strength: <b>{adjective}</b>
-            </Typography>
-            <LinearProgress
-                variant="determinate"
-                value={(score / 4) * 100}
-                color="inherit"
-            />
-            <Typography color="inherit">{reason}</Typography>
-        </Box>
-    );
-};
-
-PasswordStrength.propTypes = {
-    signUpData: PropTypes.object,
+    errorData.send();
+    console.error("Sign-in error:", errorData);
 };
 
 const UserSignUp = () => {
-    const { user, setUser } = useAuth();
+    const { state } = useLocation();
+    const { user } = useAuth();
     const [signUpData, setSignUpData] = useState({
         email: "",
         username: "",
@@ -177,7 +55,6 @@ const UserSignUp = () => {
     });
     const [showPassword, setShowPassword] = useState(false);
     const submit = usePostSubmit();
-    const actionData = useActionData();
     const navigate = useNavigate();
 
     const handleSignUpChange = (e) => {
@@ -225,21 +102,10 @@ const UserSignUp = () => {
     };
 
     useEffect(() => {
-        if (actionData) {
-            events.publish("spinner.close");
-            events.publish(
-                "message",
-                new MessageData(undefined, actionData.message)
-            );
-            setUser(actionData.user);
-        }
-    }, [actionData, navigate, setUser]);
-
-    useEffect(() => {
         if (user) {
-            navigate("/");
+            navigate(state?.redirect ?? "/");
         }
-    }, [user, navigate]);
+    }, [user, navigate, state]);
 
     return (
         <Paper elevation={6} sx={{ p: 4, maxWidth: 600 }}>
@@ -292,21 +158,23 @@ const UserSignUp = () => {
                     fullWidth
                     required
                     margin="normal"
-                    InputProps={{
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <IconButton
-                                    onClick={togglePasswordVisibility}
-                                    edge="end"
-                                >
-                                    {showPassword ? (
-                                        <VisibilityOff />
-                                    ) : (
-                                        <Visibility />
-                                    )}
-                                </IconButton>
-                            </InputAdornment>
-                        ),
+                    slotProps={{
+                        input: {
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        onClick={togglePasswordVisibility}
+                                        edge="end"
+                                    >
+                                        {showPassword ? (
+                                            <VisibilityOff />
+                                        ) : (
+                                            <Visibility />
+                                        )}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        },
                     }}
                 />
                 <TextField
@@ -319,7 +187,7 @@ const UserSignUp = () => {
                     required
                     margin="normal"
                 />
-                <PasswordStrength signUpData={signUpData} />
+                <PasswordStrength password={signUpData.password} />
                 <Button
                     type="submit"
                     variant="contained"
@@ -330,6 +198,22 @@ const UserSignUp = () => {
                     Sign Up
                 </Button>
             </form>
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}
+            >
+                <Box
+                    sx={{ flexGrow: 1, borderBottom: "1px solid black", mx: 1 }}
+                />
+                <Typography>OR</Typography>
+                <Box
+                    sx={{ flexGrow: 1, borderBottom: "1px solid black", mx: 1 }}
+                />
+            </Box>
+            <GoogleSignIn />
             {/* TODO: Sign in link should look more like a link rather than plaintext  */}
             <Typography
                 sx={{ mt: 2, textAlign: "center", cursor: "pointer" }}

@@ -30,4 +30,9 @@ const palette = {
 
 const theme = responsiveFontSizes(createTheme({ palette }));
 
-export { theme };
+const pageWidth = {
+    xs: "90vw",
+    md: "800px",
+};
+
+export { Colors, pageWidth, theme };

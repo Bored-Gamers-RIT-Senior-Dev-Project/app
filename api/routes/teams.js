@@ -1,4 +1,5 @@
 const express = require("express");
+const teamService = require("../services/teamService");
 const router = express.Router();
 
 /**
@@ -6,12 +7,16 @@ const router = express.Router();
  * @param {boolean} req.query.showUnapproved Whether to show unapproved teams. Defaults to false.
  */
 router.get("", async (req, res, next) => {
-    const { showUnapproved = false } = req.query;
-    const { uid = null } = req.user;
+    const { showUnapproved = false, university = null } = req.query;
+    const uid = req.user?.uid;
 
     try {
-        //const teamList = await teamService.getTeams(uid, showUnapproved);
-        return res.status(200).json([]);
+        const teamList = await teamService.getTeams(
+            uid,
+            university,
+            showUnapproved
+        );
+        return res.status(200).json(teamList);
     } catch (error) {
         return next(error);
     }
@@ -22,13 +27,17 @@ router.get("", async (req, res, next) => {
  * @param {number} req.params.id The ID of the team to get.
  */
 router.get("/:teamId", async (req, res, next) => {
-    const { uid = null } = req.user;
-    const { showUnapproved = false, showPendingChanges = false } = req.query;
+    const uid = req.user?.uid;
+    const { showPendingChanges = false } = req.query;
     const { teamId } = req.params;
 
     try {
-        //const {team, pending} = await teamService.getTeam(uid, teamId, showUnapproved, showPendingChanges);
-        return res.status(200).json({});
+        const result = await teamService.getTeam(
+            uid,
+            teamId,
+            showPendingChanges
+        );
+        return res.status(200).json(result);
     } catch (error) {
         return next(error);
     }
@@ -38,13 +47,13 @@ router.get("/:teamId", async (req, res, next) => {
  * Create a new team.
  */
 router.post("", async (req, res, next) => {
-    const { teamName, profileImageUrl, universityId } = req.body;
+    const { teamName, universityId } = req.body;
 
-    const { uid } = req.user;
+    const uid = req?.user?.uid;
     if (!uid) return res.status(401).send();
 
     try {
-        //const team = await teamService.createTeam(uid, teamName, profileImageUrl, universityId);
+        const team = await teamService.createTeam(uid, universityId, teamName);
         return res.status(201).json({});
     } catch (error) {
         return next(error);
@@ -56,7 +65,7 @@ router.post("", async (req, res, next) => {
  * Requires []
  */
 router.put("/:teamId/assign", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req?.user?.uid;
     const { teamId } = req.params;
     const { userId } = req.body;
     if (!uid) return res.status(401).send();
@@ -70,11 +79,28 @@ router.put("/:teamId/assign", async (req, res, next) => {
 });
 
 /**
+ * Join a team
+ * Requires [Spectator role]
+ */
+router.put("/:teamId/join", async (req, res, next) => {
+    const uid = req?.user?.uid;
+    const { teamId } = req.params;
+    if (!uid) return res.status(401).send();
+
+    try {
+        const team = await teamService.joinTeam(uid, teamId);
+        return res.status(200).json({});
+    } catch (error) {
+        return next(error);
+    }
+});
+
+/**
  * Remove a user from their team.
  * Requires [Admin Role] or [University Rep role and matching team/player university ID] or [Team Captain role and matching teamID] or [Matching User ID]
  */
 router.put("/:teamId/remove", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req?.user?.uid;
     const { teamId } = req.params;
     const { userId } = req.body;
     if (!uid) return res.status(401).send();
@@ -92,7 +118,7 @@ router.put("/:teamId/remove", async (req, res, next) => {
  * Requires [Admin Role] or [University Rep role and matching university ID]
  */
 router.put("/:teamId", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req?.user?.uid;
     if (!uid) return res.status(401).send();
 
     const { teamId } = req.params;
@@ -109,17 +135,27 @@ router.put("/:teamId", async (req, res, next) => {
 /**
  * Update a team's information (user variant, changes must be reviewed)
  * Requires [Team Captain role and matching teamID]
+ * @param {Object} req.body The request body containing the update details.
+ * @param {string} req.body.teamName The new name of the team.
+ * @param {string} req.body.profileImageUrl The URL of the team's profile image.
+ * @param {string} req.body.description A description of the team.
  */
 router.post("/:teamId/update", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req?.user?.uid;
     if (!uid) return res.status(401).send();
 
     const { teamId } = req.params;
-    const { teamName, profileImageUrl, universityId } = req.body;
+    const { teamName, profileImageUrl, description } = req.body;
 
     try {
-        //const status = await teamService.postUpdateRequest(uid, teamId, teamName, profileImageUrl, universityId);
-        //return res.status(200).json({ status });
+        const status = await teamService.postUpdateRequest(
+            uid,
+            teamId,
+            teamName,
+            description,
+            profileImageUrl
+        );
+        return res.status(200).json(status);
     } catch (error) {
         return next(error);
     }
@@ -131,7 +167,7 @@ router.post("/:teamId/update", async (req, res, next) => {
  * @param {number} req.params.id The ID of the team to approve.
  */
 router.put("/approve", async (req, res, next) => {
-    const { uid } = req.user;
+    const uid = req?.user?.uid;
     if (!uid) return res.status(401).send();
 
     try {
@@ -141,3 +177,5 @@ router.put("/approve", async (req, res, next) => {
         return next(error);
     }
 });
+
+module.exports = router;

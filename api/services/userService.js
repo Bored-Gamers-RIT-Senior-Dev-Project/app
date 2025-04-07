@@ -9,8 +9,7 @@ const createHttpError = require("http-errors");
  * @throws {HttpError} 403 error if the requestor isn't a Super Admin.
  */
 const getUserList = async (uid) => {
-    const user = await User.getUserByFirebaseId(uid);
-    if ((!User.userHasRole("Super Admin"), user.uid)) {
+    if (!(await User.userHasRole(uid, "Super Admin"))) {
         throw createHttpError(403);
     }
     return await User.getUserList();
@@ -120,6 +119,8 @@ const createUser = async (
     }
     //Create user record in Firebase Authentication and get UID
     const createdUser = await Firebase.createUser(email, password);
+
+    username = await User.checkUsername(username);
 
     //Create user record in local database using UID from Firebase Authentication
     const userRecord = await User.createUser(
