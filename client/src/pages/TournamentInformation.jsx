@@ -15,7 +15,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { api_url } from "../utils/api";
 
-const MatchesPage = () => {
+const TournamentInformation = () => {
     const { id } = useParams();
     const [tournament, setTournament] = useState(null);
     const [matches, setMatches] = useState(null);
@@ -340,4 +340,4 @@ const MatchesPage = () => {
     );
 };
 
-export { MatchesPage };
+export { TournamentInformation };

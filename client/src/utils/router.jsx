@@ -2,20 +2,20 @@ import { createBrowserRouter, redirect } from "react-router";
 import App from "../App";
 import {
     About,
+    AdminDashboard,
     Home,
     NotFound,
+    ReportView,
     Rules,
     Schedule,
     Search,
     TeamsPage,
+    TournamentInformation,
     University,
+    UserManager,
     UserSettings,
     UserSignIn,
     UserSignUp,
-    ReportView,
-    AdminDashboard,
-    UserManager,
-    MatchesPage
 } from "../pages";
 import { UserPreferences } from "../pages/UserPreferences.DEMO";
 import { search, university, users } from "./api";
@@ -109,19 +109,19 @@ const router = createBrowserRouter([
             },
             {
                 path: "/tournaments/:id/matches",
-                element: <MatchesPage />,
+                element: <TournamentInformation />,
             },
-            
+
             {
                 path: "/admin/reports",
                 element: <ReportView />,
             },
             {
-                path:"/admin",
+                path: "/admin",
                 element: <AdminDashboard />,
             },
             {
-                path:"/admin/users",
+                path: "/admin/users",
                 element: <UserManager />,
             },
             {
