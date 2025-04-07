@@ -114,7 +114,7 @@ const searchTournaments = async (
     sortAsDescending = false
 ) => {
     // Search tournament by ID, otherwise use other filters
-    if (tournamentID !== null) {
+    if (tournamentID) {
         console.log("Searching solely by tournamentID");
         tournamentID = validateInteger(tournamentID, "tournamentID");
         const tournament = await TournamentModel.searchTournaments(
