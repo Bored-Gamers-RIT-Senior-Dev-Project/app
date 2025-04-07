@@ -11,6 +11,7 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
+import PropTypes from "prop-types";
 import { useState } from "react";
 
 const style = {
@@ -25,9 +26,15 @@ const style = {
     p: 4,
 };
 
+/**
+ * A popup that lets admins edit the score
+ * @param {*} props with the match, which is null if the modal should be closed,
+ * and handleClose, a function to close the modal
+ * @returns the score popup
+ */
 const ScorePopup = (props) => {
     return (
-        <Modal open={props.match !== null} onClose={props.handleClose}>
+        <Modal open={props.match != null} onClose={props.handleClose}>
             {props.match ? (
                 <Box sx={style}>
                     <Typography align="center" variant="h4">
@@ -61,6 +68,11 @@ const ScorePopup = (props) => {
             )}
         </Modal>
     );
+};
+
+ScorePopup.propTypes = {
+    match: PropTypes.object,
+    handleClose: PropTypes.func.isRequired,
 };
 
 const Schedule = () => {
