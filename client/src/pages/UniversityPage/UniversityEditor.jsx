@@ -37,15 +37,16 @@ const UniversityEditor = ({
     );
 
     const handleSave = () => {
-        if (description || name || logoImage || bannerImage) {
-            const formData = new FormData();
-            if (name) formData.append("universityName", name);
-            if (description) formData.append("description", description);
-            if (logoImage) formData.append("logoImage", logoImage);
-            if (bannerImage) formData.append("bannerImage", bannerImage);
+        const formData = new FormData();
+        if (name) formData.append("universityName", name);
+        if (description) formData.append("description", description);
+        if (location) formData.append("location", location);
+        if (logoImage) formData.append("logoImage", logoImage);
+        if (bannerImage) formData.append("bannerImage", bannerImage);
 
+        if (Array.from(formData.keys()).length > 0)
             submit(formData, { encType: "multipart/form-data" });
-        }
+
         exitEditMode();
     };
 
