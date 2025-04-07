@@ -107,13 +107,14 @@ const AdminItemCard = ({ ticket, submit }) => {
             >
                 <Button
                     variant="contained"
-                    onClick={() =>
+                    onClick={() => {
+                        console.log(ticket);
                         submit({
                             id: getTicketID(ticket),
                             type: ticket.type,
                             approved: true,
-                        })
-                    }
+                        });
+                    }}
                 >
                     Approve
                 </Button>
@@ -193,7 +194,6 @@ NewUserCard.propTypes = {
 };
 
 const NewTeamCard = ({ newTeam }) => {
-    console.log(newTeam);
     return (
         <Box width="100%">
             <Typography variant="h4" sx={{ mb: 1 }}>
@@ -211,7 +211,7 @@ const NewTeamCard = ({ newTeam }) => {
             >
                 <Avatar
                     sx={{ width: "5em", height: "5em", mr: 2 }}
-                    alt={`${newTeam.TeamName}`}
+                    alt={newTeam.TeamName}
                     src={newTeam.ProfileImageURL}
                 />
                 <Box sx={{ flexGrow: 1 }}>
@@ -309,7 +309,7 @@ const TeamEditCard = ({ teamEdit }) => {
                 >
                     <Avatar
                         sx={{ width: "5em", height: "5em", mr: 2 }}
-                        alt={`${teamEdit.TeamName}`}
+                        alt={teamEdit.TeamName ?? teamEdit.CurrentTeamName}
                         src={teamEdit.ProfileImageURL}
                     />
                     <Box sx={{ flexGrow: 1 }}>

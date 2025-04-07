@@ -129,7 +129,6 @@ const joinTeam = async (uid, teamId) => {
  */
 const createTeam = async (uid, universityId, teamName) => {
     const user = await userModel.getUserByFirebaseId(uid);
-    console.log(user);
     if (user.roleName !== "Spectator") {
         throw createError(403, "User role cannot join a team.");
     }

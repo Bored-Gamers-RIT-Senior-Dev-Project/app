@@ -236,6 +236,7 @@ const routes = [
                 path: "/representative",
                 element: <UniversityDashboard />,
                 loader: admin.getUniversityAdminTickets,
+                action: makeAction(admin.approveUniversityAdminTicket),
             },
             {
                 path: "*",

@@ -85,6 +85,14 @@ const admin = Object.freeze({
         const { data } = await api.get("representative");
         return data;
     },
+    approveUniversityAdminTicket: async ({ id, type, approved }) => {
+        const { data } = await api.put("representative/approve", {
+            id,
+            type,
+            approved,
+        });
+        return data;
+    },
 });
 
 const teams = Object.freeze({

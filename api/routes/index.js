@@ -76,4 +76,15 @@ router.get("/representative", async (req, res, next) => {
     }
 });
 
+router.put("/representative/approve", async (req, res, next) => {
+    const uid = req.user?.uid;
+    if (!uid) return res.status(401).send();
+    try {
+        console.log(req.body);
+        return res.json(true);
+    } catch (e) {
+        next(e);
+    }
+});
+
 module.exports = router;
