@@ -110,7 +110,7 @@ const Schedule = () => {
     /**
      * Open the ScorePopup
      */
-    const handleOpen = (id) => setOpenScorePopup(id);
+    const handleOpen = (match) => setOpenScorePopup(match);
 
     /**
      * Close the ScorePopup
