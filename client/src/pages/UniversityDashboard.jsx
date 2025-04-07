@@ -1,12 +1,15 @@
 import SearchIcon from "@mui/icons-material/Search";
 import {
+    Avatar,
     Box,
     Button,
     Card,
+    CardActions,
     CardContent,
     FormControl,
     InputAdornment,
     InputLabel,
+    Paper,
     TextField,
     Typography,
 } from "@mui/material";
@@ -89,7 +92,6 @@ const searchTicket = (ticket, searchTerm) => {
             );
         case "newTeam":
         case "teamEdit":
-            console.log(ticket);
             return (ticket.TeamName ?? "").toLowerCase().includes(searchTerm);
     }
 };
@@ -98,51 +100,238 @@ const searchTicket = (ticket, searchTerm) => {
  * Component for displaying an admin item card.
  * @param {AdminItem} props - Admin item properties.
  */
-const AdminItemCard = ({
-    title,
-    details,
-    submitted,
-    lastUpdated,
-    status,
-    buttonText,
-}) => (
-    <Card
-        sx={{
-            mb: 2,
-            p: 2,
-            backgroundColor: "#f0f0f0",
-            boxShadow: 2,
-            borderRadius: "12px",
-        }}
-    >
-        <CardContent
+const AdminItemCard = ({ ticket }) => {
+    let cardContent;
+    switch (ticket.type) {
+        case "newUser":
+            cardContent = <NewUserCard newUser={ticket} />;
+            break;
+        case "newTeam":
+            cardContent = <NewTeamCard newTeam={ticket} />;
+            break;
+        case "teamEdit":
+            cardContent = <TeamEditCard teamEdit={ticket} />;
+            break;
+        case "userEdit":
+            cardContent = <UserEditCard userEdit={ticket} />;
+            break;
+    }
+
+    return (
+        <Card
             sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                p: 1,
+                boxShadow: 2,
+                borderRadius: "12px",
             }}
         >
-            <Box>
-                <Typography variant="h6" fontWeight="bold">
-                    {title}
-                </Typography>
-                <Typography variant="body1">{details}</Typography>
-                <Typography variant="body2">Submitted: {submitted}</Typography>
-            </Box>
-            <Box textAlign="right">
-                <Typography variant="body2" color="textSecondary">
-                    Last Updated: {lastUpdated}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                    Status: {status}
-                </Typography>
-                <Button variant="contained" sx={{ mt: 1, borderRadius: "8px" }}>
-                    {buttonText}
+            <CardContent
+                sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                }}
+            >
+                {cardContent}
+            </CardContent>
+            <CardActions
+                sx={{ display: "flex", flexDirection: "row-reverse", gap: 1 }}
+            >
+                <Button variant="contained">Approve</Button>
+                <Button variant="contained" color="secondary">
+                    Deny
                 </Button>
-            </Box>
-        </CardContent>
-    </Card>
-);
+            </CardActions>
+        </Card>
+    );
+};
+
+const NewUserCard = ({ newUser }) => {
+    return (
+        <Box width="100%">
+            <Typography variant="h4" sx={{ mb: 1 }}>
+                New User
+            </Typography>
+            <Paper
+                variant="outlined"
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    position: "relative",
+                    width: "100%",
+                    padding: 1,
+                }}
+            >
+                <Avatar
+                    sx={{ width: "5em", height: "5em", mr: 2 }}
+                    alt={`${newUser.FirstName} ${newUser.LastName}`}
+                    src={newUser.ProfileImageURL}
+                />
+                <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6">
+                        {newUser.FirstName} {newUser.LastName}
+                    </Typography>
+                    <Typography variant="body2">
+                        Email: {newUser.Email}
+                    </Typography>
+                    <Typography variant="body2">
+                        Username: {newUser.Username}
+                    </Typography>
+                </Box>
+                <Typography
+                    variant="body2"
+                    sx={(theme) => ({
+                        fontStyle: "italic",
+                        borderRadius: 2,
+                        border: `1px solid ${theme.palette.grey[400]}`,
+                        flexGrow: 3,
+                        height: "100%",
+                        display: "block",
+                    })}
+                >
+                    {newUser.Bio ?? "No Bio"}
+                </Typography>
+            </Paper>
+        </Box>
+    );
+};
+NewUserCard.propTypes = {
+    newUser: PropTypes.object.isRequired,
+};
+
+const NewTeamCard = ({ newTeam }) => {
+    console.log(newTeam);
+    return (
+        <Box width="100%">
+            <Typography variant="h4" sx={{ mb: 1 }}>
+                New Team
+            </Typography>
+            <Paper
+                variant="outlined"
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    position: "relative",
+                    width: "100%",
+                    padding: 1,
+                }}
+            >
+                <Avatar
+                    sx={{ width: "5em", height: "5em", mr: 2 }}
+                    alt={`${newTeam.TeamName}`}
+                    src={newTeam.ProfileImageURL}
+                />
+                <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6">{newTeam.TeamName}</Typography>
+                    <Typography variant="body2">
+                        {/* Email: {userEdit.Email} */}
+                    </Typography>
+                    <Typography variant="body2">
+                        {/* Username: {userEdit.Username} */}
+                    </Typography>
+                </Box>
+            </Paper>
+        </Box>
+    );
+};
+NewTeamCard.propTypes = {
+    newTeam: PropTypes.object.isRequired,
+};
+
+const UserEditCard = ({ userEdit }) => {
+    return (
+        <Box width="100%">
+            <Typography variant="h4" sx={{ mb: 1 }}>
+                Edited User
+            </Typography>
+            <Paper
+                variant="outlined"
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    position: "relative",
+                    width: "100%",
+                    padding: 1,
+                }}
+            >
+                <Avatar
+                    sx={{ width: "5em", height: "5em", mr: 2 }}
+                    alt={`${userEdit.FirstName} ${userEdit.LastName}`}
+                    src={userEdit.ProfileImageURL}
+                />
+                <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6">
+                        {userEdit.FirstName} {userEdit.LastName}
+                    </Typography>
+                    <Typography variant="body2">
+                        Email: {userEdit.Email}
+                    </Typography>
+                    <Typography variant="body2">
+                        Username: {userEdit.Username}
+                    </Typography>
+                </Box>
+                <Typography
+                    variant="body2"
+                    sx={(theme) => ({
+                        fontStyle: "italic",
+                        borderRadius: 2,
+                        border: `1px solid ${theme.palette.grey[400]}`,
+                        flexGrow: 3,
+                        height: "100%",
+                        display: "block",
+                    })}
+                >
+                    {userEdit.Bio ?? "No Bio"}
+                </Typography>
+            </Paper>
+            <Button variant="contained" color="secondary">
+                Deny
+            </Button>
+            <Button variant="contained">Approve</Button>
+        </Box>
+    );
+};
+UserEditCard.propTypes = {
+    userEdit: PropTypes.object.isRequired,
+};
+
+const TeamEditCard = ({ teamEdit }) => {
+    return (
+        <Box width="100%">
+            <Typography variant="h4" sx={{ mb: 1 }}>
+                Team Update
+            </Typography>
+            <Paper
+                variant="outlined"
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    position: "relative",
+                    width: "100%",
+                    padding: 1,
+                }}
+            >
+                <Avatar
+                    sx={{ width: "5em", height: "5em", mr: 2 }}
+                    alt={`${teamEdit.TeamName}`}
+                    src={teamEdit.ProfileImageURL}
+                />
+                <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6">{teamEdit.TeamName}</Typography>
+                    <Typography variant="body2">
+                        {/* Email: {userEdit.Email} */}
+                    </Typography>
+                    <Typography variant="body2">
+                        {/* Username: {userEdit.Username} */}
+                    </Typography>
+                </Box>
+            </Paper>
+        </Box>
+    );
+};
+TeamEditCard.propTypes = {
+    teamEdit: PropTypes.object.isRequired,
+};
 
 const UniversityDashboard = () => {
     const [startDate, setStartDate] = useState(null);
@@ -151,8 +340,6 @@ const UniversityDashboard = () => {
     const [ticketType, setTicketType] = useState("All");
 
     const tickets = useLoaderData();
-    console.log(tickets);
-
     /**
      * Handles the search input change.
      * @param {React.ChangeEvent<HTMLInputElement>} e - The event object.
@@ -191,7 +378,7 @@ const UniversityDashboard = () => {
             const matchesType = ticketType === "All" || item.type == ticketType;
             return isWithinDateRange && matchesSearch && matchesType;
         });
-    }, [search, ticketType, startDate, endDate]);
+    }, [tickets, search, ticketType, startDate, endDate]);
 
     const filteredItems = useMemo(() => getFilteredItems(), [getFilteredItems]);
 
@@ -202,20 +389,22 @@ const UniversityDashboard = () => {
                 sx={{
                     maxWidth: "900px",
                     margin: "auto",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 1,
                 }}
             >
                 <Typography variant="h4" gutterBottom textAlign="center">
                     Admin Dashboard
                 </Typography>
 
-                <Box
+                <Paper
                     display="flex"
                     gap={2}
                     mb={3}
                     sx={{
                         justifyContent: "space-between",
                         alignItems: "center",
-                        backgroundColor: "rgba(255, 255, 255, 0.8)",
                         padding: "10px",
                         borderRadius: "8px",
                         flexWrap: "nowrap",
@@ -266,11 +455,11 @@ const UniversityDashboard = () => {
                         }}
                         sx={{ width: 200 }}
                     />
-                </Box>
+                </Paper>
 
                 {filteredItems.length > 0 ? (
                     filteredItems.map((item, index) => (
-                        <AdminItemCard key={index} {...item} />
+                        <AdminItemCard key={index} ticket={item} />
                     ))
                 ) : (
                     <Typography textAlign="center" color="textSecondary">
