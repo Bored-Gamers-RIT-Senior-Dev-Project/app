@@ -49,7 +49,7 @@ const ScorePopup = (props) => {
                                 min="0"
                                 value={props.match.team1Score}
                             ></input>
-                            <Button>Cancel</Button>
+                            <Button onClick={props.handleClose}>Cancel</Button>
                         </Stack>
                         <Stack alignItems="center">
                             <Typography align="center">{`${props.match.team2}`}</Typography>
