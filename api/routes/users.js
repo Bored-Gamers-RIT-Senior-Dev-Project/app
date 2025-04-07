@@ -4,7 +4,7 @@ const UserService = require("../services/userService");
 const multer = require("multer");
 const createHttpError = require("http-errors");
 
-const upload = multer();
+const upload = multer({ limits: { fileSize: 1e7 /* 10 MB */ } });
 
 //Gets a user's profile information
 router.get("/profile", async (req, res, next) => {
