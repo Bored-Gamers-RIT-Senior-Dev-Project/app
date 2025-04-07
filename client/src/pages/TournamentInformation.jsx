@@ -306,6 +306,7 @@ const TournamentInformation = () => {
                                         <Typography
                                             variant="caption"
                                             color="textSecondary"
+                                            ml={4}
                                         >
                                             {getMatchCountdown(match.matchTime)}
                                         </Typography>
