@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getIdToken } from "./firebase/auth";
 
-const API_URL = import.meta.env.API_URL || "http://localhost:3000/api";
+const api_url = import.meta.env.API_URL || "http://localhost:3000/api";
 
 /**
  * Constructs the full API URL for a given path.
@@ -129,4 +129,4 @@ const university = Object.freeze({
     },
 });
 
-export { search, university, users };
+export { api_url, search, university, users };
