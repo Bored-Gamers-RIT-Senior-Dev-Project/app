@@ -260,4 +260,4 @@ const combine = (...calls) => {
     return () => Promise.all(calls);
 };
 
-export { admin, combine, search, teams, university, users };
+export { admin, API_URL, combine, search, teams, university, users };
