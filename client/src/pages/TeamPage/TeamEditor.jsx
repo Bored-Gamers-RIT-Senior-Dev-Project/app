@@ -18,11 +18,18 @@ const TeamEditor = ({ teamName, teamSummary, teamImage, exitEditMode }) => {
     const submit = usePostSubmit();
 
     const handleSave = () => {
+        const formData = new FormData();
+        if (name) {
+            formData.append("teamName", name);
+        }
+        if (description) {
+            formData.append("description", description);
+        }
+        if (image) {
+            formData.append("image", image);
+        }
         if (description || name || image) {
-            submit(
-                { teamName: name, description, image },
-                { encType: "multipart/form-data" }
-            );
+            submit(formData, { encType: "multipart/form-data" });
         }
         exitEditMode();
     };

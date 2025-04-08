@@ -1,6 +1,7 @@
 const teamModel = require("../models/teamModel");
 const userModel = require("../models/userModel");
 const createError = require("http-errors");
+const imageUploadService = require("./imageUploadService");
 const { makeObjectCamelCase } = require("../utils");
 
 /**
@@ -165,7 +166,7 @@ const addUserToTeam = async (uid, teamId, universityId) => {
  * @param {string} uid UID of the user posting the update
  * @param {string|null} teamName The updated team name, null if the team name has not been updated
  * @param {string|null} description The updated team description, null if the description has not been updated
- * @param {string|null} profileImageUrl The url to a newly uploaded profile image, null if no image was uploaded.
+ * @param {Express.Multer.File|null} profileImage A newly uploaded profile image file, null if no image was uploaded.
  * @returns {Promise<boolean>} True if successful, false if something went wrong
  */
 const postUpdateRequest = async (
@@ -173,11 +174,17 @@ const postUpdateRequest = async (
     teamId,
     teamName,
     description,
-    profileImageUrl
+    profileImage
 ) => {
     const user = await userModel.getUserByFirebaseId(uid);
     if (user.roleName != userModel.Roles.CAPTAIN || user.teamId != teamId) {
         throw createError(403);
+    }
+    let profileImageUrl = null;
+    if (profileImage) {
+        profileImageUrl = await imageUploadService.uploadImage(
+            profileImage.buffer
+        );
     }
 
     return await teamModel.teamUpdateRequest(
