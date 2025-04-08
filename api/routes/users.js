@@ -5,7 +5,7 @@ const ImageUploadService = require("../services/imageUploadService");
 const multer = require("multer");
 const createHttpError = require("http-errors");
 
-const upload = multer({ limits: { fileSize: 1e7 /* 10 MB */ } });
+const upload = multer({ limits: { fileSize: 2e7 /* 20 MB */ } });
 
 //Gets a user's profile information
 router.get("/profile", async (req, res, next) => {
