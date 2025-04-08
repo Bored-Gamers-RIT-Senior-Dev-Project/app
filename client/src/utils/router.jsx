@@ -10,6 +10,7 @@ import {
     Rules,
     Schedule,
     Search,
+    TournamentInformation,
     TeamPage,
     University,
     UniversityDashboard,
@@ -132,6 +133,10 @@ const routes = [
             {
                 path: "/schedule",
                 element: <Schedule />,
+            },
+            {
+                path: "/tournaments/:id/matches",
+                element: <TournamentInformation />,
             },
             {
                 path: "/join",
