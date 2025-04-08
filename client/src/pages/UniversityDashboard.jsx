@@ -36,19 +36,23 @@ const getTicketDate = (ticket) => {
 
 const searchTicket = (ticket, searchTerm) => {
     searchTerm = searchTerm.toLowerCase();
+    if (!searchTerm) return true;
+
     switch (ticket.type) {
         case "newUser":
         case "userEdit":
-            return (
-                ticket.FirstName?.toLowerCase().includes(searchTerm) ||
-                ticket.LastName?.toLowerCase().includes(searchTerm) ||
-                ticket.Username?.toLowerCase().includes(searchTerm) ||
-                ticket.Email?.toLowerCase().includes(searchTerm)
-            );
+            ["FirstName", "LastName", "Username", "Email"].forEach((key) => {
+                const value = ticket[key];
+                if (value && value.toLowerCase().includes(searchTerm)) {
+                    return true;
+                }
+            });
+            return false;
         case "newTeam":
         case "teamEdit":
             return (ticket.TeamName ?? "").toLowerCase().includes(searchTerm);
     }
+    return true;
 };
 
 const getTicketID = (ticket) => {
@@ -370,11 +374,12 @@ const UniversityDashboard = () => {
 
     /**
      * Filters admin items based on search, date range, and ticket type.
-     * @returns {AdminItem[]} The filtered list of admin items.
+     * @returns {object[]} The filtered list of admin items.
      */
     const getFilteredItems = useCallback(() => {
         return tickets.filter((item) => {
             const submittedDate = getTicketDate(item);
+            console.log(item, submittedDate);
             const isWithinDateRange =
                 (!startDate ||
                     submittedDate.isAfter(startDate) ||
@@ -386,6 +391,7 @@ const UniversityDashboard = () => {
             const matchesSearch = searchTicket(item, search);
 
             const matchesType = ticketType === "All" || item.type == ticketType;
+            console.log(isWithinDateRange, matchesSearch, matchesType);
             return isWithinDateRange && matchesSearch && matchesType;
         });
     }, [tickets, search, ticketType, startDate, endDate]);
