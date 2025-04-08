@@ -177,7 +177,7 @@ const VALID_KEYS = Object.freeze({
  * Updates user entry
  * @param {number|string} userId  Id of the user to update
  * @param {object} body
- * @param {UserIdentifier|undefined} identifier Determines if DB should check
+ * @param {UserIdentifier} [identifier] Determines if DB should check
  */
 const updateUser = async (userId, body, identifier = UserIds.LOCAL) => {
     if (body.username) body.username = await generateUsername(body.username);
@@ -222,12 +222,29 @@ const updateUser = async (userId, body, identifier = UserIds.LOCAL) => {
 };
 
 /**
- *
+ * Request an update for a user, or update the user if it's not part of a
+ * university
  * @param {number} userId the UserID to update
  * @param {object} body the body
  */
 const updateUserOrRequestUpdate = async (userId, body) => {
-    getUserById;
+    "use strict";
+    const user = await getUserByUserId(userId);
+    if (user.universityId == null) {
+        updateUser(userId, body);
+        return;
+    }
+    requestUserUpdate(userId, body);
+};
+
+/**
+ * Add an item to the user_update table
+ * @param {number} userId the UserID to request the update for
+ * @param {object} body the body, containing the fields that have to be updated
+ */
+const requestUserUpdate = async (userId, body) => {
+    "use strict";
+    // TODO
 };
 
 /**
