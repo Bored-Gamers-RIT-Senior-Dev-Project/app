@@ -17,6 +17,7 @@ import { formatDistanceToNow } from "date-fns";
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import { useAuth } from "../hooks/useAuth";
 import { api_url } from "../utils/api";
 
 const style = {
@@ -30,6 +31,10 @@ const style = {
     boxShadow: 24,
     p: 4,
 };
+
+const { user } = useAuth();
+
+const isFacilitator = [2, 3, 5, 8].includes(user?.roleId);
 
 /**
  * A popup that lets admins edit the score
@@ -431,13 +436,15 @@ const TournamentInformation = () => {
                                                 : match.team2Name
                                             : "TBD"}
                                     </Typography>
-                                    <Button
-                                        variant="contained"
-                                        size="small"
-                                        onClick={() => handleOpen(match)}
-                                    >
-                                        Update Score
-                                    </Button>
+                                    {isFacilitator && (
+                                        <Button
+                                            variant="contained"
+                                            size="small"
+                                            onClick={() => handleOpen(match)}
+                                        >
+                                            Update Score
+                                        </Button>
+                                    )}
                                 </Box>
                             ))
                         ) : (
