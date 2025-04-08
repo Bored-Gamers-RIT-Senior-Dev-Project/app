@@ -1,4 +1,3 @@
-import React from 'react';
 import { Container, Paper, Typography, Link, Divider } from "@mui/material";
 
 const PrivacyPolicy = () => {
