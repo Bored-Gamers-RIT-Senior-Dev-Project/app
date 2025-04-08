@@ -67,7 +67,7 @@ jobs:
 
                     # Run the new container on port 5173
                     echo "Running container: $CONTAINER_NAME"
-                    docker run -d --name "$CONTAINER_NAME" -p 5173:5173 bg-client
+                    docker run --network host -d --name "$CONTAINER_NAME" -p 5173:5173 bg-client
 
                     # Clean up image tar file
                     echo "Cleaning up image file..."
