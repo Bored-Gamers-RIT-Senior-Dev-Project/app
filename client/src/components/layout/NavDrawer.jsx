@@ -29,6 +29,7 @@ const buildNavLinks = (user) => {
                 { key: "about", text: 'About "A New World"', path: "/about" },
                 { key: "rules", text: "Rules", path: "/rules" },
                 { key: "faq", text: "FAQ", path: "/faq" },
+                { key: "privacy", text: "Privacy Policy", path: "/privacy" },
             ],
         },
     ];
