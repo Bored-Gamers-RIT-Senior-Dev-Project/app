@@ -354,12 +354,12 @@ const promoteCaptain = async (userId, teamId) => {
 
         // Downgrade the current captain to student
         console.debug("Removing current captain's role to student");
-        const sql1 = `UPDATE users SET RoleID = 3 WHERE UserID = (SELECT TeamLeaderID FROM teams WHERE TeamID = ?)`;
+        const sql1 = `UPDATE users SET RoleID = (SELECT RoleID FROM roles WHERE RoleName = 'Student/Player') WHERE UserID = (SELECT TeamLeaderID FROM teams WHERE TeamID = ?)`;
         await conn.query(sql1, [teamId]);
 
         console.debug("Promoting new captain to captain role");
         // Promote the new captain to captain
-        const sql2 = `UPDATE users SET RoleID = 2 WHERE UserID = ?`;
+        const sql2 = `UPDATE users SET RoleID = (SELECT RoleID FROM roles WHERE RoleName = 'Team Captain') WHERE UserID = ?`;
         await conn.query(sql2, [userId]);
 
         console.debug("Updating team leader ID in the team table");
