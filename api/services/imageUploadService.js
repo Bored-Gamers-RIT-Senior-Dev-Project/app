@@ -1,5 +1,5 @@
 const sharp = require("sharp");
-const { createHash } = require("node:crypto");
+const { createHash, hash } = require("node:crypto");
 const fs = require("node:fs/promises");
 const userModel = require("../models/userModel");
 
@@ -71,7 +71,15 @@ const recordUserImageURL = async (url, userId) => {
  * WEBP, and request a user update for that image
  * @param {Buffer} file the file to try to use as an image
  * @param {number} userId the user's id
+ * @throws {Error} if something goes wrong with converting or saving an image
  */
-const uploadUserImage = async (file, userId) => {};
+const uploadUserImage = async (file, userId) => {
+    "use strict";
+    const image = await encodeImage(file);
+    const imageHash = hash(image);
+    const url = `${USER_IMAGE_DIRECTORY}${imageHash}.webp`;
+    saveImage(url, image);
+    recordUserImageURL(url, userId);
+};
 
 module.exports = { uploadUserImage };
