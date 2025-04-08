@@ -1,6 +1,7 @@
 const sharp = require("sharp");
 const { createHash } = require("node:crypto");
 const fs = require("node:fs/promises");
+const userModel = require("../models/userModel");
 
 // The maximum length of the longest side of a user-uploaded image, in pixels:
 const MAX_LONGEST_SIDE = 1000;
@@ -59,18 +60,18 @@ const saveImage = async (name, image) => {
 /**
  * Record in the database where to find the uploaded image
  * @param {string} url the url to the image
- * @param {number} uid the id of the user that's uploading an image
+ * @param {number} userId the id of the user that's uploading an image
  */
-const recordUserImageURL = async (url, uid) => {
-    // TODO
+const recordUserImageURL = async (url, userId) => {
+    userModel.updateUserOrRequestUpdate(userId, { profileImageUrl: url });
 };
 
 /**
  * Save an image for a user - save the image to the disk after transcoding to
  * WEBP, and request a user update for that image
  * @param {Buffer} file the file to try to use as an image
- * @param {number} userid the user's id
+ * @param {number} userId the user's id
  */
-const uploadUserImage = async (file, userid) => {};
+const uploadUserImage = async (file, userId) => {};
 
-module.exports = { encodeImage, hash, saveImage, uploadUserImage };
+module.exports = { uploadUserImage };
