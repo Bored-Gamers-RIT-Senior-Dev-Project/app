@@ -164,9 +164,9 @@ const VALID_KEYS = Object.freeze({
     LASTNAME: "LastName",
     USERNAME: "Username",
     EMAIL: "Email",
-    ProfileImageURL: "ProfileImageURL",
+    PROFILEIMAGEURL: "ProfileImageURL",
     BIO: "Bio",
-    CreatedAt: "CreatedAt",
+    CREATEDAT: "CreatedAt",
     PAID: "Paid",
     TEAMID: "TeamId",
     ROLEID: "RoleId",
@@ -230,6 +230,8 @@ const updateUser = async (userId, body, identifier = UserIds.LOCAL) => {
 const updateUserOrRequestUpdate = async (userId, body) => {
     "use strict";
     const user = await getUserByUserId(userId);
+    console.log(user);
+    console.log(userId);
     if (user.universityId == null) {
         updateUser(userId, body);
         return;
@@ -250,14 +252,14 @@ const requestUserUpdate = async (userId, body) => {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, )`,
         [
             userId,
-            body.requestedDate,
-            body.approvedBy,
-            body.firstName,
-            body.lastName,
-            body.username,
-            body.email,
-            body.profileImageUrl,
-            body.bio,
+            body.RequestedDate,
+            body.ApprovedBy,
+            body.FirstName,
+            body.LastName,
+            body.Username,
+            body.Email,
+            body.ProfileImageURL,
+            body.Bio,
         ]
     );
     return result;

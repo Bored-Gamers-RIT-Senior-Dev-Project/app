@@ -167,7 +167,7 @@ router.put(
             const { body, file } = req;
             console.debug("FormData received:", body);
             console.debug("File Received: ", file);
-            await ImageUploadService.uploadUserImage(file, uid);
+            await ImageUploadService.uploadUserImage(file.buffer, userId);
             return res.status(200).send();
         } catch (e) {
             next(e);

@@ -7,6 +7,8 @@ const userModel = require("../models/userModel");
 const MAX_LONGEST_SIDE = 1000;
 // The directory to where images are stored
 const USER_IMAGE_DIRECTORY = __dirname + "/../user-images/";
+const API_URL = process.env.API_URL || "http://localhost:3000/api";
+
 /**
  * Encode image as WEBP, discarding any metadata
  * Also, resize image so that it is at most 1000px on it's longest side
@@ -30,7 +32,7 @@ const encodeImage = async (image) => {
  * @param {Buffer} buffer
  * @returns {string} sha1 of the buffer, base64url encoded
  */
-const hash = (buffer) => {
+const hashBuffer = (buffer) => {
     const hash = createHash("sha1");
     hash.update(buffer);
     return hash.digest("base64url");
@@ -63,7 +65,7 @@ const saveImage = async (name, image) => {
  * @param {number} userId the id of the user that's uploading an image
  */
 const recordUserImageURL = async (url, userId) => {
-    userModel.updateUserOrRequestUpdate(userId, { profileImageUrl: url });
+    userModel.updateUserOrRequestUpdate(userId, { ProfileImageURL: url });
 };
 
 /**
@@ -75,11 +77,16 @@ const recordUserImageURL = async (url, userId) => {
  */
 const uploadUserImage = async (file, userId) => {
     "use strict";
-    const image = await encodeImage(file);
-    const imageHash = hash(image);
-    const url = `${USER_IMAGE_DIRECTORY}${imageHash}.webp`;
-    saveImage(url, image);
-    recordUserImageURL(url, userId);
+    try {
+        const image = await encodeImage(file);
+        const imageHash = hashBuffer(image);
+        const name = `${imageHash}.webp`;
+        saveImage(name, image);
+        recordUserImageURL(`${API_URL}/user-images/${name}`, userId);
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }
 };
 
 module.exports = { uploadUserImage };
