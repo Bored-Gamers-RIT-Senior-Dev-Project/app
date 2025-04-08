@@ -121,7 +121,8 @@ const getUserList = async () => {
 
 /**
  * Retrieve a user from the database, using the column and value specified.
- * @param {string} column The column to use to match with value.  (TO PREVENT SQL INJECTION, SHOULD ALWAYS BE USED HARD-CODED)
+ * @param {string} column The column to use to match with value.  (TO PREVENT
+ * SQL INJECTION, SHOULD ALWAYS BE USED HARD-CODED)
  * @param {string|number} value The value of {column} to search for.
  * @returns A matching user, or null if no user is found.
  */
@@ -163,9 +164,9 @@ const VALID_KEYS = Object.freeze({
     LASTNAME: "LastName",
     USERNAME: "Username",
     EMAIL: "Email",
-    ProfileImageURL: "ProfileImageURL",
+    PROFILEIMAGEURL: "ProfileImageURL",
     BIO: "Bio",
-    CreatedAt: "CreatedAt",
+    CREATEDAT: "CreatedAt",
     PAID: "Paid",
     TEAMID: "TeamId",
     ROLEID: "RoleId",
@@ -176,8 +177,7 @@ const VALID_KEYS = Object.freeze({
  * Updates user entry
  * @param {number|string} userId  Id of the user to update
  * @param {object} body
- * @param {UserIdentifier|undefined} identifier Determines if DB should check
- * @returns
+ * @param {UserIdentifier} [identifier] Determines if DB should check
  */
 const updateUser = async (userId, body, identifier = UserIds.LOCAL) => {
     if (body.username) body.username = await generateUsername(body.username);
@@ -219,6 +219,48 @@ const updateUser = async (userId, body, identifier = UserIds.LOCAL) => {
     }
 
     return await getUserByUserId(userId);
+};
+
+/**
+ * Request an update for a user, or update the user if it's not part of a
+ * university
+ * @param {number} userId the UserID to update
+ * @param {object} body the body
+ */
+const updateUserOrRequestUpdate = async (userId, body) => {
+    "use strict";
+    const user = await getUserByUserId(userId);
+    if (user.universityId == null) {
+        updateUser(userId, body);
+        return;
+    }
+    requestUserUpdate(userId, body);
+};
+
+/**
+ * Add an item to the user_update table
+ * @param {number} userId the UserID to request the update for
+ * @param {object} body the body, containing the fields that have to be updated
+ */
+const requestUserUpdate = async (userId, body) => {
+    "use strict";
+    const result = await db.query(
+        `INSERT INTO
+            user_update (UpdatedUserID, ApprovedBy, FirstName, LastName, Username, Email, ProfileImageURL, Bio)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+            userId,
+            body.RequestedDate,
+            body.ApprovedBy,
+            body.FirstName,
+            body.LastName,
+            body.Username,
+            body.Email,
+            body.ProfileImageURL,
+            body.Bio,
+        ]
+    );
+    return result;
 };
 
 /**
@@ -386,4 +428,5 @@ module.exports = {
     checkUsername,
     userHasRole,
     grantRole,
+    updateUserOrRequestUpdate,
 };
