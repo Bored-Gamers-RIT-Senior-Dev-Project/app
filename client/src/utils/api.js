@@ -152,6 +152,7 @@ const teams = Object.freeze({
             description,
             profileImageUrl,
         });
+        events.publish("refreshAuth");
         return data;
     },
 });

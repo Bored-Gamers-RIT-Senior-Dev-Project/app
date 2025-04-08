@@ -12,7 +12,6 @@ import { useNavigate } from "react-router";
 import { ImageUploader } from "../components/ImageUploader";
 import { useAuth } from "../hooks/useAuth/index";
 import { usePostSubmit } from "../hooks/usePostSubmit";
-import { events } from "../utils/events";
 import { reauthenticate, updateCredentials } from "../utils/firebase/auth";
 const UserSettings = () => {
     const { user } = useAuth();
@@ -75,8 +74,6 @@ const UserSettings = () => {
         if (Array.from(formData.keys()).length > 0) {
             submit(formData, { encType: "multipart/form-data" }); //Submitting as form-data for the sake of the image.
             //See router.jsx for action definition
-            events.publish("refreshAuth");
-            navigate(0);
         }
     };
 
