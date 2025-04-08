@@ -21,11 +21,14 @@ const SQL_SELECTOR = `SELECT
             role.RoleName AS roleName,
             user.UniversityID AS universityID,
             uni.UniversityName AS universityName,
-            user.IsValidated AS isValidated
+            user.IsValidated AS isValidated,
+            CASE WHEN user_update.UserUpdateId IS NOT NULL THEN true ELSE false END AS pendingUpdate
         FROM users AS user
             LEFT JOIN universities AS uni ON user.UniversityID = uni.UniversityId
             LEFT JOIN teams AS team ON user.TeamID = team.TeamId
-            JOIN roles AS role ON user.RoleId = role.RoleId`;
+            LEFT JOIN user_update AS user_update ON user.UserID = user_update.UpdatedUserID
+            JOIN roles AS role ON user.RoleId = role.RoleId
+        WHERE user_update.ApprovedBy IS NULL`;
 
 /**
  *@typedef {"FirebaseUID"|"UserID"} UserIdentifier
@@ -129,7 +132,7 @@ const getUserList = async () => {
 const getUser = async (column, value) => {
     try {
         const [rows] = await db.query(
-            `${SQL_SELECTOR} WHERE ?? = ?;
+            `${SQL_SELECTOR} AND ?? = ?;
         `,
             [column, value]
         );
