@@ -142,6 +142,27 @@ const MemberList = ({ members, captainId, currentUserId }) => {
                                         {member.bio}
                                     </Typography>
                                 </Box>
+                                {!member.isValidated && (
+                                    //Courtesy of copilot
+                                    <Box
+                                        sx={{
+                                            position: "absolute",
+                                            top: 8,
+                                            right: 8,
+                                            display: "flex",
+                                            alignItems: "center",
+                                        }}
+                                        title="This member is not verified"
+                                    >
+                                        <Typography
+                                            variant="body2"
+                                            color="error"
+                                            sx={{ mr: 1 }}
+                                        >
+                                            Unverified
+                                        </Typography>
+                                    </Box>
+                                )}
                                 {member.userId != captainId &&
                                     (currentUserId == captainId ||
                                         member.userId == currentUserId) && (
