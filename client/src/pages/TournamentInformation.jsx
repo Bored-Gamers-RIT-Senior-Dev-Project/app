@@ -6,15 +6,79 @@ import {
     Grid,
     Menu,
     MenuItem,
+    Modal,
     Paper,
     Select,
+    Stack,
     TextField,
     Typography,
 } from "@mui/material";
 import { formatDistanceToNow } from "date-fns";
+import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { api_url } from "../utils/api";
+
+const style = {
+    // https://mui.com/material-ui/react-modal/
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    p: 4,
+};
+
+/**
+ * A popup that lets admins edit the score
+ * @param {*} props with the match, which is null if the modal should be closed,
+ * and handleClose, a function to close the modal
+ * @returns the score popup
+ */
+const ScorePopup = (props) => {
+    return (
+        <Modal open={props.match != null} onClose={props.handleClose}>
+            {props.match ? (
+                <Box sx={style}>
+                    <Typography align="center" variant="h4">
+                        Update Score
+                    </Typography>
+                    <Stack direction="row" alignItems="center">
+                        <Stack>
+                            <Typography align="center">{`${props.match.team1Name}`}</Typography>
+                            <input
+                                type="number"
+                                style={{ width: "50%", alignSelf: "center" }}
+                                min="0"
+                                value={props.match.score1}
+                            ></input>
+                            <Button onClick={props.handleClose}>Cancel</Button>
+                        </Stack>
+                        <Stack alignItems="center">
+                            <Typography align="center">{`${props.match.team2Name}`}</Typography>
+                            <input
+                                type="number"
+                                style={{ width: "50%", alignSelf: "center" }}
+                                min="0"
+                                value={props.match.score2}
+                            ></input>
+                            <Button>Submit</Button>
+                        </Stack>
+                    </Stack>
+                </Box>
+            ) : (
+                <></>
+            )}
+        </Modal>
+    );
+};
+
+ScorePopup.propTypes = {
+    match: PropTypes.object,
+    handleClose: PropTypes.func.isRequired,
+};
 
 const TournamentInformation = () => {
     const { id } = useParams();
@@ -28,6 +92,37 @@ const TournamentInformation = () => {
         sortBy: "",
         dateRange: [null, null],
     });
+
+    const [openScorePopup, setOpenScorePopup] = useState(null); // openScorePopup is the match or null
+
+    /**
+     * Open the ScorePopup
+     */
+    const handleOpen = (match) => setOpenScorePopup(match);
+
+    /**
+     * Close the ScorePopup
+     */
+    const handleClose = () => setOpenScorePopup(null);
+
+    /**
+     * Figure out who won a match
+     * (hopefully no one names their team "Tie" - this is just for visual
+     * purposes so nothing serious will break if they do)
+     * @param {*} match the match data, with the keys team1, team2, team1Score,
+     * and team2Score
+     * @returns team1 if team1 won, team2 if team 2 won, or "Tie" if the scores
+     * are equal
+     */
+    const winner = (match) => {
+        if (match.team1Score > match.team2Score) {
+            return match.team1;
+        }
+        if (match.team1Score < match.team2Score) {
+            return match.team2;
+        }
+        return "Tie";
+    };
 
     const navigate = useNavigate();
 
@@ -168,178 +263,196 @@ const TournamentInformation = () => {
         );
     }
     return (
-        <Box sx={{ maxWidth: "900px", margin: "auto", padding: 2 }}>
-            {/* Match Filters Dropdown Button */}
+        <>
+            <Box sx={{ maxWidth: "900px", margin: "auto", padding: 2 }}>
+                {/* Match Filters Dropdown Button */}
 
-            <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-                <Button
-                    onClick={() => navigate(-1)}
-                    variant="contained"
-                    startIcon={<ArrowBack />}
-                >
-                    Go Back
-                </Button>
-            </Box>
-
-            <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-                disableScrollLock
-                keepMounted
-            >
-                <Paper sx={{ padding: 1, borderRadius: "10px", m: 1 }}>
-                    <Typography gutterBottom>Match Filters</Typography>
-                    <Grid container spacing={2}>
-                        <Grid item xs={18} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Match Team Name"
-                                name="matchTeam"
-                                value={filters.matchTeam}
-                                onChange={handleFilterChange}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <Select
-                                fullWidth
-                                name="sortBy"
-                                value={filters.sortBy}
-                                onChange={handleFilterChange}
-                                displayEmpty
-                            >
-                                <MenuItem value="">Sort By</MenuItem>
-                                <MenuItem value="dateAsc">Date ↑</MenuItem>
-                                <MenuItem value="dateDesc">Date ↓</MenuItem>
-                                <MenuItem value="score">Score</MenuItem>
-                                <MenuItem value="team">Team Name</MenuItem>
-                            </Select>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Button
-                                variant="outlined"
-                                fullWidth
-                                onClick={clearFilters}
-                            >
-                                Clear All Filters
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </Paper>
-            </Menu>
-
-            {/* Tournament Details & Matches List */}
-            <Paper sx={{ padding: 3, borderRadius: "10px", marginBottom: 3 }}>
-                <Box width="100%">
-                    <Typography variant="h6" fontWeight="bold">
-                        {tournament.tournamentName} ({filteredMatches.length}{" "}
-                        matches)
-                    </Typography>
-                    <Typography>
-                        {formatDateRange(
-                            tournament.startDate,
-                            tournament.endDate
-                        )}
-                    </Typography>
-                    <Typography>{tournament.location}</Typography>
-                    <Typography variant="body2">
-                        Status: {tournament.status}
-                    </Typography>
-                </Box>
-                <Box mt={2}>
-                    <Typography
-                        variant="subtitle1"
-                        fontWeight="bold"
-                        gutterBottom
-                    >
-                        Matches
-                    </Typography>
+                <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
                     <Button
+                        onClick={() => navigate(-1)}
                         variant="contained"
-                        onClick={handleMenuOpen}
-                        sx={{ mb: 2 }}
+                        startIcon={<ArrowBack />}
                     >
-                        Match Filters
+                        Go Back
                     </Button>
-                    {filteredMatches.length > 0 ? (
-                        filteredMatches.map((match) => (
-                            <Box
-                                key={match.matchId}
-                                display="flex"
-                                flexDirection="column"
-                                gap={0.5}
-                                px={2}
-                                py={1}
-                                border="1px solid #ccc"
-                                borderRadius="10px"
-                                mb={1}
-                            >
-                                <Box
-                                    display="flex"
-                                    justifyContent="space-between"
-                                    alignItems="center"
-                                    flexWrap="wrap"
-                                >
-                                    <Box
-                                        display="flex"
-                                        alignItems="center"
-                                        gap={1}
-                                    >
-                                        <Typography>
-                                            {match.team1Name}
-                                        </Typography>
-                                        <Typography
-                                            fontWeight="bold"
-                                            color="primary"
-                                        >
-                                            vs
-                                        </Typography>
-                                        <Typography>
-                                            {match.team2Name}
-                                        </Typography>
-                                    </Box>
-                                    <Box
-                                        display="flex"
-                                        alignItems="center"
-                                        gap={2}
-                                    >
-                                        <Typography
-                                            variant="caption"
-                                            color="textSecondary"
-                                            ml={4}
-                                        >
-                                            {getMatchCountdown(match.matchTime)}
-                                        </Typography>
-                                        <Typography
-                                            variant="body2"
-                                            color="textSecondary"
-                                        >
-                                            {match.score1} - {match.score2}
-                                        </Typography>
-                                    </Box>
-                                </Box>
-                                <Typography
-                                    variant="body2"
-                                    color="primary"
-                                    mt={0.5}
-                                >
-                                    Winner:{" "}
-                                    {match.winnerId
-                                        ? match.winnerId === match.team1Id
-                                            ? match.team1Name
-                                            : match.team2Name
-                                        : "TBD"}
-                                </Typography>
-                            </Box>
-                        ))
-                    ) : (
-                        <Typography variant="body2" color="textSecondary">
-                            No matches found.
-                        </Typography>
-                    )}
                 </Box>
-            </Paper>
-        </Box>
+
+                <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                    disableScrollLock
+                    keepMounted
+                >
+                    <Paper sx={{ padding: 1, borderRadius: "10px", m: 1 }}>
+                        <Typography gutterBottom>Match Filters</Typography>
+                        <Grid container spacing={2}>
+                            <Grid item xs={18} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Match Team Name"
+                                    name="matchTeam"
+                                    value={filters.matchTeam}
+                                    onChange={handleFilterChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <Select
+                                    fullWidth
+                                    name="sortBy"
+                                    value={filters.sortBy}
+                                    onChange={handleFilterChange}
+                                    displayEmpty
+                                >
+                                    <MenuItem value="">Sort By</MenuItem>
+                                    <MenuItem value="dateAsc">Date ↑</MenuItem>
+                                    <MenuItem value="dateDesc">Date ↓</MenuItem>
+                                    <MenuItem value="score">Score</MenuItem>
+                                    <MenuItem value="team">Team Name</MenuItem>
+                                </Select>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Button
+                                    variant="outlined"
+                                    fullWidth
+                                    onClick={clearFilters}
+                                >
+                                    Clear All Filters
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </Paper>
+                </Menu>
+
+                {/* Tournament Details & Matches List */}
+                <Paper
+                    sx={{ padding: 3, borderRadius: "10px", marginBottom: 3 }}
+                >
+                    <Box width="100%">
+                        <Typography variant="h6" fontWeight="bold">
+                            {tournament.tournamentName} (
+                            {filteredMatches.length} matches)
+                        </Typography>
+                        <Typography>
+                            {formatDateRange(
+                                tournament.startDate,
+                                tournament.endDate
+                            )}
+                        </Typography>
+                        <Typography>{tournament.location}</Typography>
+                        <Typography variant="body2">
+                            Status: {tournament.status}
+                        </Typography>
+                    </Box>
+
+                    <Box mt={2}>
+                        <Typography
+                            variant="subtitle1"
+                            fontWeight="bold"
+                            gutterBottom
+                        >
+                            Matches
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            onClick={handleMenuOpen}
+                            sx={{ mb: 2 }}
+                        >
+                            Match Filters
+                        </Button>
+                        {filteredMatches.length > 0 ? (
+                            filteredMatches.map((match) => (
+                                <Box
+                                    key={match.matchId}
+                                    display="flex"
+                                    flexDirection="column"
+                                    gap={0.5}
+                                    px={2}
+                                    py={1}
+                                    border="1px solid #ccc"
+                                    borderRadius="10px"
+                                    mb={1}
+                                >
+                                    <Box
+                                        display="flex"
+                                        justifyContent="space-between"
+                                        alignItems="center"
+                                        flexWrap="wrap"
+                                    >
+                                        <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            gap={1}
+                                        >
+                                            <Typography>
+                                                {match.team1Name}
+                                            </Typography>
+                                            <Typography
+                                                fontWeight="bold"
+                                                color="primary"
+                                            >
+                                                vs
+                                            </Typography>
+                                            <Typography>
+                                                {match.team2Name}
+                                            </Typography>
+                                        </Box>
+                                        <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            gap={2}
+                                        >
+                                            <Typography
+                                                variant="caption"
+                                                color="textSecondary"
+                                                ml={4}
+                                            >
+                                                {getMatchCountdown(
+                                                    match.matchTime
+                                                )}
+                                            </Typography>
+                                            <Typography
+                                                variant="body2"
+                                                color="textSecondary"
+                                            >
+                                                {match.score1} - {match.score2}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                    <Typography
+                                        variant="body2"
+                                        color="primary"
+                                        mt={0.5}
+                                    >
+                                        Winner:{" "}
+                                        {match.winnerId
+                                            ? match.winnerId === match.team1Id
+                                                ? match.team1Name
+                                                : match.team2Name
+                                            : "TBD"}
+                                    </Typography>
+                                    <Button
+                                        variant="contained"
+                                        size="small"
+                                        onClick={() => handleOpen(match)}
+                                    >
+                                        Update Score
+                                    </Button>
+                                </Box>
+                            ))
+                        ) : (
+                            <Typography variant="body2" color="textSecondary">
+                                No matches found.
+                            </Typography>
+                        )}
+                    </Box>
+                </Paper>
+            </Box>
+            <ScorePopup
+                match={openScorePopup}
+                handleClose={handleClose}
+            ></ScorePopup>
+        </>
     );
 };
 
