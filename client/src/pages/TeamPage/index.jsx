@@ -49,7 +49,11 @@ const TeamPage = () => {
                         enterEditMode={() => setEditMode(true)}
                     />
                 )}
-                <MemberList members={team.members} captainId={team.captainId} />
+                <MemberList
+                    members={team.members}
+                    captainId={team.captainId}
+                    currentUserId={user?.userId}
+                />
             </Paper>
         </Box>
     );

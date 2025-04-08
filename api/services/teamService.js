@@ -195,6 +195,76 @@ const postUpdateRequest = async (
     );
 };
 
+const userCanPromote = async (user, prospectiveCaptain) => {
+    switch (user.roleName) {
+        case userModel.Roles.ADMIN:
+            return true;
+        case userModel.Roles.CAPTAIN:
+            return user.teamId == prospectiveCaptain.teamId;
+        case userModel.Roles.UNIVERSITY_ADMIN:
+            return user.universityId == prospectiveCaptain.universityId;
+        default:
+            return false;
+    }
+};
+
+const promoteUserToCaptain = async (uid, userId) => {
+    const user = await userModel.getUserByFirebaseId(uid);
+    const prospectiveCaptain = await userModel.getUserByUserId(userId);
+    //If no user, 404
+    if (!prospectiveCaptain) {
+        throw createError(404, "User not found.");
+    }
+    //If user doesn't have the right permissions, throw 403
+    if (!(await userCanPromote(user, prospectiveCaptain))) {
+        throw createError(403);
+    }
+    //If prospective captain is not a member of a team, (or isn't a student role), 400.
+    if (
+        !prospectiveCaptain.teamId ||
+        prospectiveCaptain.roleName !== userModel.Roles.STUDENT
+    ) {
+        throw createError(400);
+    }
+    console.log("Promoting user to captain: ", userId);
+    return await teamModel.promoteCaptain(userId, prospectiveCaptain.teamId);
+};
+
+const userCanRemove = async (user, userToRemove) => {
+    if (user.userId == userToRemove.userId) {
+        return true;
+    }
+    switch (user.roleName) {
+        case userModel.Roles.ADMIN:
+            return true;
+        case userModel.Roles.CAPTAIN:
+            return user.teamId == userToRemove.teamId;
+        case userModel.Roles.UNIVERSITY_ADMIN:
+            return user.universityId == userToRemove.universityId;
+        default:
+            return false;
+    }
+};
+const removeUserFromTeam = async (uid, userId) => {
+    const user = await userModel.getUserByFirebaseId(uid);
+    const removedUser = await userModel.getUserByUserId(userId);
+    if (!removedUser) {
+        throw createError(404);
+    }
+    if (!(await userCanRemove(user, removedUser))) {
+        throw createError(403);
+    }
+
+    if (removedUser.roleName == userModel.Roles.CAPTAIN) {
+        throw createError(400, "Cannot remove team captain from team.");
+    }
+    if (removedUser.roleName !== userModel.Roles.STUDENT) {
+        throw createError(400, "User is not a student member of the team.");
+    }
+
+    return await teamModel.removeTeamMember(userId);
+};
+
 module.exports = {
     createTeam,
     getTeam,
@@ -202,4 +272,6 @@ module.exports = {
     getTeams,
     joinTeam,
     postUpdateRequest,
+    promoteUserToCaptain,
+    removeUserFromTeam,
 };
