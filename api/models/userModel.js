@@ -475,7 +475,11 @@ const denyUserUpdate = async (userUpdateId) => {
  * @returns {Promise<object>}
  */
 const getUserEditById = async (editId) => {
-    const sql = "SELECT * FROM user_updates WHERE UserUpdateId = ?";
+    const sql = `SELECT
+    u.UniversityID,
+    uu.*
+    FROM user_update uu JOIN users u ON uu.UpdatedUserID = u.UserID
+    WHERE uu.UserUpdateId = ?;`;
     const [rows] = await db.query(sql, [editId]);
     if (rows.length == 0) {
         return null;
@@ -499,6 +503,7 @@ module.exports = {
     updateUserOrRequestUpdate,
     approveUser,
     denyUser,
+    requestUserUpdate,
     approveUserUpdate,
     denyUserUpdate,
 };
