@@ -244,21 +244,51 @@ const updateUserOrRequestUpdate = async (userId, body) => {
  */
 const requestUserUpdate = async (userId, body) => {
     "use strict";
-    const result = await db.query(
+
+    //Start by trying to update an existing user update that hasn't been approved.
+    const [result1] = await db.query(
+        `UPDATE user_update req
+        JOIN user_update existing ON existing.UserUpdateId = req.UserUpdateId
+        SET
+            req.FirstName = COALESCE(?, existing.FirstName),
+            req.LastName = COALESCE(?, existing.LastName),
+            req.Username = COALESCE(?, existing.Username),
+            req.Email = COALESCE(?, existing.Email),
+            req.ProfileImageURL = COALESCE(?, existing.ProfileImageURL),
+            req.Bio = COALESCE(?, existing.Bio)
+        WHERE req.UpdatedUserId = ? AND req.ApprovedBy IS NULL;
+        `,
+        [
+            body.firstName,
+            body.lastName,
+            body.username,
+            body.email,
+            body.profileImageUrl,
+            body.bio,
+            userId,
+        ]
+    );
+    //If that worked, return true and move on.
+    if (result1.affectedRows > 0) {
+        return true;
+    }
+
+    //If it didn't insert a new user update.
+    const [result2] = await db.query(
         `INSERT INTO
             user_update (UpdatedUserID, FirstName, LastName, Username, Email, ProfileImageURL, Bio)
             VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
             userId,
-            body.FirstName,
-            body.LastName,
-            body.Username,
-            body.Email,
-            body.ProfileImageURL,
-            body.Bio,
+            body.firstName,
+            body.lastName,
+            body.username,
+            body.email,
+            body.profileImageURL,
+            body.bio,
         ]
     );
-    return result;
+    return result2.affectedRows > 0;
 };
 
 /**
