@@ -471,6 +471,20 @@ const denyUserUpdate = async (userUpdateId) => {
     return result.affectedRows > 0;
 };
 
+/**
+ * Get a user edit from the user_updates table by its UserUpdateID
+ * @param {number} editId
+ * @returns {Promise<object>}
+ */
+const getUserEditById = async (editId) => {
+    const sql = "SELECT * FROM user_updates WHERE UserUpdateId = ?";
+    const [rows] = await db.query(sql, [editId]);
+    if (rows.length == 0) {
+        return null;
+    }
+    return rows[0];
+};
+
 module.exports = {
     UserIds,
     Roles,
@@ -478,6 +492,7 @@ module.exports = {
     getUserList,
     getUserByUserId,
     getUserByFirebaseId,
+    getUserEditById,
     updateUser,
     deleteUser,
     checkUsername,
