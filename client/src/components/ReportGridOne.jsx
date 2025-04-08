@@ -61,13 +61,7 @@ const ReportGridOne = ({ data, totals }) => {
     ];
 
     return (
-        <Box
-            sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-            }}
-        >
+        <Box>
             <Grid
                 rowData={data}
                 columnDefs={columnDefs}
