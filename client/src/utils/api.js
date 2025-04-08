@@ -151,6 +151,16 @@ const teams = Object.freeze({
         events.publish("refreshAuth");
         return data;
     },
+    promoteMember: async ({ id }) => {
+        const { data } = await api.put(`teams/promote/${id}`);
+        events.publish("refreshAuth");
+        return data;
+    },
+    removeMember: async ({ id }) => {
+        const { data } = await api.put(`teams/removeUser/${id}`);
+        events.publish("refreshAuth");
+        return data;
+    },
 });
 
 const users = Object.freeze({

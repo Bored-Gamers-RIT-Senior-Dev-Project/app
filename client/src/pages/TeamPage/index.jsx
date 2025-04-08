@@ -52,7 +52,7 @@ const TeamPage = () => {
                 <MemberList
                     members={team.members}
                     captainId={team.captainId}
-                    currentUserId={user.userId}
+                    currentUserId={user?.userId}
                 />
             </Paper>
         </Box>

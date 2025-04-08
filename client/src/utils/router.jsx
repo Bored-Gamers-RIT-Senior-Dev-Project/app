@@ -83,12 +83,12 @@ const routes = [
                     {
                         path: "/teams/:teamId/remove",
                         element: null,
-                        action: makeAction(console.log),
+                        action: makeAction(teams.removeMember),
                     },
                     {
                         path: "/teams/:teamId/promote",
                         element: null,
-                        action: makeAction(console.log),
+                        action: makeAction(teams.promoteMember),
                     },
                 ],
             },

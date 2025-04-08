@@ -102,15 +102,33 @@ router.put("/:teamId/join", async (req, res, next) => {
  * Remove a user from their team.
  * Requires [Admin Role] or [University Rep role and matching team/player university ID] or [Team Captain role and matching teamID] or [Matching User ID]
  */
-router.put("/:teamId/remove", async (req, res, next) => {
+router.put("/removeUser/:userId", async (req, res, next) => {
     const uid = req?.user?.uid;
-    const { teamId } = req.params;
-    const { userId } = req.body;
+    const { userId } = req.params;
     if (!uid) return res.status(401).send();
+    if (!userId) return res.status(400).send();
 
     try {
-        //const team = await teamService.removeUserFromTeam(uid, teamId, userId);
-        return res.status(200).json({});
+        const result = await teamService.removeUserFromTeam(uid, userId);
+        return res.status(200).json(result);
+    } catch (error) {
+        return next(error);
+    }
+});
+
+/**
+ * Remove a user from their team.
+ * Requires [Admin Role] or [University Rep role and matching team/player university ID] or [Team Captain role and matching teamID] or [Matching User ID]
+ */
+router.put("/promote/:userId", async (req, res, next) => {
+    const uid = req?.user?.uid;
+    const { userId } = req.params;
+    if (!uid) return res.status(401).send();
+    if (!userId) return res.status(400).send();
+
+    try {
+        const result = await teamService.promoteUserToCaptain(uid, userId);
+        return res.status(200).json(result);
     } catch (error) {
         return next(error);
     }
