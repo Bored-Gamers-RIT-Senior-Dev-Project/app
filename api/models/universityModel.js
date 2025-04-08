@@ -1,5 +1,5 @@
 const db = require("../config/db");
-
+const createHttpError = require("http-errors");
 /**
  * Searches universities based on the search term.
  *

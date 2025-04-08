@@ -2,6 +2,7 @@ const universityModel = require("../models/universityModel");
 const userModel = require("../models/userModel");
 const teamModel = require("../models/teamModel");
 const createHttpError = require("http-errors");
+const imageUploadService = require("./imageUploadService");
 /**
  * Searches universities based on the search term.
  *
@@ -106,9 +107,14 @@ const userCanUpdateUniversity = (user, universityId) => {
 
 /**
  *
- * @param {*} uid The uid of the account making the update.
- * @param {*} universityId The id of the university to update
- * @param {*} updateBody The updates to be made.
+ * @param {string} uid Firebase UID of the user requesting the edit
+ * @param {number} universityId ID of university to edit
+ * @param {string|null} universityName New Name
+ * @param {string|null} location New Location
+ * @param {string|null} description New Description
+ * @param {string|null} websiteUrl New WebsiteUrl
+ * @param {Express.Multer.File|null} logoImage Uploaded Logo Image file
+ * @param {Express.Multer.File|null} bannerImage Uploaded banner image file
  * @returns
  */
 const updateUniversity = async (
@@ -128,7 +134,7 @@ const updateUniversity = async (
     }
 
     //TODO: Validate and sanitize updateBody to prevent SQL injection or other attacks/errors.
-    const updateBody = {};
+    let updateBody = {};
     if (universityName) {
         updateBody.universityName = universityName;
     }
@@ -141,17 +147,22 @@ const updateUniversity = async (
     if (websiteUrl) {
         updateBody.websiteUrl = websiteUrl;
     }
-    //TODO: Handle image uploads here
+    const imageUploads = [];
     if (logoImage) {
-        console.debug(
-            "Here is where we'd upload the logo image and add its URL to the upload body."
+        imageUploads.push(
+            imageUploadService
+                .uploadImage(logoImage.buffer)
+                .then((url) => (updateBody.logoUrl = url))
         );
     }
     if (bannerImage) {
-        console.debug(
-            "Here is where we'd upload the banner image and add its url to the upload body."
+        imageUploads.push(
+            imageUploadService
+                .uploadImage(bannerImage.buffer)
+                .then((url) => (updateBody.bannerUrl = url))
         );
     }
+    await Promise.all(imageUploads);
 
     //Update university in universityModel.
     const university = await universityModel.updateUniversity(
