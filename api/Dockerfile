@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 3000
 
 # Run the app on the port listed above
-CMD [ "npm", "run", "start" ]
+CMD [ "npm", "--loglevel", "verbose", "run", "start" ]
