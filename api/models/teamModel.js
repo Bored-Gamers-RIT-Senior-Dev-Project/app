@@ -252,7 +252,7 @@ const getTeamUpdate = async (updateId) => {
     WHERE u.TeamUpdateId = ?;
     `;
     const [rows] = await db.query(sql, [updateId]);
-    if (rows.count < 1) {
+    if (rows.length < 1) {
         return null;
     }
     return rows[0];
