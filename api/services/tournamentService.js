@@ -115,7 +115,6 @@ const searchTournaments = async (
 ) => {
     // Search tournament by ID, otherwise use other filters
     if (tournamentID) {
-        console.log("Searching solely by tournamentID");
         tournamentID = validateInteger(tournamentID, "tournamentID");
         const tournament = await TournamentModel.searchTournaments(
             tournamentID

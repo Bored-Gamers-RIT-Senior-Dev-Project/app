@@ -65,7 +65,6 @@ const searchTeams = async (
     partial = true,
     approvedOnly = true
 ) => {
-    console.log("Request on /search reached team model layer");
     let sql = `
         SELECT 
             t.TeamID AS Id, 

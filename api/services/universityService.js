@@ -9,11 +9,9 @@ const createHttpError = require("http-errors");
  * @returns {Promise<Array>} - A promise that resolves to an array of search results.
  */
 const searchUniversities = async (universityName) => {
-    console.log("Request on /search reached university service layer");
     const searchResult = await universityModel.searchUniversities(
         universityName
     );
-    console.log("Returning result on /search from university service layer");
     return searchResult;
 };
 
