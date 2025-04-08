@@ -216,6 +216,7 @@ const Search = () => {
                             imageUrl={result.profileImageUrl}
                             title={result.teamName}
                             subtitle={result.universityName}
+                            onClick={() => navigate(`/teams/${result.id}`)}
                             key={"Team" + result.id}
                         />
                     )
