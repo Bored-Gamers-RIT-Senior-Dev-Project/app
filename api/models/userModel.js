@@ -230,8 +230,6 @@ const updateUser = async (userId, body, identifier = UserIds.LOCAL) => {
 const updateUserOrRequestUpdate = async (userId, body) => {
     "use strict";
     const user = await getUserByUserId(userId);
-    console.log(user);
-    console.log(userId);
     if (user.universityId == null) {
         updateUser(userId, body);
         return;
@@ -248,8 +246,8 @@ const requestUserUpdate = async (userId, body) => {
     "use strict";
     const result = await db.query(
         `INSERT INTO
-            user_update (UpdatedUserID, RequestedDate, ApprovedBy, FirstName, LastName, Username, Email, ProfileImageURL, Bio)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, )`,
+            user_update (UpdatedUserID, ApprovedBy, FirstName, LastName, Username, Email, ProfileImageURL, Bio)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [
             userId,
             body.RequestedDate,
