@@ -283,7 +283,7 @@ const requestUserUpdate = async (userId, body) => {
             body.lastName,
             body.username,
             body.email,
-            body.profileImageURL,
+            body.profileImageUrl,
             body.bio,
         ]
     );
