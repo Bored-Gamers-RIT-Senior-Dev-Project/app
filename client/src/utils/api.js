@@ -1,7 +1,8 @@
 import axios from "axios";
+import { events } from "./events";
 import { getIdToken } from "./firebase/auth";
 
-const api_url = import.meta.env.API_URL || "http://localhost:3000/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 /**
  * Constructs the full API URL for a given path.
@@ -71,7 +72,91 @@ const search = async (params) => {
     return data;
 };
 
+const admin = Object.freeze({
+    getRoles: async () => {
+        const { data } = await api.get("roles");
+        return data;
+    },
+    getReports: async () => {
+        const { data } = await api.get("reports");
+        return data;
+    },
+    getUniversityAdminTickets: async () => {
+        const { data } = await api.get("representative");
+        return data;
+    },
+});
+
+const teams = Object.freeze({
+    /**
+     * Gets a list of existing teams.
+     * @returns {Promise<Array<object>>}
+     */
+    getList: async (getUnapproved = false) => {
+        let uri = "teams";
+        if (getUnapproved) uri += "?showUnapproved=true";
+        const { data } = await api.get(uri);
+        return data;
+    },
+    /**
+     * Gets information on a certain team (team page)
+     * @param {number} params.id TeamID to
+     * @returns The team information
+     */
+    getInfo: async ({ id }) => {
+        const { data } = await api.get(`teams/${id}`);
+        return data;
+    },
+    /**
+     * Create a new team, captained by the currently signed in user
+     * @param {number} params.universityId The university hosting the team.
+     * @param {string} params.teamName The name of the team being created.
+     * @returns Confirmation that the team has been created.
+     */
+    create: async ({ universityId, teamName }) => {
+        const { data } = await api.post(`teams`, { teamName, universityId });
+        events.publish("refreshAuth"); //Refresh the user profile to load the user's team data.
+        return data;
+    },
+    /**
+     * When successful, causes the current user to join the specified team.
+     * @param {number} teamId Team ID to join.
+     * @returns Confirmation of action result
+     */
+    join: async ({ teamId }) => {
+        const { data } = await api.put(`teams/${teamId}/join`);
+        events.publish("refreshAuth"); //Refresh the user profile to load the user's team data.
+        return data;
+    },
+    /**
+     * Post an update to the user db
+     * @param {object} data The form data for the update.
+     * @param {string|null} data.teamName The updated team name.
+     * @param {string|null} data.description The updated team description
+     * @param {string|null} data.profileImageUrl A URL to a newly uploaded profile image.
+     * @param {object} params The params of the route.
+     * @param {number} params.teamId The ID of the team being updated (gotten from route)
+     * @returns {Promise<boolean>} True on a successful update post.
+     */
+    update: async ({ teamName, description, profileImageUrl }, { teamId }) => {
+        const { data } = await api.post(`teams/${teamId}/update`, {
+            teamName,
+            description,
+            profileImageUrl,
+        });
+        return data;
+    },
+});
+
 const users = Object.freeze({
+    /**
+     * Gets a list of all users that exist in the local database.
+     * @returns {Promise<Array<object>>} Users
+     */
+    getList: async () => {
+        const { data } = await api.get("users");
+        return data;
+    },
     /**
      * Gets the user profile for the currently logged in user.
      * @returns The user profile for the currently logged in user.
@@ -111,8 +196,35 @@ const users = Object.freeze({
      * @param {*} params The keys to update in the user profile.  //TODO: This function should be further locked down or specified to what the front-end can do once we have the dashboard
      * @returns {Promise<*>} A confirmation of the update
      */
-    update: async (params) => {
-        const { data } = await api.put("users", params);
+    update: async (userId, params) => {
+        const { data } = await api.put(`users/${userId}`, params);
+        return data;
+    },
+
+    /**
+     *
+     * Updates the user profile for the specified user
+     * @param {*} params The keys to update in the user profile.  //TODO: This function should be further locked down or specified to what the front-end can do once we have the dashboard
+     * @returns {Promise<*>} A confirmation of the update
+     */
+    updateSettings: async (userId, formData) => {
+        const { data } = await api.put(`users/${userId}/settings`, formData);
+        return data;
+    },
+
+    createUser: async (params) => {
+        const { data } = await api.post("users", params);
+        return data;
+    },
+
+    getUser: async (userId) => {
+        const { data } = await api.get(`users/${userId}`);
+        return data;
+    },
+
+    delete: async (userId) => {
+        console.log("Deleting " + userId);
+        const { data } = await api.delete(`users/${userId}`);
         return data;
     },
 });
@@ -127,6 +239,25 @@ const university = Object.freeze({
         const { data } = await api.get(`university/${universityId}`);
         return data;
     },
+
+    getList: async () => {
+        const { data } = await api.get(`university`);
+        return data;
+    },
+    /**
+     * Create a new university in the database
+     * @param {object} params The request body
+     * @param {string} params.universityName The name of the university to create.
+     * @returns Post data
+     */
+    addUniversity: async (params) => {
+        const { data } = await api.post("university", params);
+        return data;
+    },
 });
 
-export { api_url, search, university, users };
+const combine = (...calls) => {
+    return () => Promise.all(calls);
+};
+
+export { admin, combine, search, teams, university, users };
