@@ -91,7 +91,7 @@ const getUniversityAdminTickets = async (universityId) => {
         FROM team_update upd
         JOIN teams t ON upd.UpdatedTeamID = t.TeamId
         WHERE t.UniversityId = ?
-        AND ApprovedBy = null`;
+        AND ApprovedBy IS NULL`;
 
     const userEditsQuery = ` SELECT upd.*,
             u.Email CurrentEmail,
@@ -100,9 +100,9 @@ const getUniversityAdminTickets = async (universityId) => {
             u.LastName CurrentLastName,
             "userEdit" type
         FROM user_update upd
-        JOIN users u ON upd.UpdatedUserID = u.TeamId
+        JOIN users u ON upd.UpdatedUserID = u.UserID
         WHERE u.UniversityId = ?
-        AND ApprovedBy = null`;
+        AND ApprovedBy IS NULL`;
 
     const [newTeams, newUsers, teamEdits, userEdits] = await Promise.all(
         [newTeamsQuery, newUsersQuery, teamEditsQuery, userEditsQuery].map(
