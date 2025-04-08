@@ -13,6 +13,7 @@ import { UniversityDashboard } from "./UniversityDashboard";
 import { UserSettings } from "./UserSettings";
 import { UserSignIn } from "./UserSignIn";
 import { UserSignUp } from "./UserSignUp";
+import { PrivacyPolicy } from "./PrivacyPolicy"; 
 
 export {
     About,
@@ -30,4 +31,5 @@ export {
     UserSettings,
     UserSignIn,
     UserSignUp,
+    PrivacyPolicy, 
 };
