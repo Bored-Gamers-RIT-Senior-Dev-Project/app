@@ -1,24 +1,30 @@
-import { createBrowserRouter, redirect } from "react-router";
+import { Navigate, redirect } from "react-router";
 import App from "../App";
 import {
     About,
     AdminDashboard,
+    Faq,
     Home,
     NotFound,
     ReportView,
     Rules,
     Schedule,
     Search,
-    TeamsPage,
     TournamentInformation,
+    TeamPage,
     University,
-    UserManager,
+    UniversityDashboard,
     UserSettings,
     UserSignIn,
     UserSignUp,
+    PrivacyPolicy,
 } from "../pages";
-import { UserPreferences } from "../pages/UserPreferences.DEMO";
-import { search, university, users } from "./api";
+import { JoinTeamPage } from "../pages/JoinTeamPage";
+import { AddUniversityModal } from "../pages/modals/AddUniversityModal";
+import { AddUserModal } from "../pages/modals/AddUserModal";
+import { DeleteModal } from "../pages/modals/DeleteModal";
+import { EditUserModal } from "../pages/modals/EditUserModal";
+import { admin, search, teams, university, users } from "./api";
 import { events } from "./events";
 
 /**
@@ -28,13 +34,13 @@ import { events } from "./events";
  */
 const makeAction =
     (action, spinner = true) =>
-    async (params) => {
+    async ({ request, params }) => {
         if (spinner) {
             events.publish("spinner.open");
         }
         try {
-            const data = await params.request.json();
-            const response = await action(data);
+            const data = await request.json();
+            const response = await action(data, params);
             return response;
         } finally {
             if (spinner) {
@@ -42,7 +48,7 @@ const makeAction =
             }
         }
     };
-const router = createBrowserRouter([
+const routes = [
     {
         path: "/",
         element: <App />,
@@ -68,8 +74,10 @@ const router = createBrowserRouter([
                 loader: () => search({ value: "" }),
             },
             {
-                path: "/teamspage",
-                element: <TeamsPage />,
+                path: "/teams/:teamId",
+                element: <TeamPage />,
+                loader: ({ params }) => teams.getInfo({ id: params.teamId }),
+                action: makeAction(teams.update),
             },
             {
                 path: "/university/:universityId",
@@ -96,8 +104,27 @@ const router = createBrowserRouter([
                 element: <About />,
             },
             {
+                path: "/faq",
+                element: <Faq />,
+            },
+            {
+                path: "/privacy",
+                element: <PrivacyPolicy />,
+            },            
+            {
                 path: "/settings",
                 element: <UserSettings />,
+                action: async ({ request }) => {
+                    //Read formData in request
+                    const formData = await request.formData();
+
+                    //Get the userid back from the formdata and remove it
+                    const userId = formData.get("userId");
+                    formData.delete("userId");
+
+                    //Send to api to process updates.
+                    return users.updateSettings(userId, formData);
+                },
             },
             {
                 path: "/rules",
@@ -111,23 +138,107 @@ const router = createBrowserRouter([
                 path: "/tournaments/:id/matches",
                 element: <TournamentInformation />,
             },
-
             {
-                path: "/admin/reports",
-                element: <ReportView />,
+                path: "/join",
+                element: <JoinTeamPage />,
+                loader: () =>
+                    Promise.all([university.getList(), teams.getList(true)]),
+                action: makeAction(teams.join),
+                children: [
+                    {
+                        path: "/join/newTeam",
+                        action: makeAction(teams.create),
+                        element: <Navigate to="/join" />,
+                    },
+                ],
             },
             {
                 path: "/admin",
                 element: <AdminDashboard />,
+                children: [
+                    {
+                        path: "/admin/addUser",
+                        element: <AddUserModal />,
+                        loader: () =>
+                            Promise.all([
+                                university.getList(),
+                                admin.getRoles(),
+                            ]),
+                        action: makeAction(users.createUser),
+                    },
+                    {
+                        path: "/admin/editUser/:userId",
+                        element: <EditUserModal />,
+                        loader: async ({ params }) => {
+                            const { userId } = params;
+                            try {
+                                if (isNaN(Number(userId))) {
+                                    const error = new Error("Bad Request");
+                                    error.status = 404;
+                                    throw error;
+                                }
+                                return await Promise.all([
+                                    university.getList(),
+                                    admin.getRoles(),
+                                    users.getUser(userId),
+                                ]);
+                            } catch (e) {
+                                if (e.status === 404) {
+                                    return redirect("/notfound");
+                                }
+                                throw e;
+                            }
+                        },
+                        action: makeAction(users.update),
+                    },
+                    {
+                        path: "/admin/deleteUser/:userId",
+                        element: <DeleteModal />,
+                        loader: async ({ params }) => {
+                            const { userId } = params;
+                            try {
+                                if (isNaN(Number(userId))) {
+                                    const error = new Error("Bad Request");
+                                    error.status = 404;
+                                    throw error;
+                                }
+                                return await users.getUser(userId);
+                            } catch (e) {
+                                if (e.status === 404) {
+                                    return redirect("/notfound");
+                                }
+                                throw e;
+                            }
+                        },
+                        action: async ({ params }) => {
+                            events.publish("spinner.open");
+                            try {
+                                const response = await users.delete(
+                                    params.userId
+                                );
+                                return response;
+                            } finally {
+                                events.publish("spinner.close");
+                            }
+                        },
+                    },
+                    {
+                        path: "/admin/addUniversity",
+                        element: <AddUniversityModal />,
+                        action: makeAction(university.addUniversity),
+                    },
+                ],
+                loader: users.getList,
             },
             {
-                path: "/admin/users",
-                element: <UserManager />,
+                path: "/admin/reports",
+                element: <ReportView />,
+                loader: admin.getReports,
             },
             {
-                path: "/user_preferences",
-                element: <UserPreferences />,
-                action: makeAction(users.update),
+                path: "/representative",
+                element: <UniversityDashboard />,
+                loader: admin.getUniversityAdminTickets,
             },
             {
                 path: "*",
@@ -135,6 +246,6 @@ const router = createBrowserRouter([
             },
         ],
     },
-]);
+];
 
-export { router };
+export { routes };

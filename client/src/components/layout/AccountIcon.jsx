@@ -60,11 +60,7 @@ const MobileAccountIcon = ({ navigate, user }) => {
                 anchorEl={anchor}
                 closeAfterTransition
             >
-                <MenuItem
-                    onClick={() =>
-                        closeMenu() || navigate("./user_preferences")
-                    }
-                >
+                <MenuItem onClick={() => closeMenu() || navigate("./settings")}>
                     User Settings
                 </MenuItem>
                 <MenuItem
@@ -131,11 +127,7 @@ const DesktopAccountIcon = ({ navigate, user }) => {
                 anchorEl={anchor}
                 closeAfterTransition
             >
-                <MenuItem
-                    onClick={() =>
-                        closeMenu() || navigate("./user_preferences")
-                    }
-                >
+                <MenuItem onClick={() => closeMenu() || navigate("./settings")}>
                     User Settings
                 </MenuItem>
                 <MenuItem
@@ -150,7 +142,7 @@ const DesktopAccountIcon = ({ navigate, user }) => {
 
 const AccountIcon = ({ desktop }) => {
     const navigate = useNavigate();
-    const { user } = useAuth(); // TODO: Replace with actual user state
+    const { user } = useAuth();
 
     return (
         <Box sx={{ position: "absolute", right: { lg: 25, xs: 10 } }}>

@@ -6,13 +6,15 @@ import { ReportView } from "./ReportView";
 import { Rules } from "./Rules";
 import { Schedule } from "./Schedule";
 import { Search } from "./Search";
-import { TeamsPage } from "./TeamsPage";
 import { TournamentInformation } from "./TournamentInformation";
+import { Faq } from "./Faq";
+import { TeamPage } from "./TeamPage";
 import { University } from "./University";
-import { UserManager } from "./UserManager";
+import { UniversityDashboard } from "./UniversityDashboard";
 import { UserSettings } from "./UserSettings";
 import { UserSignIn } from "./UserSignIn";
 import { UserSignUp } from "./UserSignUp";
+import { PrivacyPolicy } from "./PrivacyPolicy"; 
 
 export {
     About,
@@ -23,11 +25,13 @@ export {
     Rules,
     Schedule,
     Search,
-    TeamsPage,
     TournamentInformation,
+    Faq,
+    TeamPage,
     University,
-    UserManager,
+    UniversityDashboard,
     UserSettings,
     UserSignIn,
     UserSignUp,
+    PrivacyPolicy, 
 };

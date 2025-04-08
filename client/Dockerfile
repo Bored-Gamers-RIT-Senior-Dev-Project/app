@@ -1,5 +1,5 @@
 # Latest LTS version of Node.js (at the time of writing this, v22)
-FROM node:lts-alpine
+FROM node:lts-slim
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -23,4 +23,4 @@ RUN npm run build
 EXPOSE 5173
 
 # Run the app on the port listed above
-CMD [ "npx", "serve", "-l", "5173", "dist" ]
+CMD [ "npx", "serve", "-s", "-l", "tcp://0.0.0.0:5173", "dist" ]

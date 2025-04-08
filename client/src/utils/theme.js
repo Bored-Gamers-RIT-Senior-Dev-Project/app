@@ -26,11 +26,13 @@ const palette = {
     success: {
         main: Colors.game.darkGreen,
     },
-    error: {
-        main: Colors.game.salmon,
-    },
 };
 
 const theme = responsiveFontSizes(createTheme({ palette }));
 
-export { theme };
+const pageWidth = {
+    xs: "90vw",
+    md: "800px",
+};
+
+export { Colors, pageWidth, theme };

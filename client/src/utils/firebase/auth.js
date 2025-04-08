@@ -1,30 +1,35 @@
 import {
     createUserWithEmailAndPassword,
+    EmailAuthProvider,
     getAdditionalUserInfo,
     getAuth,
     GoogleAuthProvider,
     onAuthStateChanged,
+    reauthenticateWithCredential,
+    reauthenticateWithPopup,
     signInWithEmailAndPassword,
     signInWithPopup,
+    updateEmail,
+    updatePassword,
 } from "firebase/auth";
 import { events } from "../events";
-import { MessageData, Severity } from "../messageData";
+import { ErrorData, MessageData, Severity } from "../messageData";
 import { app } from "./config";
 
 // Firebase Authentication
 const auth = getAuth(app);
-const authProvider = new GoogleAuthProvider();
+const googleAuthProvider = new GoogleAuthProvider();
 
 //Add scope for the user's email address, username, and profile picture to the Auth request
-authProvider.addScope("email");
-authProvider.addScope("profile");
+googleAuthProvider.addScope("email");
+googleAuthProvider.addScope("profile");
 
 /**
  * Runs the Google sign-in flow and returns the user's information.
  * @returns {Promise<*>} The user's information and additional user info from Firebase.
  */
 const signInWithGoogle = async () => {
-    const result = await signInWithPopup(auth, authProvider);
+    const result = await signInWithPopup(auth, googleAuthProvider);
     const additionalUserInfo = getAdditionalUserInfo(result);
     return { ...result, additionalUserInfo };
 };
@@ -83,12 +88,75 @@ const getIdToken = async () => {
     return await auth.currentUser.getIdToken();
 };
 
+/**
+ * Re-authenticates a user in Firebase.  Uses Google.com SSO if enabled, otherwise uses provided password.
+ * @param {string} password The user's current password.
+ * @returns {Promise<boolean>} True if successfully authenticated, false if not authenticated.
+ */
+const reauthenticate = async (password) => {
+    try {
+        const user = auth.currentUser;
+
+        //If the user has defined google SSO, use reauthenticate with a google pop-up.
+        const providers = user.providerData.map(
+            (provider) => provider.providerId
+        );
+        if (providers.includes("google.com")) {
+            await reauthenticateWithPopup(user, googleAuthProvider);
+            return [true, "Successfully authenticated with google."];
+        } else {
+            //If the user hasn't defined google SSO, reauthenticate with their old password (from the form.)
+            if (!password) {
+                new ErrorData(
+                    "Please provide your current password.",
+                    Severity.WARNING
+                ).send();
+                return false;
+            }
+            await reauthenticateWithCredential(
+                user,
+                EmailAuthProvider.credential(user.email, password)
+            );
+            return [true, "Successfully authenticated with password."];
+        }
+    } catch (e) {
+        let message;
+        switch (e.message) {
+            case "Firebase: Error (auth/invalid-credential).":
+                message = "Incorrect Password.";
+                break;
+            default:
+                message = e.message;
+        }
+        new ErrorData(message).send();
+
+        return false;
+    }
+};
+/**
+ * Updates a firebase user's email and password to the values provided
+ * @param {string} newEmail The user's new email address
+ * @param {string} newPassword The user's new password
+ */
+const updateCredentials = async (newEmail, newPassword) => {
+    const user = auth.currentUser;
+    const promises = [];
+    if (newEmail) {
+        promises.push(updateEmail(user, newEmail));
+    }
+    if (newPassword) {
+        promises.push(updatePassword(user, newPassword));
+    }
+    await Promise.all(promises);
+};
+
 export {
     getIdToken,
     observeAuthState,
-    // googleAuthProvider as authProvider,
+    reauthenticate,
     signInWithEmail,
     signInWithGoogle,
     signOut,
     signUpWithEmail,
+    updateCredentials,
 };
