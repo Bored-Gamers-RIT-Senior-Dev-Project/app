@@ -417,7 +417,7 @@ const grantRole = async (userId, roleName, identifier = UserIds.LOCAL) => {
 };
 
 const approveUser = async (userId) => {
-    const sql = "UPDATE users SET IsApproved = true WHERE UserID = ?;";
+    const sql = "UPDATE users SET IsValidated = true WHERE UserID = ?;";
     const [result] = await db.query(sql, [userId]);
     return result.affectedRows > 0;
 };
