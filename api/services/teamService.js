@@ -80,7 +80,7 @@ const getTeam = async (uid, teamId, showPendingChanges = true) => {
         teamModel.getMembers(teamId, showPendingChanges),
     ]);
     team.members = members;
-    if (showPendingChanges && userCanViewPendingChanges(user, team)) {
+    if (user && showPendingChanges && userCanViewPendingChanges(user, team)) {
         let pendingChanges = await teamModel.getPendingChanges(teamId);
         if (pendingChanges) {
             team.pendingChanges = pendingChanges;
