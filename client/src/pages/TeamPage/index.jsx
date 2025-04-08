@@ -36,7 +36,8 @@ const TeamPage = () => {
                 {editMode && isCaptain ? (
                     <TeamEditor
                         teamName={team.teamName}
-                        teamDescription={team.summary}
+                        teamSummary={team.description}
+                        teamImage={team.profileImageUrl}
                         exitEditMode={() => setEditMode(false)}
                     />
                 ) : (
@@ -44,7 +45,7 @@ const TeamPage = () => {
                         showEditButton={isCaptain}
                         teamName={team.teamName}
                         teamSummary={team.description}
-                        members={team.members}
+                        teamImage={team.profileImageUrl}
                         enterEditMode={() => setEditMode(true)}
                     />
                 )}
