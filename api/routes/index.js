@@ -32,7 +32,7 @@ router.post("/search", async (req, res, next) => {
         const result = [];
         result.push(...universities);
         result.push(...teams);
-
+        console.log("Returning JSON result from router layer");
         return res.json({
             count: result.length,
             result: makeObjectCamelCase(result),

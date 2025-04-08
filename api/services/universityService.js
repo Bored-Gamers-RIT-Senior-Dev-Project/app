@@ -13,6 +13,7 @@ const searchUniversities = async (universityName) => {
     const searchResult = await universityModel.searchUniversities(
         universityName
     );
+    console.log("Returning result on /search from university service layer");
     return searchResult;
 };
 

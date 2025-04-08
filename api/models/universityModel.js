@@ -25,6 +25,7 @@ const searchUniversities = async (universityName, partial = true) => {
     const query = await db.query(sql, [
         partial ? `%${universityName}%` : universityName,
     ]);
+    console.log("Returning result on /search from university model layer");
     return query[0];
 };
 
