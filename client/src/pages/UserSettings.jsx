@@ -43,8 +43,8 @@ const UserSettings = () => {
         if (userForm.image) {
             return URL.createObjectURL(userForm.image); // Create a URL for the uploaded image
         }
-        return user.profileImageUrl;
-    }, [user.profileImageUrl, userForm.image]);
+        return user?.profileImageUrl;
+    }, [user, userForm.image]);
 
     const submit = usePostSubmit();
 
