@@ -14,6 +14,7 @@ const getTeam = async (teamId) => {
     u.UniversityName AS universityName,
     t.Description AS description,
     t.CreatedAt AS createdAt,
+    t.IsApproved AS isApproved,
     COUNT(DISTINCT teamMember.UserID) AS members,
     CONCAT(captain.FirstName, ' ', captain.LastName) AS captainName,
     captain.Email AS captainEmail,
@@ -161,6 +162,7 @@ const getTeamById = async (teamId, showUnapproved, showPendingChanges) => {
     u.UniversityName AS universityName,
     t.Description AS description,
     t.CreatedAt AS createdAt,
+    t.IsApproved AS isApproved,
     COUNT(DISTINCT teamMember.UserID) AS members,
     CONCAT(captain.FirstName, ' ', captain.LastName) AS captainName,
     captain.Email AS captainEmail
@@ -336,6 +338,15 @@ const denyTeamUpdate = async (teamUpdateId) => {
     return result.affectedRows > 0;
 };
 
+const getPendingChanges = async (teamId) => {
+    const sql = `SELECT * FROM team_update WHERE UpdatedTeamID = ? AND ApprovedBy IS NULL`;
+    const [rows] = await db.query(sql, [teamId]);
+    if (rows.length < 1) {
+        return null;
+    }
+    return rows[0];
+};
+
 const promoteCaptain = async (userId, teamId) => {
     const conn = await db.getConnection();
     try {
@@ -343,12 +354,13 @@ const promoteCaptain = async (userId, teamId) => {
 
         // Downgrade the current captain to student
         console.debug("Removing current captain's role to student");
-        const sql1 = `UPDATE users SET RoleID = 3 WHERE UserID = (SELECT TeamLeaderID FROM teams WHERE TeamID = ?)`;
+
+        const sql1 = `UPDATE users SET RoleID = (SELECT RoleID FROM roles WHERE RoleName = 'Student/Player') WHERE UserID = (SELECT TeamLeaderID FROM teams WHERE TeamID = ?)`;
         await conn.query(sql1, [teamId]);
 
         console.debug("Promoting new captain to captain role");
         // Promote the new captain to captain
-        const sql2 = `UPDATE users SET RoleID = 2 WHERE UserID = ?`;
+        const sql2 = `UPDATE users SET RoleID = (SELECT RoleID FROM roles WHERE RoleName = 'Team Captain') WHERE UserID = ?`;
         await conn.query(sql2, [userId]);
 
         console.debug("Updating team leader ID in the team table");
@@ -380,6 +392,7 @@ module.exports = {
     createTeam,
     getTeams,
     getTeamById,
+    getPendingChanges,
     searchTeams,
     getTeamsByUniversityId,
     teamUpdateRequest,

@@ -58,7 +58,7 @@ const userCanViewPendingChanges = (user, team) => {
             return true;
         case userModel.Roles.CAPTAIN:
         case userModel.Roles.STUDENT:
-            return user.teamId == team.teamId;
+            return user.teamId == team.id;
         case userModel.Roles.UNIVERSITY_ADMIN:
             return user.universityId == team.universityId;
         default:
@@ -73,17 +73,15 @@ const userCanViewPendingChanges = (user, team) => {
  * @param {boolean} showPendingChanges if the data should include pending changes.
  * @returns {Promise<object>} Team information
  */
-const getTeam = async (uid, teamId, showPendingChanges = false) => {
+const getTeam = async (uid, teamId, showPendingChanges = true) => {
     const [user, team, members] = await Promise.all([
         userModel.getUserByFirebaseId(uid),
         teamModel.getTeam(teamId),
         teamModel.getMembers(teamId, showPendingChanges),
     ]);
     team.members = members;
-
-    if (showPendingChanges && userCanViewPendingChanges(user, team)) {
-        let pendingChanges = null;
-
+    if (user && showPendingChanges && userCanViewPendingChanges(user, team)) {
+        let pendingChanges = await teamModel.getPendingChanges(teamId);
         if (pendingChanges) {
             team.pendingChanges = pendingChanges;
         }

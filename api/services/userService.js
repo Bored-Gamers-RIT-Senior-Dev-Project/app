@@ -172,10 +172,10 @@ const updateUser = async (uid, body, profileImage) => {
  * @returns The updated user object.
  */
 const adminUpdateUser = async (uid, userId, body) => {
-    if (!User.userHasRole(uid, "Super Admin")) {
+    if (!User.userHasRole(uid, User.Roles.ADMIN)) {
         throw createHttpError(403);
     }
-    const targetUser = await User.getUserByUserId(userId);
+    const targetUser = await User.getFullUserByUserId(userId);
     if (body.password) {
         await Firebase.updatePassword(targetUser.firebaseUid, body.password);
     }

@@ -7,17 +7,14 @@ import {
     IconButton,
     Menu,
     MenuItem,
-    Tab,
-    Tabs,
     Typography,
 } from "@mui/material";
 import { useCallback, useState } from "react";
-import { Outlet } from "react-router";
+
 import { usePostSubmit } from "../../hooks/usePostSubmit";
 import propTypes from "../../utils/propTypes";
 
 const MemberList = ({ members, captainId, currentUserId }) => {
-    const [tab, setTab] = useState(0);
     const [menuAnchor, setMenuAnchor] = useState(null);
     const [selectedMember, setSelectedMember] = useState(null);
 
@@ -97,70 +94,74 @@ const MemberList = ({ members, captainId, currentUserId }) => {
         },
         [captainId, currentUserId, menuAnchor, selectedMember?.userId, submit]
     );
-
     return (
-        <Box>
-            <Tabs
-                value={tab}
-                onChange={(e, newValue) => setTab(newValue)}
-                sx={{ borderBottom: 1, borderColor: "divider" }}
-            >
-                <Tab label="Members" />
-                <Tab label="Events" />
-            </Tabs>
-
-            {tab === 0 && (
-                <Grid container spacing={2} sx={{ mt: 2 }}>
-                    {members.map((member) => (
-                        <Grid size={12} key={member.userId}>
-                            <Card
+        <Grid container spacing={2} sx={{ mt: 2 }}>
+            {members.map((member) => (
+                <Grid size={12} key={member.userId}>
+                    <Card
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            padding: 2,
+                            position: "relative",
+                        }}
+                    >
+                        <Avatar
+                            sx={{ width: 50, height: 50, mr: 2 }}
+                            alt={`${member.firstName} ${member.lastName}`}
+                            src={member.profileImageUrl}
+                        />
+                        <Box sx={{ flexGrow: 1 }}>
+                            <Typography variant="h6">
+                                {member.firstName} {member.lastName}
+                            </Typography>
+                            <Typography variant="body2">
+                                {member.userId == captainId
+                                    ? "Captain"
+                                    : "Member"}
+                            </Typography>
+                            <Typography
+                                variant="body2"
+                                sx={{ fontStyle: "italic" }}
+                            >
+                                {member.bio}
+                            </Typography>
+                        </Box>
+                        {!member.isValidated && (
+                            //Courtesy of copilot
+                            <Box
                                 sx={{
+                                    position: "absolute",
+                                    top: 8,
+                                    right: 8,
                                     display: "flex",
                                     alignItems: "center",
-                                    padding: 2,
-                                    position: "relative",
                                 }}
+                                title="This member is not verified"
                             >
-                                <Avatar
-                                    sx={{ width: 50, height: 50, mr: 2 }}
-                                    alt={`${member.firstName} ${member.lastName}`}
-                                    src={member.profileImageUrl}
-                                />
-                                <Box sx={{ flexGrow: 1 }}>
-                                    <Typography variant="h6">
-                                        {member.firstName} {member.lastName}
-                                    </Typography>
-                                    <Typography variant="body2">
-                                        {member.userId == captainId
-                                            ? "Captain"
-                                            : "Member"}
-                                    </Typography>
-                                    <Typography
-                                        variant="body2"
-                                        sx={{ fontStyle: "italic" }}
-                                    >
-                                        {member.bio}
-                                    </Typography>
-                                </Box>
-                                {member.userId != captainId &&
-                                    (currentUserId == captainId ||
-                                        member.userId == currentUserId) && (
-                                        <IconButton
-                                            onClick={(e) =>
-                                                handleMenuOpen(e, member)
-                                            }
-                                        >
-                                            <MoreVertIcon />
-                                        </IconButton>
-                                    )}
-                                <UserMenu member={member} />
-                            </Card>
-                        </Grid>
-                    ))}
+                                <Typography
+                                    variant="body2"
+                                    color="error"
+                                    sx={{ mr: 1 }}
+                                >
+                                    Unverified
+                                </Typography>
+                            </Box>
+                        )}
+                        {member.userId != captainId &&
+                            (currentUserId == captainId ||
+                                member.userId == currentUserId) && (
+                                <IconButton
+                                    onClick={(e) => handleMenuOpen(e, member)}
+                                >
+                                    <MoreVertIcon />
+                                </IconButton>
+                            )}
+                        <UserMenu member={member} />
+                    </Card>
                 </Grid>
-            )}
-            <Outlet />
-        </Box>
+            ))}
+        </Grid>
     );
 };
 

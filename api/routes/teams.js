@@ -31,7 +31,7 @@ router.get("", async (req, res, next) => {
  */
 router.get("/:teamId", async (req, res, next) => {
     const uid = req.user?.uid;
-    const { showPendingChanges = false } = req.query;
+    const { showPendingChanges = true } = req.query;
     const { teamId } = req.params;
 
     try {

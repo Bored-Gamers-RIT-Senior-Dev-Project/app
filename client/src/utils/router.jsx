@@ -165,7 +165,7 @@ const routes = [
                 path: "/join",
                 element: <JoinTeamPage />,
                 loader: () =>
-                    Promise.all([university.getList(), teams.getList(true)]),
+                    Promise.all([university.getList(), teams.getList()]),
                 action: makeAction(teams.join),
                 children: [
                     {

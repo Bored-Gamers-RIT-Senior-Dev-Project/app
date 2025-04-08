@@ -75,6 +75,110 @@ const getReportOneTotals = async () => {
     return rows[0];
 };
 
+const getReportTwo = async () => {
+    const sql = `SELECT 
+  COALESCE(
+    (
+      SELECT DATE_FORMAT(MIN(m.MatchTime), '%Y-%m-%d %H:%i:%s')
+      FROM teams t2
+      INNER JOIN tournament_participants tp2 ON t2.TeamID = tp2.TeamID
+      INNER JOIN matches m ON tp2.NextMatchID = m.MatchID
+      WHERE t2.UniversityID = u.UniversityID
+        AND m.MatchTime >= NOW()
+    ),
+    'No upcoming tournament play'
+  ) AS DateOfNextTournamentPlay,
+  u.UniversityName AS CollegeName,
+  u.Location AS CollegeCountry,
+  (
+    SELECT COUNT(DISTINCT m.MatchID)
+    FROM teams t2
+    INNER JOIN tournament_participants tp2 ON t2.TeamID = tp2.TeamID
+    INNER JOIN matches m ON tp2.NextMatchID = m.MatchID
+    WHERE t2.UniversityID = u.UniversityID 
+      AND m.MatchTime >= NOW()
+      AND tp2.Round = (
+            SELECT MIN(tp3.Round)
+            FROM teams t3
+            INNER JOIN tournament_participants tp3 ON t3.TeamID = tp3.TeamID
+            INNER JOIN matches m2 ON tp3.NextMatchID = m2.MatchID
+            WHERE t3.UniversityID = u.UniversityID 
+              AND m2.MatchTime >= NOW()
+          )
+  ) AS NumberOfMatchesPlanned,
+  (
+    SELECT COUNT(DISTINCT m2.MatchID)
+    FROM teams t2
+    INNER JOIN matches m2 ON (t2.TeamID = m2.Team1ID OR t2.TeamID = m2.Team2ID)
+    WHERE t2.UniversityID = u.UniversityID
+      AND m2.WinnerID IS NOT NULL
+  ) AS TotalMatchesPlayed,
+  CASE 
+    WHEN (
+      SELECT COUNT(*)
+      FROM teams t2
+      INNER JOIN tournament_participants tp2 ON t2.TeamID = tp2.TeamID
+      WHERE t2.UniversityID = u.UniversityID
+        AND tp2.Status = 'active'
+    ) > 0 THEN 'No'
+    ELSE 'Yes'
+  END AS EliminationsComplete
+FROM universities u
+WHERE EXISTS (
+  SELECT 1
+  FROM teams t
+  INNER JOIN tournament_participants tp ON t.TeamID = tp.TeamID
+  WHERE t.UniversityID = u.UniversityID
+)
+ORDER BY DateOfNextTournamentPlay;`;
+    const [data] = await db.query(sql);
+    return data;
+};
+
+const getReportTwoTotals = async () => {
+    const sql = `SELECT 
+  COUNT(*) AS TotalColleges,
+  SUM(NumberOfMatchesPlanned) AS TotalMatchesPlanned,
+  SUM(TotalMatchesPlayed) AS TotalMatchesPlayed
+FROM (
+  SELECT 
+    u.UniversityID,
+    (
+      SELECT COUNT(DISTINCT m.MatchID)
+      FROM teams t2
+      INNER JOIN tournament_participants tp2 ON t2.TeamID = tp2.TeamID
+      INNER JOIN matches m ON tp2.NextMatchID = m.MatchID
+      WHERE t2.UniversityID = u.UniversityID 
+        AND m.MatchTime >= NOW()
+        AND tp2.Round = (
+              SELECT MIN(tp3.Round)
+              FROM teams t3
+              INNER JOIN tournament_participants tp3 ON t3.TeamID = tp3.TeamID
+              INNER JOIN matches m2 ON tp3.NextMatchID = m2.MatchID
+              WHERE t3.UniversityID = u.UniversityID 
+                AND m2.MatchTime >= NOW()
+          )
+    ) AS NumberOfMatchesPlanned,
+    (
+      SELECT COUNT(DISTINCT m2.MatchID)
+      FROM teams t2
+      INNER JOIN matches m2 
+        ON (t2.TeamID = m2.Team1ID OR t2.TeamID = m2.Team2ID)
+      WHERE t2.UniversityID = u.UniversityID 
+        AND m2.WinnerID IS NOT NULL
+    ) AS TotalMatchesPlayed
+  FROM universities u
+  WHERE EXISTS (
+    SELECT 1
+    FROM teams t
+    INNER JOIN tournament_participants tp ON t.TeamID = tp.TeamID
+    WHERE t.UniversityID = u.UniversityID
+  )
+) AS college_tournament_status;`;
+    const [data] = await db.query(sql);
+    return data[0];
+};
+
 /**
  * Gets a list of events the University Admin needs to review, then returns them as a list.
  * @param {number} universityId University Admin's University ID
@@ -126,6 +230,8 @@ const getUniversityAdminTickets = async (universityId) => {
 module.exports = {
     getReportOne,
     getReportOneTotals,
+    getReportTwo,
+    getReportTwoTotals,
     getRoleList,
     getUniversityAdminTickets,
 };

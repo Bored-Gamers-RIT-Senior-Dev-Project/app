@@ -1,4 +1,5 @@
 import {
+    Alert,
     Avatar,
     Box,
     Button,
@@ -108,6 +109,20 @@ const UserSettings = () => {
                 onSubmit={handleUserSettingsSubmit}
                 sx={{ padding: 1 }}
             >
+                {user.universityId && !user.isValidated && (
+                    <Alert severity="warning">
+                        Your account has not been verified by a university
+                        representative. Your profile may not be visible by other
+                        users.
+                    </Alert>
+                )}
+                {user.pendingUpdate != 0 && (
+                    <Alert severity="warning">
+                        You have pending changes to your profile. These changes
+                        will not be visible until a representative from your
+                        university verifies them.
+                    </Alert>
+                )}
                 <Typography variant="h6">My Profile</Typography>
                 {/* Profile Picture Upload */}
                 <Box

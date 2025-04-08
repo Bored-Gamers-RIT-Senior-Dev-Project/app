@@ -1,13 +1,14 @@
-import { Box, Button, Paper, Tab, Tabs, Typography } from "@mui/material";
+import { Box, Paper, Tab, Tabs, Typography } from "@mui/material";
 import { useState } from "react";
 import { useLoaderData, useNavigate } from "react-router";
 import { ReportGridOne } from "../components/ReportGridOne";
+import { ReportGridTwo } from "../components/ReportGridTwo";
 
 const ReportView = () => {
     const [tabIndex, setTabIndex] = useState(0);
     // const [dates, setDates] = useState({ start: "", end: "" });
     const navigate = useNavigate();
-    const [reportOne] = useLoaderData();
+    const [reportOne, reportTwo] = useLoaderData();
 
     const handleTabChange = (_, newIndex) => setTabIndex(newIndex);
     // const handleDateChange = (field) => (e) =>
@@ -32,6 +33,7 @@ const ReportView = () => {
             <Paper
                 sx={{
                     width: "100%",
+                    height: "80%",
                 }}
             >
                 {/* Date Pickers with Grid2 for Better Alignment */}
@@ -80,31 +82,9 @@ const ReportView = () => {
                             borderBottom: `3px solid ${theme.palette.primary.main}`,
                         })}
                     >
-                        {["Sign-Up Status", "Event Status", "Analytics"].map(
+                        {["Sign-Up Status", "Event Status"].map(
                             (label, index) => (
-                                <Tab
-                                    key={index}
-                                    label={label}
-                                    // sx={{
-                                    //     bgcolor:
-                                    //         tabIndex === index
-                                    //             ? "#a2bee8"
-                                    //             : "#e0e0e0",
-                                    //     color:
-                                    //         tabIndex === index
-                                    //             ? "white"
-                                    //             : "black",
-                                    //     borderRadius:
-                                    //         index === 0
-                                    //             ? "10px 0 0 0"
-                                    //             : index === 2
-                                    //             ? "0 10px 0 0"
-                                    //             : "0",
-                                    //     fontWeight: "bold",
-                                    //     flexGrow: 1,
-                                    //     minHeight: "48px",
-                                    // }}
-                                />
+                                <Tab key={index} label={label} />
                             )
                         )}
                     </Tabs>
@@ -116,6 +96,7 @@ const ReportView = () => {
                         p: 4,
                         bgcolor: "white",
                         textAlign: "center",
+                        minHeight: "60vh",
                     }}
                 >
                     {tabIndex === 0 && (
@@ -125,25 +106,10 @@ const ReportView = () => {
                         />
                     )}
                     {tabIndex === 1 && (
-                        <Typography variant="h6">
-                            Event Status Data Here
-                        </Typography>
-                    )}
-                    {tabIndex === 2 && (
-                        <Box>
-                            <Typography variant="h6">
-                                Analytics Data Here
-                            </Typography>
-                            <Box mt={2}>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={() => navigate("/admin/users")}
-                                >
-                                    Open Analytics Dashboard
-                                </Button>
-                            </Box>
-                        </Box>
+                        <ReportGridTwo
+                            data={reportTwo.report}
+                            totals={reportTwo.totals}
+                        />
                     )}
                 </Box>
             </Paper>

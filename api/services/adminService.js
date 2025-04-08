@@ -18,11 +18,17 @@ const generateReports = async (uid) => {
         throw createHttpError(403);
     }
 
-    const [reportOne, reportOneTotals] = await Promise.all([
-        Admin.getReportOne(),
-        Admin.getReportOneTotals(),
-    ]);
-    const rv = [{ report: reportOne, totals: reportOneTotals }];
+    const [reportOne, reportOneTotals, reportTwo, reportTwoTotals] =
+        await Promise.all([
+            Admin.getReportOne(),
+            Admin.getReportOneTotals(),
+            Admin.getReportTwo(),
+            Admin.getReportTwoTotals(),
+        ]);
+    const rv = [
+        { report: reportOne, totals: reportOneTotals },
+        { report: reportTwo, totals: reportTwoTotals },
+    ];
     return rv;
 };
 
