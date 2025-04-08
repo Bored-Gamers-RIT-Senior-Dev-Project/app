@@ -4,14 +4,16 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 import { observeAuthState } from "./utils/firebase/auth.js";
 import { routes } from "./utils/router.jsx";
 
-// Boundary setup to delay rendering the RouterProvider until Firebase auth state is known
+// Boundary setup, based on advice from GPT, delays rendering the RouterProvider until Firebase auth state is known, preventing BrowserRouter creation until user session is accessed.
+// This is to prevent a flash of the login page before the user is authenticated.
+// This is a common pattern in React applications that use Firebase authentication.
 const Boundary = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const unsubscribe = observeAuthState(() => setLoading(false));
         return () => unsubscribe && unsubscribe(); // Clean up
-    }, []); // 🔑 Empty dependency array so it runs only once
+    }, []); 
 
     if (loading) {
         return (
