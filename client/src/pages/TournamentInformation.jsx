@@ -18,7 +18,7 @@ import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useAuth } from "../hooks/useAuth";
-import { api_url } from "../utils/api";
+import { API_URL } from "../utils/api";
 
 const style = {
     // https://mui.com/material-ui/react-modal/
@@ -158,9 +158,9 @@ const TournamentInformation = () => {
         const fetchData = async () => {
             try {
                 const [tournamentRes, matchesRes] = await Promise.all([
-                    fetch(api_url + `/tournament/search?tournamentID=${id}`),
+                    fetch(API_URL + `/tournament/search?tournamentID=${id}`),
                     fetch(
-                        api_url + `/tournament/searchMatches?tournamentID=${id}`
+                        API_URL + `/tournament/searchMatches?tournamentID=${id}`
                     ),
                 ]);
                 let tournamentData = await tournamentRes.json();

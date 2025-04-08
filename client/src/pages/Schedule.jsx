@@ -18,7 +18,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { api_url } from "../utils/api";
+import { API_URL } from "../utils/api";
 
 const Schedule = () => {
     const [tournaments, setTournaments] = useState([]);
@@ -48,7 +48,7 @@ const Schedule = () => {
     useEffect(() => {
         const fetchTournaments = async () => {
             try {
-                const res = await fetch(api_url + "/tournament/search");
+                const res = await fetch(API_URL + "/tournament/search");
                 const data = await res.json();
                 if (Array.isArray(data)) {
                     setTournaments(data);
