@@ -1,88 +1,191 @@
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import {
+    Avatar,
+    Box,
     Button,
-    FormControl,
-    FormLabel,
+    Card,
     Paper,
     TextField,
     Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
+import { ImageUploader } from "../components/ImageUploader";
 import { useAuth } from "../hooks/useAuth/index";
-
-const universityList = [
-    "Rochester Institute of Technology",
-    "Harvard University",
-    "MIT",
-    "Stanford University",
-];
+import { usePostSubmit } from "../hooks/usePostSubmit";
+import { reauthenticate, updateCredentials } from "../utils/firebase/auth";
 
 const UserSettings = () => {
-    const [selectedNotifications, setSelectedNotifications] = useState([]);
-    const [selectedRole, setSelectedRole] = useState("");
-    const [selectedTeamOption, setSelectedTeamOption] = useState("");
-    const [selectedUniversity, setSelectedUniversity] = useState(null);
-
-    const handleNotificationChange = (event) => {
-        const value = event.target.name;
-        setSelectedNotifications((prev) =>
-            prev.includes(value)
-                ? prev.filter((item) => item !== value)
-                : [...prev, value]
-        );
-    };
     const { user } = useAuth();
     const navigate = useNavigate(); //React router useNavigate hook
+    const [error, setError] = useState("");
+    const [userForm, setUserForm] = useState({
+        username: "",
+        bio: "",
+        image: undefined,
+        newPassword: "",
+        currentPassword: "",
+    });
     useEffect(() => {
         if (user === null) {
             //User is 'undefined' before Firebase inits, 'null' if user is not logged in.
             navigate("/signin");
+        } else if (user) {
+            setUserForm((current) => ({
+                ...current,
+                username: user.username,
+                email: user.email,
+                bio: user.bio ?? "",
+            }));
         }
     }, [user, navigate]);
-    if (!user) {
-        console.error(`UserSettings: user is ${user}!`);
-        return;
-    }
 
+    const imageUrl = useMemo(() => {
+        if (userForm.image) {
+            return URL.createObjectURL(userForm.image); // Create a URL for the uploaded image
+        }
+        return user.profileImageUrl;
+    }, [user.profileImageUrl, userForm.image]);
+
+    const submit = usePostSubmit();
+
+    const handleUserSettingsSubmit = async (e) => {
+        e.preventDefault();
+        setError("");
+
+        //Create new formdata object
+        const formData = new FormData();
+
+        //email and password need to be handled by Firebase first and require re-authentication.
+        if (userForm.newPassword) {
+            if (!(await reauthenticate(userForm.currentPassword))) {
+                return false;
+            }
+
+            updateCredentials(userForm.email, userForm.newPassword);
+        }
+
+        //Append relevant fields to the formdata
+        ["username", "bio", "image"].forEach((key) => {
+            if (userForm[key] && userForm[key] != user?.[key]) {
+                formData.append(key, userForm[key]);
+            }
+        });
+
+        //If the form was given any values, submit. (Otherwise the user is clicking 'submit' without making changes)
+        if (Array.from(formData.keys()).length > 0) {
+            formData.append("userId", user.userId);
+            submit(formData, { encType: "multipart/form-data" }); //Submitting as form-data for the sake of the image.
+            //See router.jsx for action definition
+        }
+    };
+
+    const handleSettingsUpdate = async (e) => {
+        setUserForm({ ...userForm, [e.target.name]: e.target.value });
+    };
+
+    if (!user) {
+        return <Box></Box>;
+    }
     const emailEncoded = encodeURI(user.email);
 
     return (
-        <Paper sx={{ padding: 3, maxWidth: 800, margin: "auto" }}>
+        <Paper
+            sx={{
+                padding: 3,
+                maxWidth: 800,
+                margin: "auto",
+                display: "flex",
+                alignContent: "center",
+                flexDirection: "column",
+                gap: 1,
+            }}
+        >
             <Typography variant="h4" textAlign="center">
                 User Settings
             </Typography>
 
-            {/* Profile Picture Upload */}
-            <FormControl fullWidth sx={{ mt: 3 }}>
-                <FormLabel>Profile Picture</FormLabel>
-                <Button
-                    variant="outlined"
-                    component="label"
-                    startIcon={<CloudUploadIcon />}
+            <Card
+                component="form"
+                variant="outlined"
+                onSubmit={handleUserSettingsSubmit}
+                sx={{ padding: 1 }}
+            >
+                <Typography variant="h6">My Profile</Typography>
+                {/* Profile Picture Upload */}
+                <Box
+                    sx={{
+                        position: "relative",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                    }}
                 >
-                    Upload / Drag & Drop
-                    <input type="file" hidden />
-                </Button>
-            </FormControl>
+                    <Avatar
+                        src={imageUrl}
+                        alt={user?.displayName}
+                        sx={{ height: "7em", width: "7em", margin: "auto" }}
+                    />
+                    <ImageUploader
+                        label="Upload Profile Picture"
+                        onUpload={(image) =>
+                            setUserForm({ ...userForm, image })
+                        }
+                        size="small"
+                        color="secondary"
+                    />
+                </Box>
 
-            {/* Change Password */}
-            <FormControl fullWidth sx={{ mt: 3 }}>
-                <FormLabel>Change Password</FormLabel>
-                <TextField label="Email" fullWidth margin="dense" />
                 <TextField
-                    label="Old Password"
+                    label="Username"
+                    fullWidth
+                    margin="dense"
+                    name="username"
+                    value={userForm.username ?? user?.username}
+                    onChange={handleSettingsUpdate}
+                />
+                <TextField
+                    label="Bio"
+                    fullWidth
+                    margin="dense"
+                    name="bio"
+                    multiline
+                    minRows={3}
+                    value={userForm.bio ?? user?.bio}
+                    onChange={handleSettingsUpdate}
+                />
+                <TextField
+                    label="Change Password"
                     type="password"
                     fullWidth
                     margin="dense"
+                    name="newPassword"
+                    value={userForm.newPassword}
+                    onChange={handleSettingsUpdate}
                 />
                 <TextField
-                    label="New Password"
+                    label="Current Password"
                     type="password"
                     fullWidth
                     margin="dense"
+                    name="currentPassword"
+                    value={userForm.currentPassword}
+                    onChange={handleSettingsUpdate}
                 />
-            </FormControl>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    size="small"
+                    fullWidth
+                    sx={{ mt: 3 }}
+                >
+                    Save Changes
+                </Button>
+                <Typography variant="body2" color="error">
+                    {error}
+                </Typography>
+            </Card>
 
             {/* Payment Section (Placeholder) */}
             <Paper variant="outlined" sx={{ mt: 3, padding: 2 }}>
@@ -94,16 +197,6 @@ const UserSettings = () => {
                     Click here to pay registration fee with Stripe
                 </Button>
             </Paper>
-
-            {/* Save Changes Button */}
-            <Button
-                variant="contained"
-                color="primary"
-                fullWidth
-                sx={{ mt: 3 }}
-            >
-                Save Changes
-            </Button>
         </Paper>
     );
 };
