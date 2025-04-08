@@ -119,12 +119,8 @@ const routes = [
                     //Read formData in request
                     const formData = await request.formData();
 
-                    //Get the userid back from the formdata and remove it
-                    const userId = formData.get("userId");
-                    formData.delete("userId");
-
                     //Send to api to process updates.
-                    return users.updateSettings(userId, formData);
+                    return users.updateSettings(formData);
                 },
             },
             {

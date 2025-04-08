@@ -154,26 +154,22 @@ router.put("/:userId", async (req, res, next) => {
     }
 });
 
-router.put(
-    "/:userId/settings",
-    upload.single("image"),
-    async (req, res, next) => {
-        const uid = req.user?.uid;
-        const { userId } = req.params;
-        if (!uid) {
-            return res.status(401).send();
-        }
-        try {
-            const { body, file } = req;
-            console.debug("FormData received:", body);
-            console.debug("File Received: ", file);
-            await ImageUploadService.uploadUserImage(file.buffer, userId);
-            return res.status(200).send();
-        } catch (e) {
-            next(e);
-        }
+router.put("/", upload.single("image"), async (req, res, next) => {
+    const uid = req.user?.uid;
+    if (!uid) {
+        return res.status(401).send();
     }
-);
+    try {
+        const { body, file } = req;
+        console.debug("FormData received:", body);
+        console.debug("File Received: ", file);
+        await UserService.updateUser(uid, body, file);
+        // await ImageUploadService.uploadUserImage(file.buffer, userId);
+        return res.status(200).send();
+    } catch (e) {
+        next(e);
+    }
+});
 
 /**
  * DELETE to delete a user.

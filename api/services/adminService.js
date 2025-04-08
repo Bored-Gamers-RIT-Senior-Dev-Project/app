@@ -66,19 +66,39 @@ const respondToNewUser = async (user, userId, approved) => {
 
     if (approved) {
         return await User.approveUser(userId);
-    } else {
-        return await User.denyUser(userId);
     }
+    return await User.denyUser(userId);
 };
-const respondToUserEdit = async (user, editId, approved) => {};
+
+const respondToUserEdit = async (user, editId, approved) => {
+    const userEdit = await User.getUserEditById(editId);
+    //If user isn't an admin, or is from a different university, 403.
+    if (
+        user.roleName != User.Roles.UNIVERSITY_ADMIN ||
+        userEdit.UniversityID != user.universityId
+    ) {
+        throw createHttpError(403);
+    }
+
+    if (approved) {
+        return await User.approveUserUpdate(editId, user.userId);
+    }
+    return await User.denyUserUpdate(editId);
+};
+
 const respondToNewTeam = async (user, teamId, approved) => {
     const newTeam = await Team.getTeamById(teamId, true);
     if (
         user.roleName != User.Roles.UNIVERSITY_ADMIN ||
-        newTeam.universityId != user.universityId
+        newTeam.UniversityID != user.universityId
     ) {
+        console.log(newTeam);
         throw createHttpError(403);
     }
+    if (approved) {
+        return await Team.approveTeam(teamId);
+    }
+    return await Team.denyTeam(teamId);
 };
 const respondToTeamEdit = async (user, teamId, approved) => {};
 

@@ -2,6 +2,8 @@ const Firebase = require("../config/firebase");
 const User = require("../models/userModel");
 const createHttpError = require("http-errors");
 
+const imageUploadService = require("./imageUploadService");
+
 /**
  * Gets a list of all users
  * @param {string} uid Requestor's UID, validated from their request token.
@@ -139,6 +141,28 @@ const createUser = async (
 };
 
 /**
+ * Processes a user's update request (for their own information)
+ * @param {string} uid User's UID from auth header, used to determine which user is being updated. (self-requested)
+ * @param {object} body Object containing fields to be updated
+ * @param {Express.Multer.File|null} profileImage An uploaded image to be made the user's profile image url, or null if this request didn't include a new profile image.
+ * @returns
+ */
+const updateUser = async (uid, body, profileImage) => {
+    const user = await User.getUserByFirebaseId(uid);
+
+    if (profileImage) {
+        body.profileImageUrl = await imageUploadService.uploadImage(
+            profileImage.buffer
+        );
+    }
+
+    if (user.universityId && user.roleName != User.Roles.UNIVERSITY_ADMIN) {
+        return await User.requestUserUpdate(user.userId, body);
+    }
+    return await User.updateUser(user.userId, body);
+};
+
+/**
  * Updates a user's information in the database.
  * @param {string} uid The user's Firebase UID provided through authentication.s
  * @param {*} body The information to update.
@@ -160,6 +184,12 @@ const adminUpdateUser = async (uid, userId, body) => {
     return user;
 };
 
+/**
+ * Deletes a user.
+ * @param {string} uid The UID of the user requesting the deletion (from auth header)
+ * @param {number} userId The ID of the user to be deleted.
+ * @returns
+ */
 const deleteUser = async (uid, userId) => {
     const user = await getUserByFirebaseId(uid);
     if (user.roleName !== "Super Admin" /* && user.UserId !== userId */) {
@@ -180,12 +210,17 @@ const deleteUser = async (uid, userId) => {
 };
 
 module.exports = {
+    //C
     createUser,
-    deleteUser,
+    googleSignIn,
+    signUp,
+    //R
     getUserList,
     getUserByFirebaseId,
     getUserByUserId,
-    googleSignIn,
-    signUp,
+    //U
+    updateUser,
     adminUpdateUser,
+    //D
+    deleteUser,
 };
