@@ -176,6 +176,21 @@ const VALID_KEYS = Object.freeze({
     UNIVERSITYID: "UniversityID",
     ISVALIDATED: "IsValidated",
 });
+
+/**
+ * Gets the information SPECIFICALLY in the users table.
+ * @param {number} userId The user's ID
+ * @returns {Promise<object>}
+ */
+const getFullUserByUserId = async (userId) => {
+    const sql = "SELECT * FROM users WHERE UserID = ?;";
+    const [rows] = await db.query(sql, [userId]);
+    if (rows.length === 0) {
+        return null;
+    }
+    return makeObjectCamelCase(rows[0]);
+};
+
 /**
  * Updates user entry
  * @param {number|string} userId  Id of the user to update
@@ -527,6 +542,7 @@ module.exports = {
     getUserByUserId,
     getUserByFirebaseId,
     getUserEditById,
+    getFullUserByUserId,
     updateUser,
     deleteUser,
     checkUsername,
