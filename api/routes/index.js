@@ -77,11 +77,25 @@ router.get("/representative", async (req, res, next) => {
 });
 
 router.put("/representative/approve", async (req, res, next) => {
+    //Permissions Verification
     const uid = req.user?.uid;
     if (!uid) return res.status(401).send();
+
+    //Body verification
+    const { type, id, approved } = req.body;
+    if (!type || !id || approved === null) {
+        return res.status(400).send();
+    }
+
+    //Action
     try {
-        console.log(req.body);
-        return res.json(true);
+        const result = await adminService.respondToUniversityAdminTicket(
+            uid,
+            type,
+            id,
+            approved
+        );
+        return res.json(result);
     } catch (e) {
         next(e);
     }
