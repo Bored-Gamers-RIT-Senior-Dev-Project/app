@@ -33,7 +33,7 @@ const TeamPage = () => {
                     margin: "auto",
                 }}
             >
-                {!team.isValidated && (
+                {!team.isApproved && (
                     <Alert severity="warning" sx={{ marginBottom: 2 }}>
                         This team has not been approved by a university
                         representative. It will not be publicly visible until it

@@ -14,6 +14,7 @@ const getTeam = async (teamId) => {
     u.UniversityName AS universityName,
     t.Description AS description,
     t.CreatedAt AS createdAt,
+    t.IsApproved AS isApproved,
     COUNT(DISTINCT teamMember.UserID) AS members,
     CONCAT(captain.FirstName, ' ', captain.LastName) AS captainName,
     captain.Email AS captainEmail,
@@ -161,6 +162,7 @@ const getTeamById = async (teamId, showUnapproved, showPendingChanges) => {
     u.UniversityName AS universityName,
     t.Description AS description,
     t.CreatedAt AS createdAt,
+    t.IsApproved AS isApproved,
     COUNT(DISTINCT teamMember.UserID) AS members,
     CONCAT(captain.FirstName, ' ', captain.LastName) AS captainName,
     captain.Email AS captainEmail
