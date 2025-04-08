@@ -31,6 +31,7 @@ jobs:
                   DB_PORT=${{ secrets.DB_PORT }}
                   DB_USER=${{ secrets.DB_USER }}
                   DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+                  API_URL=${{ secrets.API_URL }}
                   FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}
                   FIREBASE_PRIVATE_KEY_ID=${{ secrets.FIREBASE_PRIVATE_KEY_ID }}
                   FIREBASE_PRIVATE_KEY=${{ secrets.FIREBASE_PRIVATE_KEY }}
@@ -74,7 +75,7 @@ jobs:
 
                     # Run the new container on port 5173
                     echo "Running container: $CONTAINER_NAME"
-                    docker run -d --name "$CONTAINER_NAME" -p 3000:3000 --env-file /tmp/.env bg-api
+                    docker run --network host -d --name "$CONTAINER_NAME" -p 3000:3000 -v /mnt/app/user-images:/app/user-images --env-file /tmp/.env bg-api
 
                     # Clean up image tar file
                     echo "Cleaning up image file..."

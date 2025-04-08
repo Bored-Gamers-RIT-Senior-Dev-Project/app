@@ -10,6 +10,7 @@ import {
     Typography,
 } from "@mui/material";
 import { useCallback, useState } from "react";
+
 import { usePostSubmit } from "../../hooks/usePostSubmit";
 import propTypes from "../../utils/propTypes";
 
@@ -93,7 +94,6 @@ const MemberList = ({ members, captainId, currentUserId }) => {
         },
         [captainId, currentUserId, menuAnchor, selectedMember?.userId, submit]
     );
-
     return (
         <Grid container spacing={2} sx={{ mt: 2 }}>
             {members.map((member) => (

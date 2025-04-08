@@ -1,243 +1,288 @@
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
     Box,
     Button,
-    Card,
-    CardContent,
+    CircularProgress,
+    Grid,
     MenuItem,
-    Modal,
     Paper,
     Select,
-    Stack,
     TextField,
     Typography,
 } from "@mui/material";
-import PropTypes from "prop-types";
-import { useState } from "react";
-
-const style = {
-    // https://mui.com/material-ui/react-modal/
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 400,
-    bgcolor: "background.paper",
-    boxShadow: 24,
-    p: 4,
-};
-
-/**
- * A popup that lets admins edit the score
- * @param {*} props with the match, which is null if the modal should be closed,
- * and handleClose, a function to close the modal
- * @returns the score popup
- */
-const ScorePopup = (props) => {
-    return (
-        <Modal open={props.match != null} onClose={props.handleClose}>
-            {props.match ? (
-                <Box sx={style}>
-                    <Typography align="center" variant="h4">
-                        Update Score
-                    </Typography>
-                    <Stack direction="row" alignItems="center">
-                        <Stack>
-                            <Typography align="center">{`${props.match.team1}`}</Typography>
-                            <input
-                                type="number"
-                                style={{ width: "50%", alignSelf: "center" }}
-                                min="0"
-                                value={props.match.team1Score}
-                            ></input>
-                            <Button onClick={props.handleClose}>Cancel</Button>
-                        </Stack>
-                        <Stack alignItems="center">
-                            <Typography align="center">{`${props.match.team2}`}</Typography>
-                            <input
-                                type="number"
-                                style={{ width: "50%", alignSelf: "center" }}
-                                min="0"
-                                value={props.match.team2Score}
-                            ></input>
-                            <Button>Submit</Button>
-                        </Stack>
-                    </Stack>
-                </Box>
-            ) : (
-                <></>
-            )}
-        </Modal>
-    );
-};
-
-ScorePopup.propTypes = {
-    match: PropTypes.object,
-    handleClose: PropTypes.func.isRequired,
-};
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+import { API_URL } from "../utils/api";
 
 const Schedule = () => {
-    const [matches, setMatches] = useState([
-        {
-            id: 1,
-            team1: "Team 1",
-            team2: "Team 2",
-            dateTime: "Feb 10, 2025 - 3:00 PM",
-            location: "Stadium A",
-            team1Score: 1,
-            team2Score: 3,
-        },
-        {
-            id: 2,
-            team1: "Team 1",
-            team2: "Team 3",
-            dateTime: "Feb 12, 2025 - 4:30 PM",
-            location: "Stadium B",
-            team1Score: 0,
-            team2Score: 0,
-        },
-        {
-            id: 3,
-            team1: "Team 2",
-            team2: "Team 3",
-            dateTime: "Feb 15, 2025 - 6:00 PM",
-            location: "Stadium C",
-            team1Score: 0,
-            team2Score: 0,
-        },
-    ]);
-    const [openScorePopup, setOpenScorePopup] = useState(null); // openScorePopup is the match or null
+    const [tournaments, setTournaments] = useState([]);
+    const [filters, setFilters] = useState({
+        name: "",
+        location: "",
+        status: "",
+        sortBy: "",
+        startDate: null,
+        endDate: null,
+    });
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+    const tournamentStatuses = ["Active", "Completed", "Cancelled", "Upcoming"];
 
-    /**
-     * Open the ScorePopup
-     */
-    const handleOpen = (match) => setOpenScorePopup(match);
-
-    /**
-     * Close the ScorePopup
-     */
-    const handleClose = () => setOpenScorePopup(null);
-
-    /**
-     * Figure out who won a match
-     * (hopefully no one names their team "Tie" - this is just for visual
-     * purposes so nothing serious will break if they do)
-     * @param {*} match the match data, with the keys team1, team2, team1Score,
-     * and team2Score
-     * @returns team1 if team1 won, team2 if team 2 won, or "Tie" if the scores
-     * are equal
-     */
-    const winner = (match) => {
-        if (match.team1Score > match.team2Score) {
-            return match.team1;
-        }
-        if (match.team1Score < match.team2Score) {
-            return match.team2;
-        }
-        return "Tie";
+    const formatDateRange = (start, end) => {
+        const options = { dateStyle: "medium" };
+        const startDate = start
+            ? new Date(start).toLocaleDateString(undefined, options)
+            : "N/A";
+        const endDate = end
+            ? new Date(end).toLocaleDateString(undefined, options)
+            : "N/A";
+        return `${startDate} - ${endDate}`;
     };
 
+    useEffect(() => {
+        const fetchTournaments = async () => {
+            try {
+                const res = await fetch(API_URL + "/tournament/search");
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                    setTournaments(data);
+                } else if (Array.isArray(data.result)) {
+                    setTournaments(data.result);
+                } else {
+                    console.error("Unexpected API response:", data);
+                    setTournaments([]);
+                }
+            } catch (err) {
+                console.error("Failed to fetch tournaments:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchTournaments();
+    }, []);
+
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setFilters((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const clearFilters = () => {
+        setFilters({
+            name: "",
+            location: "",
+            status: "",
+            sortBy: "",
+            startDate: null,
+            endDate: null,
+        });
+    };
+
+    const filteredTournaments = tournaments
+        .filter((tournament) =>
+            tournament.tournamentName
+                .toLowerCase()
+                .includes(filters.name.toLowerCase())
+        )
+        .filter(
+            (tournament) =>
+                filters.location === "" ||
+                (tournament.location &&
+                    tournament.location
+                        .toLowerCase()
+                        .includes(filters.location.toLowerCase()))
+        )
+        .filter(
+            (tournament) =>
+                filters.status === "" ||
+                tournament.status.toLowerCase() === filters.status.toLowerCase()
+        )
+        .filter((tournament) => {
+            const start = filters.startDate;
+            const end = filters.endDate;
+            const tournamentStartDate = new Date(tournament.startDate);
+            if (start && tournamentStartDate < new Date(start)) return false;
+            if (end && tournamentStartDate > new Date(end)) return false;
+            return true;
+        })
+        .sort((a, b) => {
+            if (filters.sortBy === "date") {
+                return new Date(a.startDate) - new Date(b.startDate);
+            } else if (filters.sortBy === "location") {
+                return (a.location || "").localeCompare(b.location || "");
+            }
+            return 0;
+        });
+
     return (
-        <>
-            <Box sx={{ maxWidth: "900px", margin: "auto", padding: 2 }}>
-                <Typography
-                    variant="h4"
-                    sx={{
-                        fontWeight: "bold",
-                        textAlign: "center",
-                        marginBottom: 3,
-                    }}
-                >
-                    Schedule
-                </Typography>
+        <Box sx={{ maxWidth: "900px", margin: "auto", padding: 2 }}>
+            <Typography
+                variant="h4"
+                sx={{
+                    fontWeight: "bold",
+                    textAlign: "center",
+                    marginBottom: 3,
+                }}
+            >
+                All Tournaments
+            </Typography>
 
-                <Paper
-                    sx={{ padding: 3, marginBottom: 3, borderRadius: "10px" }}
-                >
-                    <Stack
-                        spacing={2}
-                        direction={{ xs: "column", sm: "row" }}
-                        useFlexGap
-                        flexWrap="wrap"
-                    >
-                        <TextField
-                            fullWidth
-                            label="Team Name"
-                            variant="outlined"
-                        />
-                        <TextField
-                            fullWidth
-                            label="Team University"
-                            variant="outlined"
-                        />
-                        <TextField
-                            fullWidth
-                            label="Location"
-                            variant="outlined"
-                        />
-                        <Select fullWidth defaultValue="">
-                            <MenuItem value="">Sort By</MenuItem>
-                            <MenuItem value="date">Date</MenuItem>
-                            <MenuItem value="location">Location</MenuItem>
-                        </Select>
-                    </Stack>
+            <Box
+                sx={{
+                    position: "sticky",
+                    top: 0,
+                    zIndex: 10,
+                    backgroundColor: "#fff",
+                    mb: 3,
+                }}
+            >
+                <Paper sx={{ padding: 3, borderRadius: "10px" }}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Tournament Name"
+                                name="name"
+                                value={filters.name}
+                                onChange={handleFilterChange}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Location"
+                                name="location"
+                                value={filters.location}
+                                onChange={handleFilterChange}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <Select
+                                fullWidth
+                                name="status"
+                                value={filters.status}
+                                onChange={handleFilterChange}
+                                displayEmpty
+                            >
+                                <MenuItem value="">Filter by Status</MenuItem>
+                                {tournamentStatuses.map((status) => (
+                                    <MenuItem key={status} value={status}>
+                                        {status}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <Select
+                                fullWidth
+                                name="sortBy"
+                                value={filters.sortBy}
+                                onChange={handleFilterChange}
+                                displayEmpty
+                            >
+                                <MenuItem value="">Sort By</MenuItem>
+                                <MenuItem value="date">Start Date</MenuItem>
+                                <MenuItem value="location">Location</MenuItem>
+                            </Select>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                <DatePicker
+                                    label="Start Date"
+                                    value={filters.startDate}
+                                    onChange={(newValue) =>
+                                        setFilters((prev) => ({
+                                            ...prev,
+                                            startDate: newValue,
+                                        }))
+                                    }
+                                    renderInput={(params) => (
+                                        <TextField {...params} fullWidth />
+                                    )}
+                                />
+                            </LocalizationProvider>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                <DatePicker
+                                    label="End Date"
+                                    value={filters.endDate}
+                                    onChange={(newValue) =>
+                                        setFilters((prev) => ({
+                                            ...prev,
+                                            endDate: newValue,
+                                        }))
+                                    }
+                                    renderInput={(params) => (
+                                        <TextField {...params} fullWidth />
+                                    )}
+                                />
+                            </LocalizationProvider>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Button
+                                fullWidth
+                                variant="outlined"
+                                onClick={clearFilters}
+                            >
+                                Clear Filters
+                            </Button>
+                        </Grid>
+                    </Grid>
                 </Paper>
-
-                <Stack spacing={2}>
-                    {matches.map((match) => (
-                        <Card
-                            key={match.id}
-                            sx={{ borderRadius: "10px", padding: 2 }}
-                        >
-                            <CardContent>
-                                <Stack
-                                    direction="row"
-                                    justifyContent="space-between"
-                                    alignItems="center"
-                                >
-                                    <Typography variant="h6" fontWeight="bold">
-                                        {match.team1}
-                                    </Typography>
-                                    <Typography variant="h6" fontWeight="bold">
-                                        vs
-                                    </Typography>
-                                    <Typography variant="h6" fontWeight="bold">
-                                        {match.team2}
-                                    </Typography>
-                                </Stack>
-
-                                <Box textAlign="center" mt={1}>
-                                    <Typography variant="body1">
-                                        {match.dateTime}
-                                    </Typography>
-                                    <Typography variant="body1">
-                                        {match.location}
-                                    </Typography>
-                                </Box>
-
-                                <Box textAlign="center" mt={2}>
-                                    <Typography variant="body1">
-                                        Score: {match.team1Score}&ndash;
-                                        {match.team2Score} <br />
-                                        Winner: {winner(match)}
-                                    </Typography>
-                                    <Button
-                                        variant="contained"
-                                        size="small"
-                                        onClick={() => handleOpen(match)}
-                                    >
-                                        Update Scores
-                                    </Button>
-                                </Box>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </Stack>
             </Box>
-            <ScorePopup
-                match={openScorePopup}
-                handleClose={handleClose}
-            ></ScorePopup>
-        </>
+
+            {loading ? (
+                <Box display="flex" justifyContent="center" mt={5}>
+                    <CircularProgress />
+                </Box>
+            ) : (
+                filteredTournaments.map((tournament) => (
+                    <Accordion key={tournament.tournamentId} sx={{ mb: 2 }}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Box width="100%">
+                                <Typography
+                                    variant="h6"
+                                    fontWeight="bold"
+                                    sx={{
+                                        color: "primary.main",
+                                        textDecoration: "underline",
+                                        cursor: "pointer",
+                                    }}
+                                    onClick={() =>
+                                        navigate(
+                                            `/tournaments/${tournament.tournamentId}/matches`
+                                        )
+                                    }
+                                >
+                                    {tournament.tournamentName}
+                                </Typography>
+                                <Typography>
+                                    {formatDateRange(
+                                        tournament.startDate,
+                                        tournament.endDate
+                                    )}
+                                </Typography>
+                                <Typography>{tournament.location}</Typography>
+                                <Typography variant="body2">
+                                    Status: {tournament.status}
+                                </Typography>
+                            </Box>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Typography variant="body2" color="textSecondary">
+                                Tournament details go here.
+                            </Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                ))
+            )}
+        </Box>
     );
 };
 

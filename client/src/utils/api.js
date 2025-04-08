@@ -2,7 +2,7 @@ import axios from "axios";
 import { events } from "./events";
 import { getIdToken } from "./firebase/auth";
 
-const API_URL = import.meta.env.API_URL || "http://localhost:3000/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 /**
  * Constructs the full API URL for a given path.
@@ -277,4 +277,4 @@ const combine = (...calls) => {
     return () => Promise.all(calls);
 };
 
-export { admin, combine, search, teams, university, users };
+export { admin, API_URL, combine, search, teams, university, users };

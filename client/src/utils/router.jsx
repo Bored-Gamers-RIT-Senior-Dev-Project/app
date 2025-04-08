@@ -10,12 +10,15 @@ import {
     Rules,
     Schedule,
     Search,
+    TournamentInformation,
     TeamPage,
     UniversityDashboard,
     UniversityPage,
     UserSettings,
     UserSignIn,
     UserSignUp,
+    PrivacyPolicy,
+    ContactUs,
 } from "../pages";
 import { JoinTeamPage } from "../pages/JoinTeamPage";
 import { AddUniversityModal } from "../pages/modals/AddUniversityModal";
@@ -128,6 +131,14 @@ const routes = [
                 element: <Faq />,
             },
             {
+                path: "/privacy",
+                element: <PrivacyPolicy />,
+            },
+            {
+                path: "/contact",
+                element: <ContactUs />,
+            },            
+            {
                 path: "/settings",
                 element: <UserSettings />,
                 action: async ({ request }) => {
@@ -145,6 +156,10 @@ const routes = [
             {
                 path: "/schedule",
                 element: <Schedule />,
+            },
+            {
+                path: "/tournaments/:id/matches",
+                element: <TournamentInformation />,
             },
             {
                 path: "/join",
