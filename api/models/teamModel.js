@@ -44,6 +44,7 @@ FROM
 const getMembers = async (teamId, showUnapproved) => {
     const sql = `
         SELECT * FROM users WHERE TeamId = ?
+        ${showUnapproved ? "" : " AND IsApproved = true"}
     `;
     const [rows] = await db.query(sql, [teamId]);
 
