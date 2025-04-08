@@ -30,6 +30,7 @@ const buildNavLinks = (user) => {
                 { key: "rules", text: "Rules", path: "/rules" },
                 { key: "faq", text: "FAQ", path: "/faq" },
                 { key: "privacy", text: "Privacy Policy", path: "/privacy" },
+                { key: "contact", text: "Contact Us", path: "/contact" },
             ],
         },
     ];

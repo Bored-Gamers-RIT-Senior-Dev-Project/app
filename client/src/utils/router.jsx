@@ -18,6 +18,7 @@ import {
     UserSignIn,
     UserSignUp,
     PrivacyPolicy,
+    ContactUs,
 } from "../pages";
 import { JoinTeamPage } from "../pages/JoinTeamPage";
 import { AddUniversityModal } from "../pages/modals/AddUniversityModal";
@@ -110,6 +111,10 @@ const routes = [
             {
                 path: "/privacy",
                 element: <PrivacyPolicy />,
+            },
+            {
+                path: "/contact",
+                element: <ContactUs />,
             },            
             {
                 path: "/settings",

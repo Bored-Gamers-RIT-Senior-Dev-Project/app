@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Container, Paper, Typography, Link, Divider } from "@mui/material";
+// Formatted using GPT.
 
 const PrivacyPolicy = () => {
     const [lastUpdated] = useState("April 08, 2025");
