@@ -260,10 +260,4 @@ const combine = (...calls) => {
     return () => Promise.all(calls);
 };
 
-const settings = Object.freeze({
-    saveProfilePicture: async () => {
-        // TODO: Stubbed out
-    },
-});
-
-export { admin, combine, search, settings, teams, university, users };
+export { admin, combine, search, teams, university, users };
