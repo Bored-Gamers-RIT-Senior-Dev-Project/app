@@ -137,13 +137,9 @@ const teams = Object.freeze({
         return data;
     },
     /**
-     * Post an update to the user db
-     * @param {object} data The form data for the update.
-     * @param {string|null} data.teamName The updated team name.
-     * @param {string|null} data.description The updated team description
-     * @param {string|null} data.profileImageUrl A URL to a newly uploaded profile image.
-     * @param {object} params The params of the route.
-     * @param {number} params.teamId The ID of the team being updated (gotten from route)
+     * Post an update to the team
+     * @param {number} teamId id of the team to update
+     * @param {FormData} formData The form data for the update.
      * @returns {Promise<boolean>} True on a successful update post.
      */
     update: async (teamId, formData) => {
@@ -224,6 +220,7 @@ const users = Object.freeze({
      */
     updateSettings: async (formData) => {
         const { data } = await api.put(`users`, formData);
+        events.publish("refreshAuth");
         return data;
     },
 
