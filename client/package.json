@@ -10,7 +10,6 @@
         "preview": "vite preview"
     },
     "dependencies": {
-        "@date-io/date-fns": "^3.2.1",
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.0",
         "@mui/icons-material": "^6.4.7",
@@ -22,7 +21,6 @@
         "ag-grid-community": "^33.2.1",
         "ag-grid-react": "^33.2.1",
         "axios": "^1.8.4",
-        "date-fns": "^2.30.0",
         "dayjs": "^1.11.13",
         "firebase": "^11.5.0",
         "postal": "^2.0.6",
