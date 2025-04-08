@@ -1,8 +1,10 @@
 import { Box, Grid2 as Grid, Typography } from "@mui/material";
+import { useNavigate } from "react-router";
 import { InfoElement } from "../../components/InfoElement";
 import propTypes from "../../utils/propTypes";
 
 const TeamList = ({ teams }) => {
+    const navigate = useNavigate();
     return (
         <Box sx={{ px: 2, width: "100%" }}>
             <Typography
@@ -14,13 +16,14 @@ const TeamList = ({ teams }) => {
             >
                 Teams ({teams.length})
             </Typography>
-            <Grid container spacing={2} sx={{ mt: 2 }}>
+            <Grid container spacing={2} sx={{ my: 2 }}>
                 {teams.map((team) => (
                     <Grid size={12} key={team.id}>
                         <InfoElement
                             imageUrl={team.profileImageUrl}
                             title={team.teamName}
                             text={team.description}
+                            onClick={() => navigate(`/teams/${team.teamId}`)}
                         />
                     </Grid>
                 ))}
