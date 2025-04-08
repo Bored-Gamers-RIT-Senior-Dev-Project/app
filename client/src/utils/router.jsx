@@ -75,7 +75,10 @@ const routes = [
                 path: "/teams/:teamId",
                 element: <TeamPage />,
                 loader: ({ params }) => teams.getInfo({ id: params.teamId }),
-                action: makeAction(teams.update),
+                action: async ({ request, params }) => {
+                    const formData = await request.formData();
+                    return await teams.update(params.teamId, formData);
+                },
             },
             {
                 path: "/university/:universityId",

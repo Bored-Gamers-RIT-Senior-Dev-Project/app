@@ -146,12 +146,8 @@ const teams = Object.freeze({
      * @param {number} params.teamId The ID of the team being updated (gotten from route)
      * @returns {Promise<boolean>} True on a successful update post.
      */
-    update: async ({ teamName, description, profileImageUrl }, { teamId }) => {
-        const { data } = await api.post(`teams/${teamId}/update`, {
-            teamName,
-            description,
-            profileImageUrl,
-        });
+    update: async (teamId, formData) => {
+        const { data } = await api.post(`teams/${teamId}/update`, formData);
         events.publish("refreshAuth");
         return data;
     },
