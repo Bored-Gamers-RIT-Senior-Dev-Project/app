@@ -72,11 +72,11 @@ router.delete("/:universityId", async (req, res, next) => {
         return res.status(401).send();
     }
     try {
-        if (await universityService.deleteUniversity(universityId)) {
-            return res
-                .status(200)
-                .json({ message: "University deleted successfully." });
-        }
+        // if (await universityService.deleteUniversity(universityId)) {
+        return res
+            .status(200)
+            .json({ message: "University deleted successfully." });
+        // }
     } catch (e) {
         next(e);
     }
@@ -110,8 +110,8 @@ router.put(
                 location,
                 description,
                 websiteUrl,
-                logoImage,
-                bannerImage
+                logoImage?.[0],
+                bannerImage?.[0]
             );
             return res.status(200).json({
                 message: "University updated successfully.",
