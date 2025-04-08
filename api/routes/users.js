@@ -1,9 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const UserService = require("../services/userService");
-const ImageUploadService = require("../services/imageUploadService");
 const multer = require("multer");
-const createHttpError = require("http-errors");
 
 const upload = multer({ limits: { fileSize: 2e7 /* 20 MB */ } });
 
