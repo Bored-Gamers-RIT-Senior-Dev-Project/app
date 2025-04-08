@@ -212,6 +212,25 @@ const teamUpdateRequest = async (
     description,
     profileImageUrl
 ) => {
+    const sql1 = `
+        UPDATE team_update
+        SET
+            TeamName = COALESCE(?, TeamName),
+            ProfileImageURL = COALESCE(?, ProfileImageURL),
+            Description = COALESCE(?, Description)
+        WHERE UpdatedTeamId = ? AND ApprovedBy IS NULL;
+    `;
+    const [result1] = await db.query(sql1, [
+        teamName,
+        profileImageUrl,
+        description,
+        teamId,
+    ]);
+
+    if (result1.affectedRows > 0) {
+        return true;
+    }
+
     const sql = `
         INSERT INTO team_update (UpdatedTeamID, TeamName, ProfileImageURL, Description)
         VALUES (?, ?, ?, ?)

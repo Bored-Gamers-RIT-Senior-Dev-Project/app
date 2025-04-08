@@ -247,16 +247,15 @@ const requestUserUpdate = async (userId, body) => {
 
     //Start by trying to update an existing user update that hasn't been approved.
     const [result1] = await db.query(
-        `UPDATE user_update req
-        JOIN user_update existing ON existing.UserUpdateId = req.UserUpdateId
+        `UPDATE user_update
         SET
-            req.FirstName = COALESCE(?, existing.FirstName),
-            req.LastName = COALESCE(?, existing.LastName),
-            req.Username = COALESCE(?, existing.Username),
-            req.Email = COALESCE(?, existing.Email),
-            req.ProfileImageURL = COALESCE(?, existing.ProfileImageURL),
-            req.Bio = COALESCE(?, existing.Bio)
-        WHERE req.UpdatedUserId = ? AND req.ApprovedBy IS NULL;
+            FirstName = COALESCE(?, FirstName),
+            LastName = COALESCE(?, LastName),
+            Username = COALESCE(?, Username),
+            Email = COALESCE(?, Email),
+            ProfileImageURL = COALESCE(?, ProfileImageURL),
+            Bio = COALESCE(?, Bio)
+        WHERE UpdatedUserId = ? AND ApprovedBy IS NULL;
         `,
         [
             body.firstName,
