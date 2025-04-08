@@ -20,6 +20,7 @@ router.post("/search", async (req, res, next) => {
     value = value ?? "";
 
     try {
+        console.log("Request on /search reached router layer");
         const universitySearch = universityService.searchUniversities(value);
         const teamSearch = teamService.searchTeams(value);
 

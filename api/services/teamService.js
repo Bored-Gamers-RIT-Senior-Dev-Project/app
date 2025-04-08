@@ -11,6 +11,7 @@ const { makeObjectCamelCase } = require("../utils");
  * @returns {Promise<Array>} - A promise that resolves to an array of search results.
  */
 const searchTeams = async (teamName, universityName = null) => {
+    console.log("Request on /search reached team service layer");
     const results = await teamModel.searchTeams(teamName, universityName);
     return results;
 };

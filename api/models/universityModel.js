@@ -8,6 +8,7 @@ const db = require("../config/db");
  * @returns {Promise<Array>} - A promise that resolves to an array of search results.
  */
 const searchUniversities = async (universityName, partial = true) => {
+    console.log("Request on /search reached university model layer");
     let sql = `
         SELECT 
             UniversityId AS Id,
