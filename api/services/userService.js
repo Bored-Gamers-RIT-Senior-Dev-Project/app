@@ -149,11 +149,14 @@ const createUser = async (
  */
 const updateUser = async (uid, body, profileImage) => {
     const user = await User.getUserByFirebaseId(uid);
-
     if (profileImage) {
         body.profileImageUrl = await imageUploadService.uploadImage(
             profileImage.buffer
         );
+    }
+
+    if (Object.keys(body).length == 0) {
+        return false;
     }
 
     if (user.universityId && user.roleName != User.Roles.UNIVERSITY_ADMIN) {
