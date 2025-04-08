@@ -1,6 +1,9 @@
 const express = require("express");
 const teamService = require("../services/teamService");
 const router = express.Router();
+const multer = require("multer");
+
+const upload = multer();
 
 /**
  * Get a list of all teams
@@ -140,26 +143,31 @@ router.put("/:teamId", async (req, res, next) => {
  * @param {string} req.body.profileImageUrl The URL of the team's profile image.
  * @param {string} req.body.description A description of the team.
  */
-router.post("/:teamId/update", async (req, res, next) => {
-    const uid = req?.user?.uid;
-    if (!uid) return res.status(401).send();
+router.post(
+    "/:teamId/update",
+    upload.single("image"),
+    async (req, res, next) => {
+        const uid = req?.user?.uid;
+        if (!uid) return res.status(401).send();
 
-    const { teamId } = req.params;
-    const { teamName, profileImageUrl, description } = req.body;
+        const { teamId } = req.params;
+        const { teamName, description } = req.body;
+        const image = req.file;
 
-    try {
-        const status = await teamService.postUpdateRequest(
-            uid,
-            teamId,
-            teamName,
-            description,
-            profileImageUrl
-        );
-        return res.status(200).json(status);
-    } catch (error) {
-        return next(error);
+        try {
+            const status = await teamService.postUpdateRequest(
+                uid,
+                teamId,
+                teamName,
+                description,
+                image
+            );
+            return res.status(200).json(status);
+        } catch (error) {
+            return next(error);
+        }
     }
-});
+);
 
 /**
  * If the team is not approved, approve it.  If the team has pending changes, apply and approve.

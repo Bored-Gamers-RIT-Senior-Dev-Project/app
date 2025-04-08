@@ -2,6 +2,7 @@ const universityModel = require("../models/universityModel");
 const userModel = require("../models/userModel");
 const teamModel = require("../models/teamModel");
 const createHttpError = require("http-errors");
+const imageUploadService = require("./imageUploadService");
 /**
  * Searches universities based on the search term.
  *
@@ -88,23 +89,80 @@ const deleteUniversity = async (universityId) => {
 };
 
 /**
+ * Checks user permissions to update a university in the database
+ * @param {object} user The user's data
+ * @param {number} universityId ID of the user being edited
+ * @returns {boolean} True if the user has accurate permissions, False if not
+ */
+const userCanUpdateUniversity = (user, universityId) => {
+    switch (user.roleName) {
+        case userModel.Roles.ADMIN:
+            return true;
+        case userModel.Roles.UNIVERSITY_ADMIN:
+            return user.universityId == universityId;
+        default:
+            return false;
+    }
+};
+
+/**
  *
- * @param {*} uid The uid of the account making the update.
- * @param {*} universityId The id of the university to update
- * @param {*} updateBody The updates to be made.
+ * @param {string} uid Firebase UID of the user requesting the edit
+ * @param {number} universityId ID of university to edit
+ * @param {string|null} universityName New Name
+ * @param {string|null} location New Location
+ * @param {string|null} description New Description
+ * @param {string|null} websiteUrl New WebsiteUrl
+ * @param {Express.Multer.File|null} logoImage Uploaded Logo Image file
+ * @param {Express.Multer.File|null} bannerImage Uploaded banner image file
  * @returns
  */
-const updateUniversity = async (uid, universityId, updateBody) => {
-    //TODO: Confirm that User is an admin or the University Rep.  Otherwise throw 403.
+const updateUniversity = async (
+    uid,
+    universityId,
+    universityName,
+    location,
+    description,
+    websiteUrl,
+    logoImage,
+    bannerImage
+) => {
+    //Confirm that User is an admin or the University Rep.  Otherwise throw 403.
     const user = await userModel.getUserByFirebaseId(uid);
-    if (
-        user.role !== "Super Admin" &&
-        (user.role !== "University Admin" || user.universityId !== universityId)
-    ) {
+    if (!userCanUpdateUniversity(user, universityId)) {
         throw createHttpError(403);
     }
 
     //TODO: Validate and sanitize updateBody to prevent SQL injection or other attacks/errors.
+    let updateBody = {};
+    if (universityName) {
+        updateBody.universityName = universityName;
+    }
+    if (location) {
+        updateBody.location = location;
+    }
+    if (description) {
+        updateBody.description = description;
+    }
+    if (websiteUrl) {
+        updateBody.websiteUrl = websiteUrl;
+    }
+    const imageUploads = [];
+    if (logoImage) {
+        imageUploads.push(
+            imageUploadService
+                .uploadImage(logoImage.buffer)
+                .then((url) => (updateBody.logoUrl = url))
+        );
+    }
+    if (bannerImage) {
+        imageUploads.push(
+            imageUploadService
+                .uploadImage(bannerImage.buffer)
+                .then((url) => (updateBody.bannerUrl = url))
+        );
+    }
+    await Promise.all(imageUploads);
 
     //Update university in universityModel.
     const university = await universityModel.updateUniversity(
@@ -112,7 +170,6 @@ const updateUniversity = async (uid, universityId, updateBody) => {
         updateBody
     );
 
-    //TODO: Return updated university.
     return university;
 };
 

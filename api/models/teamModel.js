@@ -212,6 +212,25 @@ const teamUpdateRequest = async (
     description,
     profileImageUrl
 ) => {
+    const sql1 = `
+        UPDATE team_update
+        SET
+            TeamName = COALESCE(?, TeamName),
+            ProfileImageURL = COALESCE(?, ProfileImageURL),
+            Description = COALESCE(?, Description)
+        WHERE UpdatedTeamId = ? AND ApprovedBy IS NULL;
+    `;
+    const [result1] = await db.query(sql1, [
+        teamName,
+        profileImageUrl,
+        description,
+        teamId,
+    ]);
+
+    if (result1.affectedRows > 0) {
+        return true;
+    }
+
     const sql = `
         INSERT INTO team_update (UpdatedTeamID, TeamName, ProfileImageURL, Description)
         VALUES (?, ?, ?, ?)
@@ -226,6 +245,96 @@ const teamUpdateRequest = async (
     return result.affectedRows > 0;
 };
 
+const getTeamUpdate = async (updateId) => {
+    const sql = `SELECT t.UniversityID, u.*
+    FROM team_update u
+    JOIN teams t ON u.UpdatedTeamId = t.TeamID
+    WHERE u.TeamUpdateId = ?;
+    `;
+    const [rows] = await db.query(sql, [updateId]);
+    if (rows.length < 1) {
+        return null;
+    }
+    return rows[0];
+};
+
+const approveTeam = async (teamId) => {
+    const sql = `UPDATE teams SET IsApproved = true WHERE TeamID = ?`;
+    const [result] = await db.query(sql, [teamId]);
+    return result.affectedRows > 0;
+};
+
+const denyTeam = async (teamId) => {
+    const c = await db.getConnection();
+    try {
+        await c.beginTransaction();
+
+        //Remove users from the denied team and set their role back to spectator.
+        await c.query(
+            "UPDATE users SET RoleID = 1, TeamID = null WHERE TeamID = ?;",
+            [teamId]
+        );
+
+        //Delete the team.
+        const [result] = await c.query("DELETE FROM teams WHERE TeamID = ?;", [
+            teamId,
+        ]);
+
+        await c.commit();
+
+        return result.affectedRows > 0;
+    } catch (e) {
+        await c.rollback();
+        console.error("Error occurred denying user: ", e);
+        return false;
+    } finally {
+        c.release();
+    }
+};
+
+const approveTeamUpdate = async (teamUpdateId, userId) => {
+    //SQL created with help from chatgpt
+    const c = await db.getConnection();
+    try {
+        await c.beginTransaction();
+
+        // Update the actual team using values from team_update
+        await c.query(
+            `UPDATE teams t
+             JOIN team_update tu ON t.TeamID = tu.UpdatedTeamID
+             SET
+                 t.TeamName = COALESCE(tu.TeamName, t.TeamName),
+                 t.ProfileImageURL = COALESCE(tu.ProfileImageURL, t.ProfileImageURL),
+                 t.Description = COALESCE(tu.Description, t.Description)
+             WHERE tu.TeamUpdateId = ?`,
+            [teamUpdateId]
+        );
+
+        // Mark the update as approved
+        const [updateResult] = await c.query(
+            `UPDATE team_update
+             SET ApprovedBy = ?
+             WHERE TeamUpdateId = ?`,
+            [userId, teamUpdateId]
+        );
+
+        await c.commit();
+        return updateResult.affectedRows > 0;
+    } catch (e) {
+        await c.rollback();
+        console.error("Error approving team update:", e);
+        return false;
+    } finally {
+        c.release();
+    }
+};
+
+const denyTeamUpdate = async (teamUpdateId) => {
+    const sql = `DELETE FROM team_update WHERE TeamUpdateId = ?`;
+    const [result] = await db.query(sql, [teamUpdateId]);
+    return result.affectedRows > 0;
+};
+
 module.exports = {
     getTeam,
     getMembers,
@@ -235,4 +344,9 @@ module.exports = {
     searchTeams,
     getTeamsByUniversityId,
     teamUpdateRequest,
+    getTeamUpdate,
+    approveTeam,
+    denyTeam,
+    approveTeamUpdate,
+    denyTeamUpdate,
 };

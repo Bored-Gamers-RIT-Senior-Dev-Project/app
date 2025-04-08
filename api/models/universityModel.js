@@ -1,5 +1,5 @@
 const db = require("../config/db");
-
+const createHttpError = require("http-errors");
 /**
  * Searches universities based on the search term.
  *
@@ -86,35 +86,47 @@ const VALID_KEYS = {
 };
 /**
  * Update a university in the database
+ * @param {number} universityId The ID of the university to be updated.
  * @param {*} body An object representing the keys and values to be updated.
  * @throws An error if the keys are rejected.
  */
 const updateUniversity = async (universityId, body) => {
     const updates = [];
-    for (const key of Object.keys(body)) {
-        const column = VALID_KEYS?.[key.toUpperCase()];
+    let values = [];
+
+    //Construct update query using VALID_KEYS
+    Object.entries(body).forEach(([key, value]) => {
+        const column = VALID_KEYS?.[key.toUpperCase()]; //Get column name from valid_keys
         if (column) {
-            updates.push(`${column} = ?`);
+            updates.push(`?? = ?`); //If column is in the valid_keys, push column and row wildcards.
+            values = values.concat([column, value]); //Push the values to the end of the values array
         } else {
             console.error("Error fulfilling update request:", body);
             console.error("Invalid key:", key);
             throw createHttpError(400, "Invalid attempt to update university.");
         }
+    });
+
+    //If no updates, return false.
+    if (updates.length == 0) {
+        return false;
     }
-    const keys = Object.keys(body)
-        .map((key) => `${key} = ?`)
-        .join(", ");
 
-    const [rows] = await db.query(
-        `UPDATE users SET ${keys} WHERE UniversityID = ?`,
-        [...Object.values(body), universityId]
-    );
+    //Add the universityID to the end of the values (for the WHERE wildcard).
+    values.push(universityId);
 
-    if (rows.affectedRows === 0) {
+    //Build the SQL query using updates.
+    const sql = `UPDATE universities SET ${updates.join(
+        ", "
+    )} WHERE UniversityID = ?;`;
+
+    const [result] = await db.query(sql, values);
+
+    if (result.affectedRows === 0) {
         throw new Error("User not updated.");
     }
 
-    return await getUserByFirebaseId(firebaseUid);
+    return true;
 };
 
 module.exports = {

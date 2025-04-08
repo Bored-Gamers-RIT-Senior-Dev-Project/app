@@ -12,8 +12,8 @@ import {
     Search,
     TournamentInformation,
     TeamPage,
-    University,
     UniversityDashboard,
+    UniversityPage,
     UserSettings,
     UserSignIn,
     UserSignUp,
@@ -78,11 +78,14 @@ const routes = [
                 path: "/teams/:teamId",
                 element: <TeamPage />,
                 loader: ({ params }) => teams.getInfo({ id: params.teamId }),
-                action: makeAction(teams.update),
+                action: async ({ request, params }) => {
+                    const formData = await request.formData();
+                    return await teams.update(params.teamId, formData);
+                },
             },
             {
                 path: "/university/:universityId",
-                element: <University />,
+                element: <UniversityPage />,
                 loader: async ({ params }) => {
                     const { universityId } = params;
                     try {
@@ -98,6 +101,13 @@ const routes = [
                         }
                         throw e;
                     }
+                },
+                action: async ({ request, params }) => {
+                    const formData = await request.formData();
+                    return await university.update(
+                        params.universityId,
+                        formData
+                    );
                 },
             },
             {
@@ -123,12 +133,8 @@ const routes = [
                     //Read formData in request
                     const formData = await request.formData();
 
-                    //Get the userid back from the formdata and remove it
-                    const userId = formData.get("userId");
-                    formData.delete("userId");
-
                     //Send to api to process updates.
-                    return users.updateSettings(userId, formData);
+                    return users.updateSettings(formData);
                 },
             },
             {
@@ -244,6 +250,7 @@ const routes = [
                 path: "/representative",
                 element: <UniversityDashboard />,
                 loader: admin.getUniversityAdminTickets,
+                action: makeAction(admin.approveUniversityAdminTicket),
             },
             {
                 path: "*",

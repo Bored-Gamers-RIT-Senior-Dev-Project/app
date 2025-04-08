@@ -85,6 +85,14 @@ const admin = Object.freeze({
         const { data } = await api.get("representative");
         return data;
     },
+    approveUniversityAdminTicket: async ({ id, type, approved }) => {
+        const { data } = await api.put("representative/approve", {
+            id,
+            type,
+            approved,
+        });
+        return data;
+    },
 });
 
 const teams = Object.freeze({
@@ -138,12 +146,9 @@ const teams = Object.freeze({
      * @param {number} params.teamId The ID of the team being updated (gotten from route)
      * @returns {Promise<boolean>} True on a successful update post.
      */
-    update: async ({ teamName, description, profileImageUrl }, { teamId }) => {
-        const { data } = await api.post(`teams/${teamId}/update`, {
-            teamName,
-            description,
-            profileImageUrl,
-        });
+    update: async (teamId, formData) => {
+        const { data } = await api.post(`teams/${teamId}/update`, formData);
+        events.publish("refreshAuth");
         return data;
     },
 });
@@ -196,7 +201,7 @@ const users = Object.freeze({
      * @param {*} params The keys to update in the user profile.  //TODO: This function should be further locked down or specified to what the front-end can do once we have the dashboard
      * @returns {Promise<*>} A confirmation of the update
      */
-    update: async (userId, params) => {
+    update: async (params, { userId }) => {
         const { data } = await api.put(`users/${userId}`, params);
         return data;
     },
@@ -207,8 +212,8 @@ const users = Object.freeze({
      * @param {*} params The keys to update in the user profile.  //TODO: This function should be further locked down or specified to what the front-end can do once we have the dashboard
      * @returns {Promise<*>} A confirmation of the update
      */
-    updateSettings: async (userId, formData) => {
-        const { data } = await api.put(`users/${userId}/settings`, formData);
+    updateSettings: async (formData) => {
+        const { data } = await api.put(`users`, formData);
         return data;
     },
 
@@ -252,6 +257,11 @@ const university = Object.freeze({
      */
     addUniversity: async (params) => {
         const { data } = await api.post("university", params);
+        return data;
+    },
+
+    update: async (universityId, formData) => {
+        const { data } = await api.put(`university/${universityId}`, formData);
         return data;
     },
 });

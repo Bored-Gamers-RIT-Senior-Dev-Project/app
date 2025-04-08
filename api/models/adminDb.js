@@ -81,19 +81,28 @@ const getReportOneTotals = async () => {
  * @returns {List<object>} An array of all events that need to be evaluated.
  */
 const getUniversityAdminTickets = async (universityId) => {
-    const newTeamsQuery = `SELECT *, "newTeam" type FROM teams WHERE IsApproved = false`;
+    const newTeamsQuery = `SELECT *, "newTeam" type FROM teams WHERE IsApproved = false AND UniversityID = ?`;
 
-    const newUsersQuery = `SELECT *, "newUser" type FROM users WHERE IsValidated = false`;
+    const newUsersQuery = `SELECT *, "newUser" type FROM users WHERE IsValidated = false AND UniversityID = ?`;
 
-    const teamEditsQuery = `SELECT upd.*, "teamEdit" type
+    const teamEditsQuery = `SELECT upd.*,
+            t.TeamName CurrentTeamName,
+            "teamEdit" type
         FROM team_update upd
         JOIN teams t ON upd.UpdatedTeamID = t.TeamId
-        WHERE t.UniversityId = ?`;
+        WHERE t.UniversityId = ?
+        AND ApprovedBy IS NULL`;
 
-    const userEditsQuery = `SELECT upd.*, "userEdit" type
+    const userEditsQuery = ` SELECT upd.*,
+            u.Email CurrentEmail,
+            u.Username CurrentUsername,
+            u.FirstName CurrentFirstName,
+            u.LastName CurrentLastName,
+            "userEdit" type
         FROM user_update upd
-        JOIN users u ON upd.UpdatedUserID = u.TeamId
-        WHERE u.UniversityId = ?`;
+        JOIN users u ON upd.UpdatedUserID = u.UserID
+        WHERE u.UniversityId = ?
+        AND ApprovedBy IS NULL`;
 
     const [newTeams, newUsers, teamEdits, userEdits] = await Promise.all(
         [newTeamsQuery, newUsersQuery, teamEditsQuery, userEditsQuery].map(

@@ -244,23 +244,50 @@ const updateUserOrRequestUpdate = async (userId, body) => {
  */
 const requestUserUpdate = async (userId, body) => {
     "use strict";
-    const result = await db.query(
-        `INSERT INTO
-            user_update (UpdatedUserID, ApprovedBy, FirstName, LastName, Username, Email, ProfileImageURL, Bio)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+
+    //Start by trying to update an existing user update that hasn't been approved.
+    const [result1] = await db.query(
+        `UPDATE user_update
+        SET
+            FirstName = COALESCE(?, FirstName),
+            LastName = COALESCE(?, LastName),
+            Username = COALESCE(?, Username),
+            Email = COALESCE(?, Email),
+            ProfileImageURL = COALESCE(?, ProfileImageURL),
+            Bio = COALESCE(?, Bio)
+        WHERE UpdatedUserId = ? AND ApprovedBy IS NULL;
+        `,
         [
+            body.firstName,
+            body.lastName,
+            body.username,
+            body.email,
+            body.profileImageUrl,
+            body.bio,
             userId,
-            body.RequestedDate,
-            body.ApprovedBy,
-            body.FirstName,
-            body.LastName,
-            body.Username,
-            body.Email,
-            body.ProfileImageURL,
-            body.Bio,
         ]
     );
-    return result;
+    //If that worked, return true and move on.
+    if (result1.affectedRows > 0) {
+        return true;
+    }
+
+    //If it didn't insert a new user update.
+    const [result2] = await db.query(
+        `INSERT INTO
+            user_update (UpdatedUserID, FirstName, LastName, Username, Email, ProfileImageURL, Bio)
+            VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [
+            userId,
+            body.firstName,
+            body.lastName,
+            body.username,
+            body.email,
+            body.profileImageUrl,
+            body.bio,
+        ]
+    );
+    return result2.affectedRows > 0;
 };
 
 /**
@@ -416,6 +443,79 @@ const grantRole = async (userId, roleName, identifier = UserIds.LOCAL) => {
     return true;
 };
 
+const approveUser = async (userId) => {
+    const sql = "UPDATE users SET IsValidated = true WHERE UserID = ?;";
+    const [result] = await db.query(sql, [userId]);
+    return result.affectedRows > 0;
+};
+
+const denyUser = async (userId) => {
+    const sql =
+        "UPDATE users SET UniversityID = null, RoleID = 1 WHERE UserID = ?;";
+    const result = await db.query(sql, [userId]);
+    return result.affectedRows > 0;
+};
+
+const approveUserUpdate = async (userUpdateId, approvedBy) => {
+    //Sql written with help from gpt
+    const conn = await db.getConnection();
+    try {
+        await conn.beginTransaction();
+        const updateSql = `
+        UPDATE users u
+        JOIN user_update uu ON uu.UserUpdateId = ?
+        SET
+            u.FirstName        = COALESCE(uu.FirstName, u.FirstName),
+            u.LastName         = COALESCE(uu.LastName, u.LastName),
+            u.Username         = COALESCE(uu.Username, u.Username),
+            u.Email            = COALESCE(uu.Email, u.Email),
+            u.ProfileImageURL  = COALESCE(uu.ProfileImageURL, u.ProfileImageURL),
+            u.Bio              = COALESCE(uu.Bio, u.Bio)
+        WHERE u.UserID = uu.UpdatedUserID;`;
+        const [result] = await conn.query(updateSql, [userUpdateId]);
+
+        await conn.query(
+            "UPDATE user_update SET ApprovedBy = ? WHERE UserUpdateId = ?",
+            [approvedBy, userUpdateId]
+        );
+
+        await conn.commit();
+        return result.affectedRows > 0;
+    } catch (e) {
+        await conn.rollback();
+        console.error("Error approving user: ", e);
+        return false;
+    } finally {
+        conn.release();
+    }
+};
+
+const denyUserUpdate = async (userUpdateId) => {
+    const [result] = await db.query(
+        "DELETE FROM user_update WHERE UserUpdateId = ?",
+        [userUpdateId]
+    );
+    return result.affectedRows > 0;
+};
+
+/**
+ * Get a user edit from the user_updates table by its UserUpdateID
+ * @param {number} editId
+ * @returns {Promise<object>}
+ */
+const getUserEditById = async (editId) => {
+    const sql = `SELECT
+    u.UniversityID,
+    uu.*
+    FROM user_update uu JOIN users u ON uu.UpdatedUserID = u.UserID
+    WHERE uu.UserUpdateId = ?;`;
+    const [rows] = await db.query(sql, [editId]);
+    if (rows.length == 0) {
+        return null;
+    }
+    return rows[0];
+};
+
 module.exports = {
     UserIds,
     Roles,
@@ -423,10 +523,16 @@ module.exports = {
     getUserList,
     getUserByUserId,
     getUserByFirebaseId,
+    getUserEditById,
     updateUser,
     deleteUser,
     checkUsername,
     userHasRole,
     grantRole,
     updateUserOrRequestUpdate,
+    approveUser,
+    denyUser,
+    requestUserUpdate,
+    approveUserUpdate,
+    denyUserUpdate,
 };

@@ -72,21 +72,20 @@ const recordUserImageURL = async (url, userId) => {
  * Save an image for a user - save the image to the disk after transcoding to
  * WEBP, and request a user update for that image
  * @param {Buffer} file the file to try to use as an image
- * @param {number} userId the user's id
  * @throws {Error} if something goes wrong with converting or saving an image
  */
-const uploadUserImage = async (file, userId) => {
+const uploadImage = async (file) => {
     "use strict";
     try {
         const image = await encodeImage(file);
         const imageHash = hashBuffer(image);
         const name = `${imageHash}.webp`;
         saveImage(name, image);
-        recordUserImageURL(`${API_URL}/user-images/${name}`, userId);
+        return `${API_URL}/user-images/${name}`;
     } catch (e) {
         console.error(e);
         throw e;
     }
 };
 
-module.exports = { uploadUserImage };
+module.exports = { uploadImage };

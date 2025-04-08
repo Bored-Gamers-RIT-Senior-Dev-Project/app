@@ -1,25 +1,35 @@
-import { Save as SaveIcon, Upload as UploadIcon } from "@mui/icons-material";
-import {
-    Avatar,
-    Box,
-    Button,
-    IconButton,
-    TextField,
-    Typography,
-} from "@mui/material";
+import { Save as SaveIcon } from "@mui/icons-material";
+import { Avatar, Box, IconButton, TextField, Typography } from "@mui/material";
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { ImageUploader } from "../../components/ImageUploader";
 import { usePostSubmit } from "../../hooks/usePostSubmit";
 
 const TeamEditor = ({ teamName, teamSummary, teamImage, exitEditMode }) => {
-    const [imageUrl, setImageUrl] = useState(null);
+    const [image, setImage] = useState(null);
     const [name, setName] = useState(null);
     const [description, setDescription] = useState(null);
+
+    const imageUrl = useMemo(
+        () => (image ? URL.createObjectURL(image) : teamImage),
+        [image, teamImage]
+    );
+
     const submit = usePostSubmit();
 
     const handleSave = () => {
-        if (description || name || imageUrl) {
-            submit({ teamName: name, description, profileImageUrl: imageUrl });
+        const formData = new FormData();
+        if (name) {
+            formData.append("teamName", name);
+        }
+        if (description) {
+            formData.append("description", description);
+        }
+        if (image) {
+            formData.append("image", image);
+        }
+        if (description || name || image) {
+            submit(formData, { encType: "multipart/form-data" });
         }
         exitEditMode();
     };
@@ -43,24 +53,19 @@ const TeamEditor = ({ teamName, teamSummary, teamImage, exitEditMode }) => {
             </IconButton>
             <Box sx={{ position: "relative" }}>
                 <Avatar
-                    src={imageUrl ?? teamImage}
+                    src={imageUrl}
                     alt={name ?? teamName}
                     sx={{ height: "7em", width: "7em" }}
                 />
-                <Button
-                    component="label"
-                    variant="contained"
-                    size="small"
-                    startIcon={<UploadIcon />}
+                <ImageUploader
+                    onUpload={(file) => setImage(file)}
+                    label="Upload"
                     sx={{
                         position: "absolute",
                         bottom: 0,
                         minWidth: "100%",
                     }}
-                >
-                    Upload
-                    <input type="file" hidden />
-                </Button>
+                />
             </Box>
             <Typography variant="h4" sx={{ width: "100%" }}>
                 <TextField

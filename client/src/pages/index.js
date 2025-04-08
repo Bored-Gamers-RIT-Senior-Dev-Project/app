@@ -9,8 +9,8 @@ import { Search } from "./Search";
 import { TournamentInformation } from "./TournamentInformation";
 import { Faq } from "./Faq";
 import { TeamPage } from "./TeamPage";
-import { University } from "./University";
 import { UniversityDashboard } from "./UniversityDashboard";
+import { UniversityPage } from "./UniversityPage";
 import { UserSettings } from "./UserSettings";
 import { UserSignIn } from "./UserSignIn";
 import { UserSignUp } from "./UserSignUp";
@@ -29,8 +29,8 @@ export {
     TournamentInformation,
     Faq,
     TeamPage,
-    University,
     UniversityDashboard,
+    UniversityPage,
     UserSettings,
     UserSignIn,
     UserSignUp,

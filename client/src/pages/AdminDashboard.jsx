@@ -13,9 +13,9 @@ import {
 } from "@mui/material";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
-import { AgGridReact } from "ag-grid-react";
 import { useState } from "react";
 import { Outlet, useLoaderData, useNavigate } from "react-router";
+import { Grid } from "../components/Grid";
 import propTypes from "../utils/propTypes";
 
 const ActionsCellRenderer = ({ navigate, data }) => (
@@ -112,7 +112,7 @@ const AdminDashboard = () => {
     return (
         <Paper
             sx={{
-                width: "100%",
+                width: "1200px",
                 height: "80%",
                 display: "flex",
                 flexDirection: "column",
@@ -167,13 +167,10 @@ const AdminDashboard = () => {
                     </MenuItem>
                 </Menu>
             </Box>
-            <Box className="ag-theme-alpine" style={{ width: "1200px" }}>
-                <AgGridReact
-                    rowData={rowData}
-                    columnDefs={columnDefs}
-                    pagination
-                />
-            </Box>
+            <Typography variant="h5" sx={{ textAlign: "left", width: "100%" }}>
+                Users
+            </Typography>
+            <Grid rowData={rowData} columnDefs={columnDefs} pagination />
             <Outlet />
         </Paper>
     );

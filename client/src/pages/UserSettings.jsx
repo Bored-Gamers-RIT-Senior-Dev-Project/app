@@ -13,7 +13,6 @@ import { ImageUploader } from "../components/ImageUploader";
 import { useAuth } from "../hooks/useAuth/index";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { reauthenticate, updateCredentials } from "../utils/firebase/auth";
-
 const UserSettings = () => {
     const { user } = useAuth();
     const navigate = useNavigate(); //React router useNavigate hook
@@ -43,8 +42,8 @@ const UserSettings = () => {
         if (userForm.image) {
             return URL.createObjectURL(userForm.image); // Create a URL for the uploaded image
         }
-        return user.profileImageUrl;
-    }, [user.profileImageUrl, userForm.image]);
+        return user?.profileImageUrl;
+    }, [user, userForm.image]);
 
     const submit = usePostSubmit();
 
@@ -73,7 +72,6 @@ const UserSettings = () => {
 
         //If the form was given any values, submit. (Otherwise the user is clicking 'submit' without making changes)
         if (Array.from(formData.keys()).length > 0) {
-            formData.append("userId", user.userId);
             submit(formData, { encType: "multipart/form-data" }); //Submitting as form-data for the sake of the image.
             //See router.jsx for action definition
         }
