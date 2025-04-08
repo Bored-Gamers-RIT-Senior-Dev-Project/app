@@ -244,7 +244,25 @@ const updateUserOrRequestUpdate = async (userId, body) => {
  */
 const requestUserUpdate = async (userId, body) => {
     "use strict";
-    // TODO
+    const result = await db.query(
+        `INSERT INTO
+            user_update (UserUpdateId, UpdatedUserID, RequestedDate, ApprovedBy, RequestedDate, FirstName, LastName, Username, Email, ProfileImageURL, Bio)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, )`,
+        [
+            body.userUpdateId,
+            body.updatedUserId,
+            body.requestedDate,
+            body.approvedBy,
+            body.requestedDate,
+            body.firstName,
+            body.lastName,
+            body.username,
+            body.email,
+            body.profileImageURL,
+            body.bio,
+        ]
+    );
+    return result;
 };
 
 /**
@@ -412,4 +430,5 @@ module.exports = {
     checkUsername,
     userHasRole,
     grantRole,
+    updateUserOrRequestUpdate,
 };
