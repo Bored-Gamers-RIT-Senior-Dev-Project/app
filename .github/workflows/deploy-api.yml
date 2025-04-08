@@ -2,9 +2,9 @@ name: Build and Deploy API to Staging Host
 
 on:
     # Trigger on push to the main branch
-    #  push:
-    #    branches:
-    #      - main
+    push:
+        branches:
+            - main
 
     # Allows manual execution from any branch
     workflow_dispatch:
@@ -24,6 +24,25 @@ jobs:
               with:
                   ref: ${{ github.event.inputs.branch || github.ref_name }}
 
+            - name: Create .env File
+              run: |
+                  cat <<EOF > .env
+                  DB_HOST=${{ secrets.DB_HOST }}
+                  DB_PORT=${{ secrets.DB_PORT }}
+                  DB_USER=${{ secrets.DB_USER }}
+                  DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+                  FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}
+                  FIREBASE_PRIVATE_KEY_ID=${{ secrets.FIREBASE_PRIVATE_KEY_ID }}
+                  FIREBASE_PRIVATE_KEY=${{ secrets.FIREBASE_PRIVATE_KEY }}
+                  FIREBASE_CLIENT_EMAIL=${{ secrets.FIREBASE_CLIENT_EMAIL }}
+                  FIREBASE_CLIENT_ID=${{ secrets.FIREBASE_CLIENT_ID }}
+                  FIREBASE_AUTH_URI=${{ secrets.FIREBASE_AUTH_URI }}
+                  FIREBASE_TOKEN_URI=${{ secrets.FIREBASE_TOKEN_URI }}
+                  FIREBASE_AUTH_PROVIDER_CERT_URL=${{ secrets.FIREBASE_AUTH_PROVIDER_CERT_URL }}
+                  FIREBASE_CLIENT_CERT_URL=${{ secrets.FIREBASE_CLIENT_CERT_URL }}
+                  FIREBASE_UNIVERSE_DOMAIN=${{ secrets.FIREBASE_UNIVERSE_DOMAIN }}
+                  EOF
+
             - name: Build Docker Image
               run: |
                   docker buildx build --network=host -t bg-api ./api
@@ -36,6 +55,7 @@ jobs:
 
             - name: Deploy Application via SSH
               run: |
+                  scp .env ${{ secrets.SSH_USER }}@${{ secrets.SSH_STAGING_HOST }}:/tmp/.env
                   ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_STAGING_HOST }} << 'EOF'
                     CONTAINER_NAME=bg-api_app
                     IMAGE_TAR=/tmp/bg-api.tar
@@ -54,9 +74,10 @@ jobs:
 
                     # Run the new container on port 5173
                     echo "Running container: $CONTAINER_NAME"
-                    docker run -d --name "$CONTAINER_NAME" -p 3000:3000 bg-api
+                    docker run -d --name "$CONTAINER_NAME" -p 3000:3000 --env-file /tmp/.env bg-api
 
                     # Clean up image tar file
                     echo "Cleaning up image file..."
                     rm -f "$IMAGE_TAR"
+                    rm -f /tmp/.env
                   EOF

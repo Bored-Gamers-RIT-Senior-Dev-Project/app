@@ -6,6 +6,7 @@ import { ReportView } from "./ReportView";
 import { Rules } from "./Rules";
 import { Schedule } from "./Schedule";
 import { Search } from "./Search";
+import { Faq } from "./Faq";
 import { TeamPage } from "./TeamPage";
 import { University } from "./University";
 import { UniversityDashboard } from "./UniversityDashboard";
@@ -22,6 +23,7 @@ export {
     Rules,
     Schedule,
     Search,
+    Faq,
     TeamPage,
     University,
     UniversityDashboard,

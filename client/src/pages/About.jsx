@@ -14,42 +14,52 @@ import {
   Stack,
 } from "@mui/material";
 import { ArrowBack, ArrowForward, Close } from "@mui/icons-material";
+import expeditionLeaderImg from "../assets/about/expedition_leader.jpg";
+import ResourceSpecialistImg from "../assets/about/Resource_specialist.jpeg";
+import ScientistImg from "../assets/about/Scientist.jpg";
+import TechnicianImg from "../assets/about/Technician.jpg";
+import ChroniclerImg from "../assets/about/Chronicler.avif";
+import WeaponsSpecialistImg from "../assets/about/Weapons_specialist.jpg";
+import PhysicianImg from "../assets/about/Physician.avif";
+import GameIllustrationImg from "../assets/about/main.jpg";
+
+
 
 const playerRoles = [
    {
     title: "Expedition Leader:",
     description: "This team member will make decisions on when and how action cards are played. They facilitate the team’s joint strategic planning and manage the expedition budget.",
-    image: "https://placehold.co/600x300",
-  },
+    image: expeditionLeaderImg,
+   },
   {
     title: "Resource Specialist",
     description: "This team member is responsible for obtaining the resources required for survival on arrival and the establishment of a base on the new world. ",
-    image: "https://placehold.co/600x300",
+    image: ResourceSpecialistImg,
   },
   {
     title: "Scientist:",
     description: "This team member collects knowledge cards that allow the team an advantage in knowing how to overcome obstacles and which actions are most likely to succeed. ",
-    image: "https://placehold.co/600x300",
+    image: ScientistImg,
   },
   {
     title: "Technician:",
     description: "This team member uses tool and technology cards to create the team base and repair machines and weapons as needed. ",
-    image: "https://placehold.co/600x300",
+    image: TechnicianImg,
   },
   {
     title: "Chronicler:",
     description: "This team member is responsible for all communications with Home Base, for researching historic data cards that may aid the quest and for creating a chronicle of the current expedition.",
-    image: "https://placehold.co/600x300",
+    image: ChroniclerImg,
   },
   {
     title: "Weapons Specialist:",
     description: "This team member leads the team defense strategies and works to gain points to raise each team member’s skill level on the weapon classes best suited to the current habitat.",
-    image: "https://placehold.co/600x300",
+    image: WeaponsSpecialistImg,
   },
   {
     title: "Physician:",
     description: " This team member is responsible for the physical and mental health of expedition members, treating injuries and illness when determined by cards for encounters with native wildlife, hostile forces, space adaptation syndrome, etc.",
-    image: "https://placehold.co/600x300",
+    image: PhysicianImg,
   },
 ];
 
@@ -86,11 +96,12 @@ const About = () => {
         A New World
       </Typography>
 
-      <Paper sx={{ textAlign: "center", padding: 2, marginBottom: 3, backgroundColor: "#f0f0f0", borderRadius: "10px" }}>
+      <Paper sx={{ textAlign: "center", padding: 3, marginBottom: 3, marginTop: 4 ,backgroundColor: "#f0f0f0", borderRadius: "10px" }}>
         <Button variant="contained" color="primary" sx={{ fontSize: "1.2em", padding: "10px 20px" }} onClick={() => setOpenModal(true)}>
           PRE-ORDER NOW!
         </Button>
       </Paper>
+  
 
       <Modal open={openModal} onClose={() => setOpenModal(false)}>
         <Box
@@ -122,17 +133,16 @@ const About = () => {
           </Button>
         </Box>
       </Modal>
-
-      <Paper sx={{ padding: 3, borderRadius: "10px", marginBottom: 3 }}>
+      <Paper sx={{ padding: 3, borderRadius: "10px", marginBottom: 3, marginTop: 4 }}>
         <Typography variant="h5" sx={{ fontWeight: "bold", marginBottom: 2 }}>
           About the Game
         </Typography>
-        <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2, alignItems: "center" }}>
+        <Box sx={{ display: "flex",flexDirection: { xs: "column-reverse", sm: "row" },gap: 2,alignItems: "center",}}>
           <Box sx={{ flex: 1 }}>
-            <img src="https://placehold.co/600x300" alt="Game Illustration" style={{ width: "100%", borderRadius: "10px" }} />
+            <img src={GameIllustrationImg} alt="Game Illustration" style={{ width: "100%", borderRadius: "10px",height: "auto",objectFit: "cover", }} />
           </Box>
           <Box sx={{ flex: 1 }}>
-            <Typography sx={{ textAlign: "justify", lineHeight: "1.5" }}>
+            <Typography sx={{ textAlign: "justify", lineHeight: 1.7, fontSize: "1rem" }}>
             A New World requires a team of 4-7 players who will work together to score as many points as possible after being dropped into a new, unpopulated world.<br />
             The habitats will vary and the team will not know in advance where they will land.<br /><br />
             Environments could be a desert planet, an underwater location, a water world with scattered islands, an ice-covered mountain range, or a jungle full of predatory animals and dangerous plant life.<br /><br />
@@ -144,11 +154,11 @@ const About = () => {
         </Box>
       </Paper>
 
-      <Paper sx={{ padding: 3, borderRadius: "10px"}}>
+      <Paper sx={{ padding: 3, borderRadius: "10px", marginBottom: 3, marginTop: 4 }}>
         <Typography variant="h5" sx={{ fontWeight: "bold", marginBottom: 2 }}>
           Player Roles
         </Typography>
-        <Typography sx={{ textAlign: "justify", marginBottom: 2 }}>
+        <Typography sx={{ textAlign: "justify", lineHeight: 1.7, fontSize: "1rem" }}>
           Every team must designate the roles for each player prior to beginning play. If a team has fewer than seven players, team members may assume more than one role.
         </Typography>
 

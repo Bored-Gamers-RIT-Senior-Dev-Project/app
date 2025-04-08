@@ -3,6 +3,7 @@ import App from "../App";
 import {
     About,
     AdminDashboard,
+    Faq,
     Home,
     NotFound,
     ReportView,
@@ -99,6 +100,10 @@ const routes = [
             {
                 path: "/about",
                 element: <About />,
+            },
+            {
+                path: "/faq",
+                element: <Faq />,
             },
             {
                 path: "/settings",
