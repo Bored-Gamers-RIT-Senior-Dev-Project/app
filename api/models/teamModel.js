@@ -44,7 +44,7 @@ FROM
 const getMembers = async (teamId, showUnapproved) => {
     const sql = `
         SELECT * FROM users WHERE TeamId = ?
-        ${showUnapproved ? "" : " AND IsApproved = true"}
+        ${showUnapproved ? "" : " AND IsValidated = true"}
     `;
     const [rows] = await db.query(sql, [teamId]);
 
@@ -336,6 +336,44 @@ const denyTeamUpdate = async (teamUpdateId) => {
     return result.affectedRows > 0;
 };
 
+const promoteCaptain = async (userId, teamId) => {
+    const conn = await db.getConnection();
+    try {
+        await conn.beginTransaction();
+
+        // Downgrade the current captain to student
+        console.debug("Removing current captain's role to student");
+        const sql1 = `UPDATE users SET RoleID = 3 WHERE UserID = (SELECT TeamLeaderID FROM teams WHERE TeamID = ?)`;
+        await conn.query(sql1, [teamId]);
+
+        console.debug("Promoting new captain to captain role");
+        // Promote the new captain to captain
+        const sql2 = `UPDATE users SET RoleID = 2 WHERE UserID = ?`;
+        await conn.query(sql2, [userId]);
+
+        console.debug("Updating team leader ID in the team table");
+        // Update the team leader ID in the team table.
+        const sql3 = `UPDATE teams SET TeamLeaderID = ? WHERE TeamID = (SELECT TeamID FROM users WHERE UserID = ?)`;
+        const [result3] = await conn.query(sql3, [userId, userId]);
+
+        await conn.commit();
+        console.log(result3);
+        return result3.affectedRows > 0;
+    } catch (e) {
+        await conn.rollback();
+        console.error("Error promoting captain: ", e);
+        return false;
+    } finally {
+        conn.release();
+    }
+};
+
+const removeTeamMember = async (userId) => {
+    const sql = `UPDATE users SET RoleID = 1, TeamID = null WHERE UserID = ?`;
+    const [result] = await db.query(sql, [userId]);
+    return result.affectedRows > 0;
+};
+
 module.exports = {
     getTeam,
     getMembers,
@@ -350,4 +388,6 @@ module.exports = {
     denyTeam,
     approveTeamUpdate,
     denyTeamUpdate,
+    promoteCaptain,
+    removeTeamMember,
 };
