@@ -14,6 +14,7 @@ import { UserSettings } from "./UserSettings";
 import { UserSignIn } from "./UserSignIn";
 import { UserSignUp } from "./UserSignUp";
 import { PrivacyPolicy } from "./PrivacyPolicy"; 
+import { ContactUs } from "./ContactUs"; 
 
 export {
     About,
@@ -32,4 +33,5 @@ export {
     UserSignIn,
     UserSignUp,
     PrivacyPolicy, 
+    ContactUs,
 };
