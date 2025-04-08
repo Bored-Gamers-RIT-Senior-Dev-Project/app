@@ -416,6 +416,61 @@ const grantRole = async (userId, roleName, identifier = UserIds.LOCAL) => {
     return true;
 };
 
+const approveUser = async (userId) => {
+    const sql = "UPDATE users SET IsApproved = true WHERE UserID = ?;";
+    const [result] = await db.query(sql, [userId]);
+    return result.affectedRows > 0;
+};
+
+const denyUser = async (userId) => {
+    const sql =
+        "UPDATE users SET UniversityID = null, RoleID = 1 WHERE UserID = ?;";
+    const result = await db.query(sql, [userId]);
+    return result.affectedRows > 0;
+};
+
+const approveUserUpdate = async (userUpdateId, approvedBy) => {
+    //Sql written with help from gpt
+    const conn = await db.getConnection();
+    try {
+        await conn.beginTransaction();
+        const updateSql = `
+        UPDATE users u
+        JOIN user_update uu ON uu.UserUpdateId = ?
+        SET
+            u.FirstName        = COALESCE(uu.FirstName, u.FirstName),
+            u.LastName         = COALESCE(uu.LastName, u.LastName),
+            u.Username         = COALESCE(uu.Username, u.Username),
+            u.Email            = COALESCE(uu.Email, u.Email),
+            u.ProfileImageURL  = COALESCE(uu.ProfileImageURL, u.ProfileImageURL),
+            u.Bio              = COALESCE(uu.Bio, u.Bio)
+        WHERE u.UserID = uu.UpdatedUserID;`;
+        const [result] = await conn.query(updateSql, [userUpdateId]);
+
+        await conn.query(
+            "UPDATE user_update SET ApprovedBy = ? WHERE UserUpdateId = ?",
+            [approvedBy, userUpdateId]
+        );
+
+        await conn.commit();
+        return result.affectedRows > 0;
+    } catch (e) {
+        await conn.rollback();
+        console.error("Error approving user: ", e);
+        return false;
+    } finally {
+        conn.release();
+    }
+};
+
+const denyUserUpdate = async (userUpdateId) => {
+    const [result] = await db.query(
+        "DELETE FROM user_update WHERE UserUpdateId = ?",
+        [userUpdateId]
+    );
+    return result.affectedRows > 0;
+};
+
 module.exports = {
     UserIds,
     Roles,
@@ -429,4 +484,8 @@ module.exports = {
     userHasRole,
     grantRole,
     updateUserOrRequestUpdate,
+    approveUser,
+    denyUser,
+    approveUserUpdate,
+    denyUserUpdate,
 };
