@@ -121,7 +121,8 @@ const getUserList = async () => {
 
 /**
  * Retrieve a user from the database, using the column and value specified.
- * @param {string} column The column to use to match with value.  (TO PREVENT SQL INJECTION, SHOULD ALWAYS BE USED HARD-CODED)
+ * @param {string} column The column to use to match with value.  (TO PREVENT
+ * SQL INJECTION, SHOULD ALWAYS BE USED HARD-CODED)
  * @param {string|number} value The value of {column} to search for.
  * @returns A matching user, or null if no user is found.
  */
@@ -177,7 +178,6 @@ const VALID_KEYS = Object.freeze({
  * @param {number|string} userId  Id of the user to update
  * @param {object} body
  * @param {UserIdentifier|undefined} identifier Determines if DB should check
- * @returns
  */
 const updateUser = async (userId, body, identifier = UserIds.LOCAL) => {
     if (body.username) body.username = await generateUsername(body.username);
@@ -219,6 +219,15 @@ const updateUser = async (userId, body, identifier = UserIds.LOCAL) => {
     }
 
     return await getUserByUserId(userId);
+};
+
+/**
+ *
+ * @param {number} userId the UserID to update
+ * @param {object} body the body
+ */
+const updateUserOrRequestUpdate = async (userId, body) => {
+    getUserById;
 };
 
 /**

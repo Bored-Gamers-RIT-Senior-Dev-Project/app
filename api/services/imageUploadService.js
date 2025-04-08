@@ -10,21 +10,17 @@ const USER_IMAGE_DIRECTORY = __dirname + "/../user-images/";
  * Encode image as WEBP, discarding any metadata
  * Also, resize image so that it is at most 1000px on it's longest side
  * @param {Buffer} image an image to attempt to encode
- * @return {Promise<Buffer | null>} The image, encoded as WEBP, or null if it couldn't be converted
+ * @return {Promise<Buffer>} The image, encoded as WEBP
+ * @throws {Error} if sharp can't convert the image
  */
 const encodeImage = async (image) => {
-    try {
-        return await sharp(image)
-            .resize(MAX_LONGEST_SIDE, MAX_LONGEST_SIDE, {
-                fit: "inside",
-                withoutEnlargement: true,
-            })
-            .webp()
-            .toBuffer();
-    } catch (e) {
-        console.warn(e);
-        return null;
-    }
+    return await sharp(image)
+        .resize(MAX_LONGEST_SIDE, MAX_LONGEST_SIDE, {
+            fit: "inside",
+            withoutEnlargement: true,
+        })
+        .webp()
+        .toBuffer();
 };
 
 /**
@@ -61,11 +57,20 @@ const saveImage = async (name, image) => {
 };
 
 /**
+ * Record in the database where to find the uploaded image
+ * @param {string} url the url to the image
+ * @param {number} uid the id of the user that's uploading an image
+ */
+const recordUserImageURL = async (url, uid) => {
+    // TODO
+};
+
+/**
  * Save an image for a user - save the image to the disk after transcoding to
  * WEBP, and request a user update for that image
  * @param {Buffer} file the file to try to use as an image
- * @param {number} uid the user's id
+ * @param {number} userid the user's id
  */
-const uploadUserImage = async (file, uid) => {};
+const uploadUserImage = async (file, userid) => {};
 
 module.exports = { encodeImage, hash, saveImage, uploadUserImage };
