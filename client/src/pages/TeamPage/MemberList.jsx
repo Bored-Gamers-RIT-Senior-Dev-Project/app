@@ -62,7 +62,7 @@ const MemberList = ({ members, captainId, currentUserId }) => {
                             onClick={() => {
                                 submit(
                                     { id: member.userId },
-                                    { action: "./remove", navigate: false }
+                                    { action: "./promote", navigate: false }
                                 );
                                 handleMenuClose();
                             }}
