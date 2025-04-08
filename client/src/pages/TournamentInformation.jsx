@@ -32,10 +32,6 @@ const style = {
     p: 4,
 };
 
-const { user } = useAuth();
-
-const isFacilitator = [2, 3, 5, 8].includes(user?.roleId);
-
 /**
  * A popup that lets admins edit the score
  * @param {*} props with the match, which is null if the modal should be closed,
@@ -87,6 +83,8 @@ ScorePopup.propTypes = {
 
 const TournamentInformation = () => {
     const { id } = useParams();
+    const { user } = useAuth();
+    const { isFacilitator } = [2, 3, 5, 8].includes(user?.roleId);
     const [tournament, setTournament] = useState(null);
     const [matches, setMatches] = useState(null);
     const [loading, setLoading] = useState(true);
