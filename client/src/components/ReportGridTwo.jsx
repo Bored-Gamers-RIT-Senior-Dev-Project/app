@@ -5,85 +5,71 @@ import PropTypes from "prop-types";
 import { Grid } from "./Grid";
 
 //Component Layout created by chatGPT https://chatgpt.com/canvas/shared/67e2c89cbeb88191b49c51fc7d74c8f8
-const ReportGridOne = ({ data, totals }) => {
+const ReportGridTwo = ({ data, totals }) => {
     const columnDefs = [
         {
-            headerName: "Date Added",
-            field: "DateAdded",
+            headerName: "Next Tournament",
+            field: "DateOfNextTournamentPlay",
             sortable: true,
-            resizable: true,
-            valueGetter: ({ data }) => (data ? new Date(data.DateAdded) : null),
-            valueFormatter: ({ value }) => new Date(value).toLocaleString(),
             filter: "agDateColumnFilter",
+            valueFormatter: (params) => {
+                const date = new Date(params.value);
+                return date.toLocaleString();
+            },
         },
         {
             headerName: "College Name",
             field: "CollegeName",
-            filter: true,
             sortable: true,
-            resizable: true,
+            filter: "agTextColumnFilter",
         },
         {
             headerName: "Country",
             field: "CollegeCountry",
-            filter: true,
             sortable: true,
-            resizable: true,
+            filter: "agTextColumnFilter",
         },
         {
-            headerName: "Teams",
-            field: "NumberOfTeams",
-            filter: true,
+            headerName: "Planned Matches",
+            field: "NumberOfMatchesPlanned",
             sortable: true,
-            resizable: true,
+            filter: "agNumberColumnFilter",
         },
         {
-            headerName: "Team Members",
-            field: "NumberOfTeamMembers",
-            filter: true,
+            headerName: "Matches Played",
+            field: "TotalMatchesPlayed",
             sortable: true,
-            resizable: true,
+            filter: "agNumberColumnFilter",
         },
         {
-            headerName: "Moderator Exists",
-            field: "CollegeModeratorExists",
-            filter: true,
+            headerName: "Eliminations Complete",
+            field: "EliminationsComplete",
             sortable: true,
-            resizable: true,
-        },
-        {
-            headerName: "Page Created",
-            field: "CollegePageCreated",
-            filter: true,
-            sortable: true,
-            resizable: true,
+            filter: "agTextColumnFilter",
         },
     ];
 
     return (
-        <Box
-            sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-            }}
-        >
+        <Box>
             <Grid
                 rowData={data}
                 columnDefs={columnDefs}
                 defaultColDef={{ flex: 1 }}
+                pagination={true}
                 paginationPageSize={10}
-                pagination
             />
             <Card variant="outlined" style={{ marginTop: 20 }}>
+                {console.log(totals)}
                 <CardContent>
                     <Typography variant="h6">Totals</Typography>
                     <Typography>
                         Total Colleges: {totals.TotalColleges}
                     </Typography>
-                    <Typography>Total Teams: {totals.TotalTeams}</Typography>
                     <Typography>
-                        Total Team Members: {totals.TotalTeamMembers}
+                        Total Matches Planned: {totals.TotalMatchesPlanned}
+                    </Typography>
+                    <Typography>
+                        Total Matches Played: {totals.TotalMatchesPlayed}
                     </Typography>
                 </CardContent>
             </Card>
@@ -92,13 +78,13 @@ const ReportGridOne = ({ data, totals }) => {
 };
 
 //Proptypes built in copilot
-ReportGridOne.propTypes = {
+ReportGridTwo.propTypes = {
     data: PropTypes.array.isRequired,
     totals: PropTypes.shape({
         TotalColleges: PropTypes.number.isRequired,
-        TotalTeams: PropTypes.number.isRequired,
-        TotalTeamMembers: PropTypes.number.isRequired,
+        TotalMatchesPlanned: PropTypes.number.isRequired,
+        TotalMatchesPlayed: PropTypes.number.isRequired,
     }).isRequired,
 };
 
-export { ReportGridOne };
+export { ReportGridTwo };

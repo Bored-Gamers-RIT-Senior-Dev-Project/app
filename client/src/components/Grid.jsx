@@ -15,7 +15,7 @@ provideGlobalGridOptions({ theme: "legacy" });
 
 const Grid = ({ boxProps = {}, ...props }) => {
     const mergedStyles = {
-        height: "100%",
+        minHeight: "50vh",
         width: "100%",
         ...(boxProps?.sx ?? {}),
     };
