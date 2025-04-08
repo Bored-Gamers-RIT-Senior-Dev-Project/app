@@ -90,9 +90,8 @@ const respondToNewTeam = async (user, teamId, approved) => {
     const newTeam = await Team.getTeamById(teamId, true);
     if (
         user.roleName != User.Roles.UNIVERSITY_ADMIN ||
-        newTeam.UniversityID != user.universityId
+        newTeam.universityId != user.universityId
     ) {
-        console.log(newTeam);
         throw createHttpError(403);
     }
     if (approved) {
@@ -100,7 +99,20 @@ const respondToNewTeam = async (user, teamId, approved) => {
     }
     return await Team.denyTeam(teamId);
 };
-const respondToTeamEdit = async (user, teamId, approved) => {};
+const respondToTeamEdit = async (user, editId, approved) => {
+    const teamEdit = await Team.getTeamUpdate(editId);
+    if (
+        user.roleName != User.Roles.UNIVERSITY_ADMIN ||
+        teamEdit.UniversityID != user.universityId
+    ) {
+        throw createHttpError(403);
+    }
+
+    if (approved) {
+        return await Team.approveTeamUpdate(editId, user.userId);
+    }
+    return await Team.denyTeamUpdate(editId);
+};
 
 module.exports = {
     generateReports,

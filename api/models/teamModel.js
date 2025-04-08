@@ -226,6 +226,19 @@ const teamUpdateRequest = async (
     return result.affectedRows > 0;
 };
 
+const getTeamUpdate = async (updateId) => {
+    const sql = `SELECT t.UniversityID, u.*
+    FROM team_update u
+    JOIN teams t ON u.UpdatedTeamId = t.TeamID
+    WHERE u.TeamUpdateId = ?;
+    `;
+    const [rows] = await db.query(sql, [updateId]);
+    if (rows.count < 1) {
+        return null;
+    }
+    return rows[0];
+};
+
 const approveTeam = async (teamId) => {
     const sql = `UPDATE teams SET IsApproved = true WHERE TeamID = ?`;
     const [result] = await db.query(sql, [teamId]);
@@ -312,6 +325,7 @@ module.exports = {
     searchTeams,
     getTeamsByUniversityId,
     teamUpdateRequest,
+    getTeamUpdate,
     approveTeam,
     denyTeam,
     approveTeamUpdate,
