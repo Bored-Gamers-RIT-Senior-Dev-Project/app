@@ -246,13 +246,12 @@ const requestUserUpdate = async (userId, body) => {
     "use strict";
     const result = await db.query(
         `INSERT INTO
-            user_update (UpdatedUserID, RequestedDate, ApprovedBy, RequestedDate, FirstName, LastName, Username, Email, ProfileImageURL, Bio)
+            user_update (UpdatedUserID, RequestedDate, ApprovedBy, FirstName, LastName, Username, Email, ProfileImageURL, Bio)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, )`,
         [
             userId,
             body.requestedDate,
             body.approvedBy,
-            body.requestedDate,
             body.firstName,
             body.lastName,
             body.username,
