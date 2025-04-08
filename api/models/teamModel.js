@@ -336,6 +336,15 @@ const denyTeamUpdate = async (teamUpdateId) => {
     return result.affectedRows > 0;
 };
 
+const getPendingChanges = async (teamId) => {
+    const sql = `SELECT * FROM team_update WHERE UpdatedTeamID = ? AND ApprovedBy IS NULL`;
+    const [rows] = await db.query(sql, [teamId]);
+    if (rows.length < 1) {
+        return null;
+    }
+    return rows[0];
+};
+
 const promoteCaptain = async (userId, teamId) => {
     const conn = await db.getConnection();
     try {
@@ -380,6 +389,7 @@ module.exports = {
     createTeam,
     getTeams,
     getTeamById,
+    getPendingChanges,
     searchTeams,
     getTeamsByUniversityId,
     teamUpdateRequest,

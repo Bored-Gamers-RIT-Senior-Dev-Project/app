@@ -3,7 +3,7 @@ import { useLoaderData } from "react-router";
 import { TeamEditor } from "./TeamEditor";
 import { TeamView } from "./TeamView";
 
-import { Box, Paper } from "@mui/material";
+import { Alert, Box, Paper } from "@mui/material";
 import { useAuth } from "../../hooks/useAuth";
 import { pageWidth } from "../../utils/theme";
 import { MemberList } from "./MemberList";
@@ -33,11 +33,32 @@ const TeamPage = () => {
                     margin: "auto",
                 }}
             >
+                {!team.isValidated && (
+                    <Alert severity="warning" sx={{ marginBottom: 2 }}>
+                        This team has not been approved by a university
+                        representative. It will not be publicly visible until it
+                        is reviewed and approved.
+                    </Alert>
+                )}
+                {team.pendingChanges && (
+                    <Alert severity="warning" sx={{ marginBottom: 2 }}>
+                        This team has pending changes. Changes will not be
+                        visible to the public until they are reviewed and
+                        approved by a university representative.
+                    </Alert>
+                )}
                 {editMode && isCaptain ? (
                     <TeamEditor
-                        teamName={team.teamName}
-                        teamSummary={team.description}
-                        teamImage={team.profileImageUrl}
+                        teamName={
+                            team.pendingChanges?.teamName ?? team.teamName
+                        }
+                        teamSummary={
+                            team.pendingChanges?.description ?? team.description
+                        }
+                        teamImage={
+                            team.pendingChanges?.profileImageUrl ??
+                            team.profileImageUrl
+                        }
                         exitEditMode={() => setEditMode(false)}
                     />
                 ) : (
