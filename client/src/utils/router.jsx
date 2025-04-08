@@ -79,6 +79,18 @@ const routes = [
                     const formData = await request.formData();
                     return await teams.update(params.teamId, formData);
                 },
+                children: [
+                    {
+                        path: "/teams/:teamId/remove",
+                        element: null,
+                        action: makeAction(console.log),
+                    },
+                    {
+                        path: "/teams/:teamId/promote",
+                        element: null,
+                        action: makeAction(console.log),
+                    },
+                ],
             },
             {
                 path: "/university/:universityId",

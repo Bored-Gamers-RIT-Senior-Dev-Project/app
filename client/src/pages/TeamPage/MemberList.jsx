@@ -1,8 +1,7 @@
-import { Add as AddIcon, MoreVert as MoreVertIcon } from "@mui/icons-material";
+import { MoreVert as MoreVertIcon } from "@mui/icons-material";
 import {
     Avatar,
     Box,
-    Button,
     Card,
     Grid2 as Grid,
     IconButton,
@@ -12,12 +11,17 @@ import {
     Tabs,
     Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { Outlet } from "react-router";
+import { usePostSubmit } from "../../hooks/usePostSubmit";
 import propTypes from "../../utils/propTypes";
-const MemberList = ({ members, captainId }) => {
+
+const MemberList = ({ members, captainId, currentUserId }) => {
     const [tab, setTab] = useState(0);
     const [menuAnchor, setMenuAnchor] = useState(null);
     const [selectedMember, setSelectedMember] = useState(null);
+
+    const submit = usePostSubmit();
 
     const handleMenuOpen = (event, member) => {
         setMenuAnchor(event.currentTarget);
@@ -29,10 +33,71 @@ const MemberList = ({ members, captainId }) => {
         setSelectedMember(null);
     };
 
-    const handleRemoveMember = () => {
-        console.log("Remove ", selectedMember);
-        handleMenuClose();
-    };
+    const UserMenu = useCallback(
+        ({ member }) => {
+            if (currentUserId == captainId) {
+                return (
+                    <Menu
+                        anchorEl={menuAnchor}
+                        open={
+                            Boolean(menuAnchor) &&
+                            selectedMember?.userId === member.userId
+                        }
+                        onClose={handleMenuClose}
+                    >
+                        <MenuItem
+                            onClick={() => {
+                                submit(
+                                    {
+                                        id: member.userId,
+                                    },
+                                    { action: "./remove", navigate: false }
+                                );
+                                handleMenuClose();
+                            }}
+                        >
+                            Remove From Team
+                        </MenuItem>
+                        <MenuItem
+                            onClick={() => {
+                                submit(
+                                    { id: member.userId },
+                                    { action: "./remove", navigate: false }
+                                );
+                                handleMenuClose();
+                            }}
+                        >
+                            Promote To Captain
+                        </MenuItem>
+                    </Menu>
+                );
+            }
+            return (
+                <Menu
+                    anchorEl={menuAnchor}
+                    open={
+                        Boolean(menuAnchor) &&
+                        selectedMember?.userId === member.userId
+                    }
+                    onClose={handleMenuClose}
+                >
+                    <MenuItem
+                        onClick={() => {
+                            submit(
+                                { id: member.userId },
+                                { action: "./remove", navigate: false }
+                            );
+                            handleMenuClose();
+                        }}
+                    >
+                        Leave Team
+                    </MenuItem>
+                </Menu>
+            );
+        },
+        [captainId, currentUserId, menuAnchor, selectedMember?.userId, submit]
+    );
+
     return (
         <Box>
             <Tabs
@@ -77,33 +142,24 @@ const MemberList = ({ members, captainId }) => {
                                         {member.bio}
                                     </Typography>
                                 </Box>
-                                <IconButton
-                                    onClick={(e) => handleMenuOpen(e, member)}
-                                >
-                                    <MoreVertIcon />
-                                </IconButton>
+                                {member.userId != captainId &&
+                                    (currentUserId == captainId ||
+                                        member.userId == currentUserId) && (
+                                        <IconButton
+                                            onClick={(e) =>
+                                                handleMenuOpen(e, member)
+                                            }
+                                        >
+                                            <MoreVertIcon />
+                                        </IconButton>
+                                    )}
+                                <UserMenu member={member} />
                             </Card>
                         </Grid>
                     ))}
                 </Grid>
             )}
-
-            <Menu
-                anchorEl={menuAnchor}
-                open={Boolean(menuAnchor)}
-                onClose={handleMenuClose}
-            >
-                <MenuItem onClick={handleRemoveMember}>Remove</MenuItem>
-                <MenuItem onClick={() => alert("Change Role clicked!")}>
-                    Change Role
-                </MenuItem>
-            </Menu>
-
-            <Box sx={{ position: "fixed", bottom: 16, right: 16 }}>
-                <Button variant="contained" startIcon={<AddIcon />}>
-                    Add Member
-                </Button>
-            </Box>
+            <Outlet />
         </Box>
     );
 };
@@ -111,6 +167,7 @@ const MemberList = ({ members, captainId }) => {
 MemberList.propTypes = {
     members: propTypes.array,
     captainId: propTypes.number,
+    currentUserId: propTypes.number,
 };
 
 export { MemberList };
