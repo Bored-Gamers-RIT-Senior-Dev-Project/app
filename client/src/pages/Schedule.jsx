@@ -10,7 +10,7 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
-    Grid,
+    Grid2,
     MenuItem,
     Paper,
     Select,
@@ -124,14 +124,7 @@ const Schedule = () => {
 
     return (
         <Box sx={{ maxWidth: "900px", margin: "auto", padding: 2 }}>
-            <Typography
-                variant="h4"
-                sx={{
-                    fontWeight: "bold",
-                    textAlign: "center",
-                    marginBottom: 3,
-                }}
-            >
+            <Typography variant="h4" sx={{ fontWeight: "bold", textAlign: "center", marginBottom: 3 }}>
                 All Tournaments
             </Typography>
 
@@ -145,8 +138,8 @@ const Schedule = () => {
                 }}
             >
                 <Paper sx={{ padding: 3, borderRadius: "10px" }}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
+                    <Grid2 container spacing={2}>
+                        <Grid2 item xs={12} sm={6}>
                             <TextField
                                 fullWidth
                                 label="Tournament Name"
@@ -154,8 +147,8 @@ const Schedule = () => {
                                 value={filters.name}
                                 onChange={handleFilterChange}
                             />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
+                        </Grid2>
+                        <Grid2 item xs={12} sm={6}>
                             <TextField
                                 fullWidth
                                 label="Location"
@@ -163,8 +156,8 @@ const Schedule = () => {
                                 value={filters.location}
                                 onChange={handleFilterChange}
                             />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
+                        </Grid2>
+                        <Grid2 item xs={12} sm={6}>
                             <Select
                                 fullWidth
                                 name="status"
@@ -179,8 +172,8 @@ const Schedule = () => {
                                     </MenuItem>
                                 ))}
                             </Select>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
+                        </Grid2>
+                        <Grid2 item xs={12} sm={6}>
                             <Select
                                 fullWidth
                                 name="sortBy"
@@ -192,8 +185,8 @@ const Schedule = () => {
                                 <MenuItem value="date">Start Date</MenuItem>
                                 <MenuItem value="location">Location</MenuItem>
                             </Select>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
+                        </Grid2>
+                        <Grid2 item xs={12} sm={6}>
                             <LocalizationProvider dateAdapter={AdapterDateFns}>
                                 <DatePicker
                                     label="Start Date"
@@ -209,8 +202,8 @@ const Schedule = () => {
                                     )}
                                 />
                             </LocalizationProvider>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
+                        </Grid2>
+                        <Grid2 item xs={12} sm={6}>
                             <LocalizationProvider dateAdapter={AdapterDateFns}>
                                 <DatePicker
                                     label="End Date"
@@ -226,8 +219,8 @@ const Schedule = () => {
                                     )}
                                 />
                             </LocalizationProvider>
-                        </Grid>
-                        <Grid item xs={12}>
+                        </Grid2>
+                        <Grid2 item xs={12}>
                             <Button
                                 fullWidth
                                 variant="outlined"
@@ -235,8 +228,8 @@ const Schedule = () => {
                             >
                                 Clear Filters
                             </Button>
-                        </Grid>
-                    </Grid>
+                        </Grid2>
+                    </Grid2>
                 </Paper>
             </Box>
 
@@ -278,9 +271,17 @@ const Schedule = () => {
                             </Box>
                         </AccordionSummary>
                         <AccordionDetails>
-                            <Typography variant="body2" color="textSecondary">
-                                Tournament details go here.
-                            </Typography>
+                            <Grid2 container spacing={2}>
+                                    <Grid2 item xs={12}>
+                                        <Button
+                                            variant="contained"
+                                            fullWidth
+                                            onClick={() => openManageDialog(tournament)}
+                                        >
+                                            Manage Tournament
+                                        </Button>
+                                    </Grid2>
+                            </Grid2>
                         </AccordionDetails>
                     </Accordion>
                 ))
