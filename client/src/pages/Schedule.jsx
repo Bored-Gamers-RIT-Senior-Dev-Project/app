@@ -282,6 +282,81 @@ const Schedule = () => {
                                         </Button>
                                     </Grid2>
                             </Grid2>
+
+                            <Grid2 item xs={12} sm={4}>
+                                    <Button
+                                        variant="contained"
+                                        color="success"
+                                        fullWidth
+                                        onClick={() =>
+                                            console.log("Start tournament:", tournament.tournamentId)
+                                        }
+                                    >
+                                        Start Tournament
+                                    </Button>
+                            </Grid2>
+
+                            <Grid2 item xs={12} sm={4}>
+                                    <Button
+                                        variant="contained"
+                                        color="warning"
+                                        fullWidth
+                                        onClick={() =>
+                                            console.log("Cancel tournament:", tournament.tournamentId)
+                                        }
+                                    >
+                                        Cancel Tournament
+                                    </Button>
+                            </Grid2>
+
+                            <Grid2 item xs={12} sm={4}>
+                                    <Button
+                                        variant="contained"
+                                        color="error"
+                                        fullWidth
+                                        onClick={() =>
+                                            console.log("Delete tournament:", tournament.tournamentId)
+                                        }
+                                    >
+                                        Delete Tournament
+                                    </Button>
+                            </Grid2>
+
+                            <Grid2 item xs={12} sm={6}>
+                                    <Select
+                                        fullWidth
+                                        displayEmpty
+                                        defaultValue=""
+                                        onChange={(e) =>
+                                            console.log(
+                                                `Team action "${e.target.value}" for tournament ${tournament.tournamentId}`
+                                            )
+                                        }
+                                    >
+                                        <MenuItem value="">Team Options</MenuItem>
+                                        <MenuItem value="addTeam">Add Team</MenuItem>
+                                        <MenuItem value="removeTeam">Remove Team</MenuItem>
+                                        <MenuItem value="disqualifyTeam">Disqualify Team</MenuItem>
+                                    </Select>
+                                </Grid2>
+
+                                <Grid2 item xs={12} sm={6}>
+                                    <Select
+                                        fullWidth
+                                        displayEmpty
+                                        defaultValue=""
+                                        onChange={(e) =>
+                                            console.log(
+                                                `Facilitator action "${e.target.value}" for tournament ${tournament.tournamentId}`
+                                            )
+                                        }
+                                    >
+                                        <MenuItem value="">Facilitator Options</MenuItem>
+                                        <MenuItem value="listFacilitators">List Facilitators</MenuItem>
+                                        <MenuItem value="addFacilitator">Add Facilitator</MenuItem>
+                                        <MenuItem value="removeFacilitator">Remove Facilitator</MenuItem>
+                                    </Select>
+                                </Grid2>
                         </AccordionDetails>
                     </Accordion>
                 ))
