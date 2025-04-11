@@ -132,7 +132,7 @@ const AdminDashboard = () => {
         console.log("New Tournament:", newTournament);
         setOpenDialog(false); // Close the dialog after submission
     };
-    
+
     return (
         <Paper
             sx={{
@@ -189,6 +189,9 @@ const AdminDashboard = () => {
                     <MenuItem onClick={() => navigate("./addUniversity")}>
                         New University
                     </MenuItem>
+                    <MenuItem onClick={() => setOpenDialog(true)}>
+                        New Tournament
+                    </MenuItem>
                 </Menu>
             </Box>
             <Typography variant="h5" sx={{ textAlign: "left", width: "100%" }}>
@@ -196,6 +199,76 @@ const AdminDashboard = () => {
             </Typography>
             <Grid rowData={rowData} columnDefs={columnDefs} pagination />
             <Outlet />
+
+            
+            {/* Tournament Dialog */}
+            <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+                <DialogTitle>Create New Tournament</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        label="Tournament Name"
+                        name="tournamentName"
+                        value={newTournament.tournamentName}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                    />
+                    <TextField
+                        label="Location"
+                        name="location"
+                        value={newTournament.location}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                    />
+                    <TextField
+                        label="Start Date"
+                        name="startDate"
+                        type="date"
+                        value={newTournament.startDate}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                    />
+                    <TextField
+                        label="End Date"
+                        name="endDate"
+                        type="date"
+                        value={newTournament.endDate}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                    />
+                    <TextField
+                        label="Status"
+                        name="status"
+                        value={newTournament.status}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        select
+                    >
+                        <MenuItem value="active">Active</MenuItem>
+                        <MenuItem value="ongoing">Ongoing</MenuItem>
+                        <MenuItem value="cancelled">Cancelled</MenuItem>
+                        <MenuItem value="upcoming">Upcoming</MenuItem>
+                    </TextField>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenDialog(false)} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleAddTournament} color="primary">
+                        Add Tournament
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Paper>
     );
 };
