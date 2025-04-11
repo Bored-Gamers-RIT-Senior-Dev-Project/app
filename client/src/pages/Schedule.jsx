@@ -35,17 +35,16 @@ const Schedule = () => {
         endDate: null,
     });
     const [loading, setLoading] = useState(true);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [selectedTournament, setSelectedTournament] = useState(null);
+
     const navigate = useNavigate();
     const tournamentStatuses = ["Active", "Completed", "Cancelled", "Upcoming"];
 
     const formatDateRange = (start, end) => {
         const options = { dateStyle: "medium" };
-        const startDate = start
-            ? new Date(start).toLocaleDateString(undefined, options)
-            : "N/A";
-        const endDate = end
-            ? new Date(end).toLocaleDateString(undefined, options)
-            : "N/A";
+        const startDate = start ? new Date(start).toLocaleDateString(undefined, options) : "N/A";
+        const endDate = end ? new Date(end).toLocaleDateString(undefined, options) : "N/A";
         return `${startDate} - ${endDate}`;
     };
 
