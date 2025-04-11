@@ -1,28 +1,26 @@
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { Delete, Edit, Search as SearchIcon } from "@mui/icons-material";
 import {
-    Accordion,
-    AccordionDetails,
-    AccordionSummary,
     Box,
     Button,
-    CircularProgress,
+    IconButton,
+    InputAdornment,
+    Menu,
+    MenuItem,
+    Paper,
+    TextField,
+    Tooltip,
+    Typography,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
-    Grid,
-    MenuItem,
-    Paper,
-    Select,
-    TextField,
-    Typography,
 } from "@mui/material";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
-import { API_URL } from "../utils/api";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
+import { useState } from "react";
+import { Outlet, useLoaderData, useNavigate } from "react-router";
+import { Grid } from "../components/Grid";
+import propTypes from "../utils/propTypes";
 
 const ActionsCellRenderer = ({ navigate, data }) => (
     <Box>
