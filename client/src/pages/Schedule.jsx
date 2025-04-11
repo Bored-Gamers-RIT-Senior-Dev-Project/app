@@ -1,3 +1,4 @@
+// code written with aid of AI
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
     Accordion,

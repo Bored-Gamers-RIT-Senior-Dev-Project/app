@@ -1,3 +1,4 @@
+// Code written with aid of AI
 import { Delete, Edit, Search as SearchIcon } from "@mui/icons-material";
 import {
     Box,
@@ -200,7 +201,7 @@ const AdminDashboard = () => {
             <Grid rowData={rowData} columnDefs={columnDefs} pagination />
             <Outlet />
 
-            
+
             {/* Tournament Dialog */}
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
                 <DialogTitle>Create New Tournament</DialogTitle>
