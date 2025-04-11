@@ -45,8 +45,16 @@ ActionsCellRenderer.propTypes = {
 const AdminDashboard = () => {
     const [search, setSearch] = useState("");
     const [anchorEl, setAnchorEl] = useState(null);
-    const navigate = useNavigate();
+    const [openDialog, setOpenDialog] = useState(false);
+    const [newTournament, setNewTournament] = useState({
+        tournamentName: "",
+        location: "",
+        startDate: "",
+        endDate: "",
+        status: "",
+    });
 
+    const navigate = useNavigate();
     const rowData = useLoaderData();
 
     const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
@@ -113,6 +121,18 @@ const AdminDashboard = () => {
         },
     ];
 
+    // Handling form input change for new tournament
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setNewTournament((prev) => ({ ...prev, [name]: value }));
+    };
+
+    // Handle form submission for new tournament
+    const handleAddTournament = () => {
+        console.log("New Tournament:", newTournament);
+        setOpenDialog(false); // Close the dialog after submission
+    };
+    
     return (
         <Paper
             sx={{
