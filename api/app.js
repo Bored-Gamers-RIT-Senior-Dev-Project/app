@@ -14,6 +14,7 @@ const users = require("./routes/users");
 const university = require("./routes/university");
 const teams = require("./routes/teams");
 const tournament = require("./routes/tournament");
+const payment = require("./routes/payment");
 const createError = require("http-errors");
 
 const uploadService = require("./services/imageUploadService");
@@ -35,6 +36,7 @@ app.use("/api", index);
 app.use("/api/users", users);
 app.use("/api/university", university);
 app.use("/api/teams", teams);
+app.use("/api/stripe", payment);
 
 // app.use("/api", test);
 app.use("/api/user-images", express.static(__dirname + "/user-images"));
