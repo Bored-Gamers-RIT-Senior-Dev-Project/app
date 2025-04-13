@@ -1,5 +1,3 @@
-//Adapted from Stripe Quickstart Documentation for Node.js/React Implementation:
-//https://docs.stripe.com/checkout/custom/quickstart?lang=node&client=react
 const userService = require("../services/userService");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY, {
     apiVersion: process.env.STRIPE_API_VERSION,
@@ -8,37 +6,78 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY, {
 const express = require("express");
 const router = express.Router();
 
-router.post("/create-session", async (req, res) => {
-    const uid = req.user?.uid;
-    if (!uid) return res.status(401).send();
+//Adapted from Stripe Quickstart Documentation for Node.js/React Implementation:
+//https://docs.stripe.com/checkout/custom/quickstart?lang=node&client=react
+router.post(
+    "/create-session",
+    express.json({ type: "application/json" }),
+    async (req, res) => {
+        const uid = req.user?.uid;
+        if (!uid) return res.status(401).send();
 
-    const user = await userService.getUserByFirebaseId(uid);
+        const user = await userService.getUserByFirebaseId(uid);
 
-    const session = await stripe.checkout.sessions.create({
-        ui_mode: "embedded",
-        line_items: [
-            {
-                price: "price_1RAg6bC7w5sX5X3bc0EeN1Ed",
-                quantity: 1,
+        const session = await stripe.checkout.sessions.create({
+            ui_mode: "embedded",
+            line_items: [
+                {
+                    price: "price_1RAg6bC7w5sX5X3bc0EeN1Ed",
+                    quantity: 1,
+                },
+            ],
+            mode: "payment",
+            metadata: {
+                user_id: user.userId,
             },
-        ],
-        mode: "payment",
-        customer_email: user.email,
-        redirect_on_completion: "never",
-    });
+            customer_email: user.email,
+            return_url: `${
+                process.env.CLIENT_URL ??
+                process.env.API_URL ??
+                "http://localhost:5173"
+            }/settings`,
+        });
 
-    return res.send({ clientSecret: session.client_secret });
-});
+        return res.send({
+            clientSecret: session.client_secret,
+            sessionId: session.id,
+        });
+    }
+);
 
-router.post("/client-status", async (req, res) => {
-    const session = await stripe.checkout.sessions.retrieve(
-        req.body.session_id
-    );
+//Adapted from stripe webhooks guide
+//https://docs.stripe.com/webhooks
+router.post(
+    "/webhook-process-events",
+    express.raw({ type: "application/json" }),
+    async (req, res) => {
+        //Lock-down webhook endpoint so only requests with a valid stripe-signature are allowed.
+        const sig = req.headers["stripe-signature"];
+        let event;
+        try {
+            event = stripe.webhooks.constructEvent(
+                req.body,
+                sig,
+                process.env.STRIPE_ENDPOINT_SECRET
+            );
+        } catch (err) {
+            console.error("Webhook error: ", err.message);
+            return res.status(400).send(`Webhook Error: ${err.message}`);
+        }
 
-    return res.send({
-        status: session.payment_status,
-        customer_email: session.customer_details.email,
-    });
-});
+        // Handle the event
+        switch (event.type) {
+            case "checkout.session.completed":
+                const session = event.data.object;
+                if (session.status == "complete") {
+                    await userService.setUserPaid(session.metadata.user_id);
+                    break;
+                }
+            default:
+                console.warn(`Unhandled event type ${event.type}`);
+        }
+        // Return a response to acknowledge receipt of the event
+        res.json({ received: true });
+    }
+);
 
 module.exports = router;

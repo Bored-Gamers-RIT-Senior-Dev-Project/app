@@ -12,7 +12,6 @@ import propTypes from "../utils/propTypes";
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 const StripeCheckout = ({ open, setOpen }) => {
-    // const [session, setSession] = useState(null);
     const fetchClientSecret = useCallback(
         () =>
             api
@@ -20,6 +19,7 @@ const StripeCheckout = ({ open, setOpen }) => {
                 .then(({ data }) => data.clientSecret),
         []
     );
+
     // const navigate = useNavigate();
     return (
         <Dialog open={open} onClose={() => setOpen(false)}>
