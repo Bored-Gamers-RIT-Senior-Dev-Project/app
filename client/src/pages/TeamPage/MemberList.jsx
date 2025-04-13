@@ -14,7 +14,7 @@ import { useCallback, useState } from "react";
 import { usePostSubmit } from "../../hooks/usePostSubmit";
 import propTypes from "../../utils/propTypes";
 
-const MemberList = ({ members, captainId, currentUserId }) => {
+const MemberList = ({ members, captainId, teamId, currentUser = {} }) => {
     const [menuAnchor, setMenuAnchor] = useState(null);
     const [selectedMember, setSelectedMember] = useState(null);
 
@@ -32,7 +32,7 @@ const MemberList = ({ members, captainId, currentUserId }) => {
 
     const UserMenu = useCallback(
         ({ member }) => {
-            if (currentUserId == captainId) {
+            if (currentUser.userId == captainId) {
                 return (
                     <Menu
                         anchorEl={menuAnchor}
@@ -92,7 +92,13 @@ const MemberList = ({ members, captainId, currentUserId }) => {
                 </Menu>
             );
         },
-        [captainId, currentUserId, menuAnchor, selectedMember?.userId, submit]
+        [
+            captainId,
+            currentUser.userId,
+            menuAnchor,
+            selectedMember?.userId,
+            submit,
+        ]
     );
     return (
         <Grid container spacing={2} sx={{ mt: 2 }}>
@@ -127,7 +133,7 @@ const MemberList = ({ members, captainId, currentUserId }) => {
                                 {member.bio}
                             </Typography>
                         </Box>
-                        {!member.isValidated && (
+                        {!member.isValidated ? (
                             //Courtesy of copilot
                             <Box
                                 sx={{
@@ -147,10 +153,30 @@ const MemberList = ({ members, captainId, currentUserId }) => {
                                     Unverified
                                 </Typography>
                             </Box>
-                        )}
+                        ) : !member.paid && currentUser.teamId == teamId ? (
+                            //Courtesy of copilot
+                            <Box
+                                sx={{
+                                    position: "absolute",
+                                    top: 8,
+                                    right: 8,
+                                    display: "flex",
+                                    alignItems: "center",
+                                }}
+                                title="This member has not paid their 5$ participation fee."
+                            >
+                                <Typography
+                                    variant="body2"
+                                    color="error"
+                                    sx={{ mr: 1 }}
+                                >
+                                    Participation Fee Outstanding
+                                </Typography>
+                            </Box>
+                        ) : null}
                         {member.userId != captainId &&
-                            (currentUserId == captainId ||
-                                member.userId == currentUserId) && (
+                            (currentUser.userId == captainId ||
+                                member.userId == currentUser.userId) && (
                                 <IconButton
                                     onClick={(e) => handleMenuOpen(e, member)}
                                 >
@@ -168,7 +194,7 @@ const MemberList = ({ members, captainId, currentUserId }) => {
 MemberList.propTypes = {
     members: propTypes.array,
     captainId: propTypes.number,
-    currentUserId: propTypes.number,
+    currentUser: propTypes.object,
 };
 
 export { MemberList };
