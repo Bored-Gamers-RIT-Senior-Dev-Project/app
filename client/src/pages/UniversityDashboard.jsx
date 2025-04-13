@@ -175,6 +175,21 @@ const NewUserCard = ({ newUser }) => {
                     <Typography variant="body2">
                         Username: {newUser.Username}
                     </Typography>
+                    {newUser.paid ? (
+                        <Typography
+                            variant="body2"
+                            sx={{ color: "green", fontWeight: "bold" }}
+                        >
+                            Participation Fee Paid
+                        </Typography>
+                    ) : (
+                        <Typography
+                            variant="body2"
+                            sx={{ color: "red", fontWeight: "bold" }}
+                        >
+                            Participation Fee Unpaid
+                        </Typography>
+                    )}
                 </Box>
                 <Typography
                     variant="body2"
