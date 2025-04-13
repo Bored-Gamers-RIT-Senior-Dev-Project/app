@@ -11,9 +11,11 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { ImageUploader } from "../components/ImageUploader";
+import { ParticipationFeeElement } from "../components/ParticipationFeeElement";
 import { useAuth } from "../hooks/useAuth/index";
 import { usePostSubmit } from "../hooks/usePostSubmit";
 import { reauthenticate, updateCredentials } from "../utils/firebase/auth";
+
 const UserSettings = () => {
     const { user } = useAuth();
     const navigate = useNavigate(); //React router useNavigate hook
@@ -85,7 +87,6 @@ const UserSettings = () => {
     if (!user) {
         return <Box></Box>;
     }
-    const emailEncoded = encodeURI(user.email);
 
     return (
         <Paper
@@ -201,15 +202,7 @@ const UserSettings = () => {
             </Card>
 
             {/* Payment Section (Placeholder) */}
-            <Paper variant="outlined" sx={{ mt: 3, padding: 2 }}>
-                <Typography variant="h6">Payment Portal</Typography>
-                <Button
-                    href={`https://buy.stripe.com/test_8wMaETffobOKgmc7ss?prefilled_email=${emailEncoded}`}
-                    target="_blank"
-                >
-                    Click here to pay registration fee with Stripe
-                </Button>
-            </Paper>
+            <ParticipationFeeElement />
         </Paper>
     );
 };

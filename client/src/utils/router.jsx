@@ -3,22 +3,22 @@ import App from "../App";
 import {
     About,
     AdminDashboard,
+    ContactUs,
     Faq,
     Home,
     NotFound,
+    PrivacyPolicy,
     ReportView,
     Rules,
     Schedule,
     Search,
-    TournamentInformation,
     TeamPage,
+    TournamentInformation,
     UniversityDashboard,
     UniversityPage,
     UserSettings,
     UserSignIn,
     UserSignUp,
-    PrivacyPolicy,
-    ContactUs,
 } from "../pages";
 import { JoinTeamPage } from "../pages/JoinTeamPage";
 import { AddUniversityModal } from "../pages/modals/AddUniversityModal";
@@ -137,7 +137,7 @@ const routes = [
             {
                 path: "/contact",
                 element: <ContactUs />,
-            },            
+            },
             {
                 path: "/settings",
                 element: <UserSettings />,

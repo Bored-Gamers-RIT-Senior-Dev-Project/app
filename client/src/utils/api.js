@@ -297,6 +297,7 @@ const combine = (...calls) => {
 
 export {
     admin,
+    api,
     API_URL,
     combine,
     search,
