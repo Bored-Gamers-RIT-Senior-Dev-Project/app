@@ -1,6 +1,6 @@
 //Adapted from Stripe Quickstart Documentation for Node.js/React Implementation:
 //https://docs.stripe.com/checkout/custom/quickstart?lang=node&client=react
-
+const userService = require("../services/userService");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY, {
     apiVersion: process.env.STRIPE_API_VERSION,
 });
@@ -12,8 +12,10 @@ router.post("/create-session", async (req, res) => {
     const uid = req.user?.uid;
     if (!uid) return res.status(401).send();
 
+    const user = await userService.getUserByFirebaseId(uid);
+
     const session = await stripe.checkout.sessions.create({
-        ui_mode: "custom",
+        ui_mode: "embedded",
         line_items: [
             {
                 price: "price_1RAg6bC7w5sX5X3bc0EeN1Ed",
@@ -21,6 +23,8 @@ router.post("/create-session", async (req, res) => {
             },
         ],
         mode: "payment",
+        customer_email: user.email,
+        redirect_on_completion: "never",
     });
 
     return res.send({ clientSecret: session.client_secret });
