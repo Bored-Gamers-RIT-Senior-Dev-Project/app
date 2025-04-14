@@ -1109,11 +1109,11 @@ const updateMatchResult = async (uid, matchID, score1, score2) => {
     }
     const user = await userModel.getUserByFirebaseId(uid);
     if (
-        user.role !== "Super Admin" &&
-        user.role !== "Aardvark Games Employee" &&
-        (user.role !== "University Admin" ||
+        user.roleName !== "Super Admin" &&
+        user.roleName !== "Aardvark Games Employee" &&
+        (user.roleName !== "University Admin" ||
             !checkFacilitatorTournament(tournamentID, user.userID)) &&
-        (user.role !== "Tournament Facilitator" ||
+        (user.roleName !== "Tournament Facilitator" ||
             !checkFacilitatorTournament(tournamentID, user.userID))
     ) {
         throw createHttpError(403);
