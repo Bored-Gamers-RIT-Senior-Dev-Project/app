@@ -1071,7 +1071,7 @@ const searchMatches = async (
 ) => {
     if (matchID) {
         matchID = validateInteger(matchID, "matchID");
-        const match = await TournamentModel.searchMatches(matchID);
+        const match = (await TournamentModel.searchMatches(matchID))[0];
         return match;
     } else {
         if (String(sortAsDescending).toLowerCase() === "true") {
@@ -1103,7 +1103,8 @@ const searchMatches = async (
  */
 const updateMatchResult = async (uid, matchID, score1, score2) => {
     // Get tournament ID to validate facilitator of tournament
-    const tournamentID = searchMatches(matchID)[0].TournamentID;
+    const tournamentID = (await TournamentModel.searchMatches(matchID))[0]
+        .TournamentID;
     if (!tournamentID) {
         throw new Error("Error finding tournament for this match.");
     }
@@ -1145,8 +1146,8 @@ const updateMatchResult = async (uid, matchID, score1, score2) => {
     if (!participants)
         throw new Error("Could not retrieve participant info for Team1.");
 
-    const currentRound = participants[0].TeamRound;
-    const bracketSide = participants[0].TeamBracketSide;
+    const currentRound = participants.TeamRound;
+    const bracketSide = participants.TeamBracketSide;
 
     // Handle the case where Team1 is the winner
     if (score1 > score2) {
