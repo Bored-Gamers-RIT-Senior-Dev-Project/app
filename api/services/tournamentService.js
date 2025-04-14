@@ -567,7 +567,7 @@ const searchTournamentParticipants = async (
     nextMatchID,
     universityID,
     universityName,
-    isApproved = true,
+    isApproved,
     sortBy,
     sortAsDescending = false
 ) => {
