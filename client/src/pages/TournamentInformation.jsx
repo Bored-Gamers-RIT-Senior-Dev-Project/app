@@ -18,7 +18,7 @@ import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useAuth } from "../hooks/useAuth";
-import { API_URL } from "../utils/api";
+import { API_URL, setMatchResult } from "../utils/api";
 
 const style = {
     // https://mui.com/material-ui/react-modal/
@@ -38,40 +38,90 @@ const style = {
  * and handleClose, a function to close the modal
  * @returns the score popup
  */
-const ScorePopup = (props) => {
+const ScorePopup = ({ match, handleClose, onScoreUpdated }) => {
+    const [score1, setScore1] = useState(0);
+    const [score2, setScore2] = useState(0);
+    const [submitting, setSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (match) {
+            setScore1(match.score1 ?? 0);
+            setScore2(match.score2 ?? 0);
+        }
+    }, [match]);
+
+    const handleSubmit = async () => {
+        setSubmitting(true);
+        try {
+            // Use the centralized API caller
+            await setMatchResult({
+                matchId: parseInt(match.matchId, 10),
+                score1: parseInt(score1, 10),
+                score2: parseInt(score2, 10),
+            });
+            onScoreUpdated();
+        } catch (error) {
+            console.error("Error updating match:", error);
+        } finally {
+            setSubmitting(false);
+            handleClose(); // This closes the popup regardless of the outcome.
+            window.location.reload(); // This refreshes the page.
+        }
+    };
+
+    if (!match) return null;
+
     return (
-        <Modal open={props.match != null} onClose={props.handleClose}>
-            {props.match ? (
-                <Box sx={style}>
-                    <Typography align="center" variant="h4">
-                        Update Score
-                    </Typography>
-                    <Stack direction="row" alignItems="center">
-                        <Stack>
-                            <Typography align="center">{`${props.match.team1Name}`}</Typography>
-                            <input
-                                type="number"
-                                style={{ width: "50%", alignSelf: "center" }}
-                                min="0"
-                                value={props.match.score1}
-                            ></input>
-                            <Button onClick={props.handleClose}>Cancel</Button>
-                        </Stack>
-                        <Stack alignItems="center">
-                            <Typography align="center">{`${props.match.team2Name}`}</Typography>
-                            <input
-                                type="number"
-                                style={{ width: "50%", alignSelf: "center" }}
-                                min="0"
-                                value={props.match.score2}
-                            ></input>
-                            <Button>Submit</Button>
-                        </Stack>
+        <Modal open={!!match} onClose={handleClose}>
+            <Box sx={style}>
+                <Typography align="center" variant="h4">
+                    Update Score
+                </Typography>
+                <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                >
+                    <Stack spacing={1} alignItems="center">
+                        <Typography>{match.team1Name}</Typography>
+                        <input
+                            type="number"
+                            min="0"
+                            value={score1}
+                            onChange={(e) => setScore1(e.target.value)}
+                            style={{ width: "60px" }}
+                        />
                     </Stack>
-                </Box>
-            ) : (
-                <></>
-            )}
+                    <Typography variant="h6">vs</Typography>
+                    <Stack spacing={1} alignItems="center">
+                        <Typography>{match.team2Name}</Typography>
+                        <input
+                            type="number"
+                            min="0"
+                            value={score2}
+                            onChange={(e) => setScore2(e.target.value)}
+                            style={{ width: "60px" }}
+                        />
+                    </Stack>
+                </Stack>
+                <Stack
+                    direction="row"
+                    spacing={2}
+                    mt={3}
+                    justifyContent="center"
+                >
+                    <Button onClick={handleClose} variant="outlined">
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleSubmit}
+                        variant="contained"
+                        disabled={submitting}
+                    >
+                        {submitting ? <CircularProgress size={24} /> : "Submit"}
+                    </Button>
+                </Stack>
+            </Box>
         </Modal>
     );
 };
@@ -79,6 +129,7 @@ const ScorePopup = (props) => {
 ScorePopup.propTypes = {
     match: PropTypes.object,
     handleClose: PropTypes.func.isRequired,
+    onScoreUpdated: PropTypes.func.isRequired,
 };
 
 const TournamentInformation = () => {
