@@ -256,8 +256,35 @@ const university = Object.freeze({
     },
 });
 
+/**
+ * Sets the match result for a tournament.
+ * @param {object} match - An object containing match details.
+ * @param {string|number} match.matchId - The match ID.
+ * @param {string|number} match.score1 - The score for team 1.
+ * @param {string|number} match.score2 - The score for team 2.
+ * @returns {Promise<*>} The response data from the API.
+ */
+const setMatchResult = async (match) => {
+    const body = {
+        matchID: match.matchId,
+        score1: match.score1,
+        score2: match.score2,
+    };
+    const { data } = await api.put(`tournament/setMatchResult`, body);
+    return data;
+};
+
 const combine = (...calls) => {
     return () => Promise.all(calls);
 };
 
-export { admin, API_URL, combine, search, teams, university, users };
+export {
+    admin,
+    API_URL,
+    combine,
+    search,
+    setMatchResult,
+    teams,
+    university,
+    users,
+};
