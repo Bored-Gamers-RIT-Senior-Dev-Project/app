@@ -1,4 +1,5 @@
 const TournamentModel = require("../models/tournamentModel");
+const UserModel = require("../models/userModel");
 const TeamModel = require("../models/teamModel");
 
 // Default time to schedule matches
@@ -64,7 +65,7 @@ const createTournament = async (
     endDate,
     location
 ) => {
-    const user = await userModel.getUserByFirebaseId(uid);
+    const user = await UserModel.getUserByFirebaseId(uid);
     if (
         user.role !== "Super Admin" &&
         user.role !== "Aardvark Games Employee"
@@ -1129,13 +1130,13 @@ const updateMatchResult = async (uid, matchID, score1, score2) => {
     }
 
     // Fetch the match using matchID
-    const match = await searchMatches(matchID);
+    const [match] = await TournamentModel.searchMatches(matchID);
 
     // Ensure the match exists
     if (!match) throw new Error("Could not find match");
 
     // Get participant information for Team1 to identify round and bracket side
-    const participants = await searchTournamentParticipants(
+    const [participants] = await TournamentModel.searchTournamentParticipants(
         match.TournamentID,
         match.Team1ID
     );
@@ -1158,14 +1159,14 @@ const updateMatchResult = async (uid, matchID, score1, score2) => {
         );
 
         // Advance Team1 to the next round
-        await updateTournamentParticipant(
+        await TournamentModel.updateTournamentParticipant(
             match.TournamentID,
             match.Team1ID,
             currentRound + 1
         );
 
         // Mark Team2 as "lost" and disqualify from future rounds
-        await updateTournamentParticipant(
+        await TournamentModel.updateTournamentParticipant(
             match.TournamentID,
             match.Team2ID,
             null,
@@ -1205,7 +1206,7 @@ const updateMatchResult = async (uid, matchID, score1, score2) => {
     }
 
     // Check if there are any remaining active teams in the current round for this bracket side
-    const remainingActive = await searchTournamentParticipants(
+    const remainingActive = await TournamentModel.searchTournamentParticipants(
         match.TournamentID,
         null,
         null,
@@ -1223,7 +1224,7 @@ const updateMatchResult = async (uid, matchID, score1, score2) => {
     }
 
     // Return the updated match result
-    return await searchMatches(matchID);
+    return await TournamentModel.searchMatches(matchID);
 };
 
 module.exports = {
