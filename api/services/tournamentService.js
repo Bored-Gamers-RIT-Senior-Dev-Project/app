@@ -1142,7 +1142,7 @@ const updateMatchResult = async (uid, matchID, score1, score2) => {
     );
 
     // Ensure participant information is available
-    if (!participants || participants.length === 0)
+    if (!participants)
         throw new Error("Could not retrieve participant info for Team1.");
 
     const currentRound = participants[0].TeamRound;
