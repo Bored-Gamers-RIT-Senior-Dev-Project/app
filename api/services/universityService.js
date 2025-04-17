@@ -99,6 +99,7 @@ const userCanUpdateUniversity = (user, universityId) => {
         case userModel.Roles.ADMIN:
             return true;
         case userModel.Roles.UNIVERSITY_ADMIN:
+        case userModel.Roles.MARKETING:
             return user.universityId == universityId;
         default:
             return false;
