@@ -13,7 +13,8 @@ const UniversityPage = () => {
     const [editMode, setEditMode] = useState(false);
 
     const isUniversityAdmin =
-        user?.roleId == 8 && user?.universityId == university.universityId;
+        [8, 4].includes(user?.roleId) &&
+        user?.universityId == university.universityId;
 
     return (
         <Box
