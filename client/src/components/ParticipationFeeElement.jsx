@@ -15,7 +15,7 @@ const StripeCheckout = ({ open, setOpen }) => {
     const fetchClientSecret = useCallback(
         () =>
             api
-                .post("payment/create-session")
+                .post("stripe/create-session")
                 .then(({ data }) => data.clientSecret),
         []
     );
