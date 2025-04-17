@@ -1134,7 +1134,7 @@ const updateMatchResult = async (uid, matchID, score1, score2) => {
     const [match] = await TournamentModel.searchMatches(matchID);
 
     // Ensure the match exists
-    if (!match) throw new Error("Could not find match");
+    if (!match) throw createHttpError(404)
 
     // Get participant information for Team1 to identify round and bracket side
     const [participants] = await TournamentModel.searchTournamentParticipants(
