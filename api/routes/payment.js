@@ -3,6 +3,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY, {
     apiVersion: process.env.STRIPE_API_VERSION,
 });
 
+const cors = require("cors");
 const express = require("express");
 const router = express.Router();
 
@@ -10,6 +11,7 @@ const router = express.Router();
 //https://docs.stripe.com/checkout/custom/quickstart?lang=node&client=react
 router.post(
     "/create-session",
+    cors(),
     express.json({ type: "application/json" }),
     async (req, res) => {
         const uid = req.user?.uid;
@@ -48,6 +50,7 @@ router.post(
 //https://docs.stripe.com/webhooks
 router.post(
     "/webhook-process-events",
+    cors(),
     express.raw({ type: "application/json" }),
     async (req, res) => {
         //Lock-down webhook endpoint so only requests with a valid stripe-signature are allowed.
