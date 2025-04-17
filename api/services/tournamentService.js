@@ -1144,7 +1144,10 @@ const updateMatchResult = async (uid, matchID, score1, score2) => {
 
     // Ensure participant information is available
     if (!participants)
-        throw new Error("Could not retrieve participant info for Team1.");
+        throw createHttpError(
+            404,
+            `Team with an ID of ${match.Team1ID} not found in tournament of ID ${match.TournamentID}.`
+        );
 
     const currentRound = participants.TeamRound;
     const bracketSide = participants.TeamBracketSide;
