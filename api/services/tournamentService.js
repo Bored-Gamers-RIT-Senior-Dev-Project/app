@@ -1071,7 +1071,7 @@ const searchMatches = async (
 ) => {
     if (matchID) {
         matchID = validateInteger(matchID, "matchID");
-        const match = (await TournamentModel.searchMatches(matchID))[0];
+        const [match] = await TournamentModel.searchMatches(matchID);
         return match;
     } else {
         if (String(sortAsDescending).toLowerCase() === "true") {
