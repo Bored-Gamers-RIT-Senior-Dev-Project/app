@@ -25,7 +25,7 @@ const app = express();
 
 // Middleware
 app.use(logger("dev"));
-app.use("/api/stripe/webhook-process-events", stripeWebhook);
+app.use("/api/stripe", stripeWebhook);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -38,7 +38,7 @@ app.use("/api", index);
 app.use("/api/users", users);
 app.use("/api/university", university);
 app.use("/api/teams", teams);
-app.use("/api/stripe", payment);
+app.use("/api/payment", payment);
 // app.use("/api", test);
 app.use("/api/user-images", express.static(__dirname + "/user-images"));
 app.use("/api/tournament", tournament);
