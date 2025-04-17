@@ -67,7 +67,7 @@ app.use(
             console.error("An Unhandled Error Occurred.");
             console.error(`Path: ${req.url}`);
             console.error(`Body: ${JSON.stringify(req.body)}`);
-            console.error("Error: ${err.message}");
+            console.error(`Error: ${err.message}`);
             console.error("=====================");
 
             err.status = 500;
