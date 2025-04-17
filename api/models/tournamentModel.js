@@ -694,7 +694,7 @@ const searchMatches = async (
         } else if (rows.length > 1) {
             throw Error("Search error for match ID: " + matchID);
         }
-        return rows[0];
+        return rows;
     } else {
         let search = `
             SELECT *

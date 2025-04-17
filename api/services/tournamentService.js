@@ -1,4 +1,5 @@
 const TournamentModel = require("../models/tournamentModel");
+const UserModel = require("../models/userModel");
 const TeamModel = require("../models/teamModel");
 
 // Default time to schedule matches
@@ -64,10 +65,10 @@ const createTournament = async (
     endDate,
     location
 ) => {
-    const user = await userModel.getUserByFirebaseId(uid);
+    const user = await UserModel.getUserByFirebaseId(uid);
     if (
-        user.role !== "Super Admin" &&
-        user.role !== "Aardvark Games Employee"
+        user.roleName !== UserModel.Roles.ADMIN &&
+        user.roleName !== UserModel.Roles.EMPLOYEE
     ) {
         throw createHttpError(403);
     }
@@ -566,7 +567,7 @@ const searchTournamentParticipants = async (
     nextMatchID,
     universityID,
     universityName,
-    isApproved = true,
+    isApproved,
     sortBy,
     sortAsDescending = false
 ) => {
@@ -1070,7 +1071,7 @@ const searchMatches = async (
 ) => {
     if (matchID) {
         matchID = validateInteger(matchID, "matchID");
-        const match = await TournamentModel.searchMatches(matchID);
+        const [match] = await TournamentModel.searchMatches(matchID);
         return match;
     } else {
         if (String(sortAsDescending).toLowerCase() === "true") {
@@ -1102,17 +1103,18 @@ const searchMatches = async (
  */
 const updateMatchResult = async (uid, matchID, score1, score2) => {
     // Get tournament ID to validate facilitator of tournament
-    const tournamentID = searchMatches(matchID)[0].TournamentID;
+    const tournamentID = (await TournamentModel.searchMatches(matchID))[0]
+        .TournamentID;
     if (!tournamentID) {
         throw new Error("Error finding tournament for this match.");
     }
-    const user = await userModel.getUserByFirebaseId(uid);
+    const user = await UserModel.getUserByFirebaseId(uid);
     if (
-        user.role !== "Super Admin" &&
-        user.role !== "Aardvark Games Employee" &&
-        (user.role !== "University Admin" ||
+        user.roleName !== UserModel.Roles.ADMIN &&
+        user.roleName !== UserModel.Roles.EMPLOYEE &&
+        (user.roleName !== UserModel.Roles.UNIVERSITY_ADMIN ||
             !checkFacilitatorTournament(tournamentID, user.userID)) &&
-        (user.role !== "Tournament Facilitator" ||
+        (user.roleName !== UserModel.Roles.FACILITATOR ||
             !checkFacilitatorTournament(tournamentID, user.userID))
     ) {
         throw createHttpError(403);
@@ -1129,23 +1131,27 @@ const updateMatchResult = async (uid, matchID, score1, score2) => {
     }
 
     // Fetch the match using matchID
-    const match = await searchMatches(matchID);
+    const [match] = await TournamentModel.searchMatches(matchID);
 
     // Ensure the match exists
-    if (!match) throw new Error("Could not find match");
+    if (!match)
+        throw createHttpError(404, `Match with an ID of ${matchID} not found.`);
 
     // Get participant information for Team1 to identify round and bracket side
-    const participants = await searchTournamentParticipants(
+    const [participants] = await TournamentModel.searchTournamentParticipants(
         match.TournamentID,
         match.Team1ID
     );
 
     // Ensure participant information is available
-    if (!participants || participants.length === 0)
-        throw new Error("Could not retrieve participant info for Team1.");
+    if (!participants)
+        throw createHttpError(
+            404,
+            `Team with an ID of ${match.Team1ID} not found in tournament of ID ${match.TournamentID}.`
+        );
 
-    const currentRound = participants[0].TeamRound;
-    const bracketSide = participants[0].TeamBracketSide;
+    const currentRound = participants.TeamRound;
+    const bracketSide = participants.TeamBracketSide;
 
     // Handle the case where Team1 is the winner
     if (score1 > score2) {
@@ -1158,14 +1164,14 @@ const updateMatchResult = async (uid, matchID, score1, score2) => {
         );
 
         // Advance Team1 to the next round
-        await updateTournamentParticipant(
+        await TournamentModel.updateTournamentParticipant(
             match.TournamentID,
             match.Team1ID,
             currentRound + 1
         );
 
         // Mark Team2 as "lost" and disqualify from future rounds
-        await updateTournamentParticipant(
+        await TournamentModel.updateTournamentParticipant(
             match.TournamentID,
             match.Team2ID,
             null,
@@ -1205,7 +1211,7 @@ const updateMatchResult = async (uid, matchID, score1, score2) => {
     }
 
     // Check if there are any remaining active teams in the current round for this bracket side
-    const remainingActive = await searchTournamentParticipants(
+    const remainingActive = await TournamentModel.searchTournamentParticipants(
         match.TournamentID,
         null,
         null,
@@ -1223,7 +1229,7 @@ const updateMatchResult = async (uid, matchID, score1, score2) => {
     }
 
     // Return the updated match result
-    return await searchMatches(matchID);
+    return await TournamentModel.searchMatches(matchID);
 };
 
 module.exports = {
