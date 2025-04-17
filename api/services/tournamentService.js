@@ -68,7 +68,7 @@ const createTournament = async (
     const user = await UserModel.getUserByFirebaseId(uid);
     if (
         user.role !== UserModel.Roles.ADMIN &&
-        user.role !== "Aardvark Games Employee"
+        user.role !== UserModel.Roles.EMPLOYEE
     ) {
         throw createHttpError(403);
     }
