@@ -21,7 +21,7 @@ router.post(
             ui_mode: "embedded",
             line_items: [
                 {
-                    price: "price_1RAg6bC7w5sX5X3bc0EeN1Ed",
+                    price: process.env.STRIPE_PRICE_ID,
                     quantity: 1,
                 },
             ],
