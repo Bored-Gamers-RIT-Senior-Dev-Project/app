@@ -20,7 +20,6 @@ const StripeCheckout = ({ open, setOpen }) => {
         []
     );
 
-    // const navigate = useNavigate();
     return (
         <Dialog open={open} onClose={() => setOpen(false)}>
             <EmbeddedCheckoutProvider
