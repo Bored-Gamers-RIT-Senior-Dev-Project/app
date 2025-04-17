@@ -193,7 +193,7 @@ const adminUpdateUser = async (uid, userId, body) => {
     }
 
     if (Object.keys(body).length == 0) {
-        return user;
+        return targetUser;
     }
 
     const user = await User.updateUser(userId, body);
