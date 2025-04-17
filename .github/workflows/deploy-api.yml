@@ -32,6 +32,7 @@ jobs:
                   DB_USER=${{ secrets.DB_USER }}
                   DB_PASSWORD=${{ secrets.DB_PASSWORD }}
                   API_URL=${{ secrets.API_URL }}
+                  CLIENT_URL=${{ secrets.CLIENT_URL }}
                   FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}
                   FIREBASE_PRIVATE_KEY_ID=${{ secrets.FIREBASE_PRIVATE_KEY_ID }}
                   FIREBASE_PRIVATE_KEY=${{ secrets.FIREBASE_PRIVATE_KEY }}
@@ -42,6 +43,10 @@ jobs:
                   FIREBASE_AUTH_PROVIDER_CERT_URL=${{ secrets.FIREBASE_AUTH_PROVIDER_CERT_URL }}
                   FIREBASE_CLIENT_CERT_URL=${{ secrets.FIREBASE_CLIENT_CERT_URL }}
                   FIREBASE_UNIVERSE_DOMAIN=${{ secrets.FIREBASE_UNIVERSE_DOMAIN }}
+                  STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+                  STRIPE_ENDPOINT_SECRET=${{ secrets.STRIPE_ENDPOINT_SECRET }}
+                  STRIPE_PRICE_ID=${{ secrets.STRIPE_PRICE_ID }}
+                  STRIPE_API_VERSION=${{ secrets.STRIPE_API_VERSION }}
                   EOF
 
             - name: Build Docker Image
