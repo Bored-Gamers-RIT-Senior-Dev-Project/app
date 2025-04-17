@@ -67,8 +67,8 @@ const createTournament = async (
 ) => {
     const user = await UserModel.getUserByFirebaseId(uid);
     if (
-        user.role !== UserModel.Roles.ADMIN &&
-        user.role !== UserModel.Roles.EMPLOYEE
+        user.roleName !== UserModel.Roles.ADMIN &&
+        user.roleName !== UserModel.Roles.EMPLOYEE
     ) {
         throw createHttpError(403);
     }
@@ -1110,11 +1110,11 @@ const updateMatchResult = async (uid, matchID, score1, score2) => {
     }
     const user = await UserModel.getUserByFirebaseId(uid);
     if (
-        user.role !== UserModel.Roles.ADMIN &&
-        user.role !== UserModel.Roles.EMPLOYEE &&
-        (user.role !== UserModel.Roles.UNIVERSITY_ADMIN ||
+        user.roleName !== UserModel.Roles.ADMIN &&
+        user.roleName !== UserModel.Roles.EMPLOYEE &&
+        (user.roleName !== UserModel.Roles.UNIVERSITY_ADMIN ||
             !checkFacilitatorTournament(tournamentID, user.userID)) &&
-        (user.role !== UserModel.Roles.FACILITATOR ||
+        (user.roleName !== UserModel.Roles.FACILITATOR ||
             !checkFacilitatorTournament(tournamentID, user.userID))
     ) {
         throw createHttpError(403);
