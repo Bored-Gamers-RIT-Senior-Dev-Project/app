@@ -166,6 +166,14 @@ const updateUser = async (uid, body, profileImage) => {
 };
 
 /**
+ * Confirms that a user paid their fee
+ * @param {number} userId
+ */
+const setUserPaid = async (userId) => {
+    await User.updateUser(userId, { paid: true });
+};
+
+/**
  * Updates a user's information in the database.
  * @param {string} uid The user's Firebase UID provided through authentication.s
  * @param {*} body The information to update.
@@ -224,6 +232,7 @@ module.exports = {
     //U
     updateUser,
     adminUpdateUser,
+    setUserPaid,
     //D
     deleteUser,
 };
