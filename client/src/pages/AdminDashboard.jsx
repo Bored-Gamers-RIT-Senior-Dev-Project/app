@@ -1,3 +1,4 @@
+// Code written with aid of AI
 import { Delete, Edit, Search as SearchIcon } from "@mui/icons-material";
 import {
     Box,
@@ -10,6 +11,10 @@ import {
     TextField,
     Tooltip,
     Typography,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
 } from "@mui/material";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
@@ -41,8 +46,16 @@ ActionsCellRenderer.propTypes = {
 const AdminDashboard = () => {
     const [search, setSearch] = useState("");
     const [anchorEl, setAnchorEl] = useState(null);
-    const navigate = useNavigate();
+    const [openDialog, setOpenDialog] = useState(false);
+    const [newTournament, setNewTournament] = useState({
+        tournamentName: "",
+        location: "",
+        startDate: "",
+        endDate: "",
+        status: "",
+    });
 
+    const navigate = useNavigate();
     const rowData = useLoaderData();
 
     const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
@@ -109,6 +122,18 @@ const AdminDashboard = () => {
         },
     ];
 
+    // Handling form input change for new tournament
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setNewTournament((prev) => ({ ...prev, [name]: value }));
+    };
+
+    // Handle form submission for new tournament
+    const handleAddTournament = () => {
+        console.log("New Tournament:", newTournament);
+        setOpenDialog(false); // Close the dialog after submission
+    };
+
     return (
         <Paper
             sx={{
@@ -165,6 +190,9 @@ const AdminDashboard = () => {
                     <MenuItem onClick={() => navigate("./addUniversity")}>
                         New University
                     </MenuItem>
+                    <MenuItem onClick={() => setOpenDialog(true)}>
+                        New Tournament
+                    </MenuItem>
                 </Menu>
             </Box>
             <Typography variant="h5" sx={{ textAlign: "left", width: "100%" }}>
@@ -172,6 +200,76 @@ const AdminDashboard = () => {
             </Typography>
             <Grid rowData={rowData} columnDefs={columnDefs} pagination />
             <Outlet />
+
+
+            {/* Tournament Dialog */}
+            <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+                <DialogTitle>Create New Tournament</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        label="Tournament Name"
+                        name="tournamentName"
+                        value={newTournament.tournamentName}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                    />
+                    <TextField
+                        label="Location"
+                        name="location"
+                        value={newTournament.location}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                    />
+                    <TextField
+                        label="Start Date"
+                        name="startDate"
+                        type="date"
+                        value={newTournament.startDate}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                    />
+                    <TextField
+                        label="End Date"
+                        name="endDate"
+                        type="date"
+                        value={newTournament.endDate}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                    />
+                    <TextField
+                        label="Status"
+                        name="status"
+                        value={newTournament.status}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        select
+                    >
+                        <MenuItem value="active">Active</MenuItem>
+                        <MenuItem value="ongoing">Ongoing</MenuItem>
+                        <MenuItem value="cancelled">Cancelled</MenuItem>
+                        <MenuItem value="upcoming">Upcoming</MenuItem>
+                    </TextField>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenDialog(false)} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleAddTournament} color="primary">
+                        Add Tournament
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Paper>
     );
 };

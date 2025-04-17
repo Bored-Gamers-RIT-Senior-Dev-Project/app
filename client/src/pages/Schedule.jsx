@@ -1,3 +1,4 @@
+// code written with aid of AI
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
     Accordion,
@@ -6,7 +7,11 @@ import {
     Box,
     Button,
     CircularProgress,
-    Grid,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Grid2 as Grid,
     MenuItem,
     Paper,
     Select,
@@ -31,17 +36,16 @@ const Schedule = () => {
         endDate: null,
     });
     const [loading, setLoading] = useState(true);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [selectedTournament, setSelectedTournament] = useState(null);
+
     const navigate = useNavigate();
     const tournamentStatuses = ["Active", "Completed", "Cancelled", "Upcoming"];
 
     const formatDateRange = (start, end) => {
         const options = { dateStyle: "medium" };
-        const startDate = start
-            ? new Date(start).toLocaleDateString(undefined, options)
-            : "N/A";
-        const endDate = end
-            ? new Date(end).toLocaleDateString(undefined, options)
-            : "N/A";
+        const startDate = start ? new Date(start).toLocaleDateString(undefined, options) : "N/A";
+        const endDate = end ? new Date(end).toLocaleDateString(undefined, options) : "N/A";
         return `${startDate} - ${endDate}`;
     };
 
@@ -85,17 +89,13 @@ const Schedule = () => {
 
     const filteredTournaments = tournaments
         .filter((tournament) =>
-            tournament.tournamentName
-                .toLowerCase()
-                .includes(filters.name.toLowerCase())
+            tournament.tournamentName.toLowerCase().includes(filters.name.toLowerCase())
         )
         .filter(
             (tournament) =>
                 filters.location === "" ||
                 (tournament.location &&
-                    tournament.location
-                        .toLowerCase()
-                        .includes(filters.location.toLowerCase()))
+                    tournament.location.toLowerCase().includes(filters.location.toLowerCase()))
         )
         .filter(
             (tournament) =>
@@ -119,30 +119,37 @@ const Schedule = () => {
             return 0;
         });
 
+    const openManageDialog = (tournament) => {
+        setSelectedTournament({
+            ...tournament,
+            startDate: new Date(tournament.startDate),
+            endDate: new Date(tournament.endDate),
+        });
+        setDialogOpen(true);
+    };
+
+    const handleDialogChange = (field, value) => {
+        setSelectedTournament((prev) => ({
+            ...prev,
+            [field]: value,
+        }));
+    };
+
+    const handleSaveChanges = () => {
+        console.log("Saving tournament:", selectedTournament);
+        setDialogOpen(false);
+    };
+
     return (
         <Box sx={{ maxWidth: "900px", margin: "auto", padding: 2 }}>
-            <Typography
-                variant="h4"
-                sx={{
-                    fontWeight: "bold",
-                    textAlign: "center",
-                    marginBottom: 3,
-                }}
-            >
+            <Typography variant="h4" sx={{ fontWeight: "bold", textAlign: "center", marginBottom: 3 }}>
                 All Tournaments
             </Typography>
 
-            <Box
-                sx={{
-                    position: "sticky",
-                    top: 0,
-                    zIndex: 10,
-                    backgroundColor: "#fff",
-                    mb: 3,
-                }}
-            >
+            <Box sx={{ position: "sticky", top: 0, zIndex: 10, backgroundColor: "#fff", mb: 3 }}>
                 <Paper sx={{ padding: 3, borderRadius: "10px" }}>
                     <Grid container spacing={2}>
+                        {/* Filter Fields */}
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
@@ -201,9 +208,7 @@ const Schedule = () => {
                                             startDate: newValue,
                                         }))
                                     }
-                                    renderInput={(params) => (
-                                        <TextField {...params} fullWidth />
-                                    )}
+                                    renderInput={(params) => <TextField {...params} fullWidth />}
                                 />
                             </LocalizationProvider>
                         </Grid>
@@ -218,18 +223,12 @@ const Schedule = () => {
                                             endDate: newValue,
                                         }))
                                     }
-                                    renderInput={(params) => (
-                                        <TextField {...params} fullWidth />
-                                    )}
+                                    renderInput={(params) => <TextField {...params} fullWidth />}
                                 />
                             </LocalizationProvider>
                         </Grid>
                         <Grid item xs={12}>
-                            <Button
-                                fullWidth
-                                variant="outlined"
-                                onClick={clearFilters}
-                            >
+                            <Button fullWidth variant="outlined" onClick={clearFilters}>
                                 Clear Filters
                             </Button>
                         </Grid>
@@ -254,34 +253,172 @@ const Schedule = () => {
                                         textDecoration: "underline",
                                         cursor: "pointer",
                                     }}
-                                    onClick={() =>
-                                        navigate(
-                                            `/tournaments/${tournament.tournamentId}/matches`
-                                        )
-                                    }
+                                    onClick={() => navigate(`/tournaments/${tournament.tournamentId}/matches`)}
                                 >
                                     {tournament.tournamentName}
                                 </Typography>
-                                <Typography>
-                                    {formatDateRange(
-                                        tournament.startDate,
-                                        tournament.endDate
-                                    )}
-                                </Typography>
+                                <Typography>{formatDateRange(tournament.startDate, tournament.endDate)}</Typography>
                                 <Typography>{tournament.location}</Typography>
-                                <Typography variant="body2">
-                                    Status: {tournament.status}
-                                </Typography>
+                                <Typography variant="body2">Status: {tournament.status}</Typography>
                             </Box>
                         </AccordionSummary>
                         <AccordionDetails>
-                            <Typography variant="body2" color="textSecondary">
-                                Tournament details go here.
-                            </Typography>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                    <Button
+                                        variant="contained"
+                                        fullWidth
+                                        onClick={() => openManageDialog(tournament)}
+                                    >
+                                        Manage Tournament
+                                    </Button>
+                                </Grid>
+
+                                <Grid item xs={12} sm={4}>
+                                    <Button
+                                        variant="contained"
+                                        color="success"
+                                        fullWidth
+                                        onClick={() =>
+                                            console.log("Start tournament:", tournament.tournamentId)
+                                        }
+                                    >
+                                        Start Tournament
+                                    </Button>
+                                </Grid>
+                                <Grid item xs={12} sm={4}>
+                                    <Button
+                                        variant="contained"
+                                        color="warning"
+                                        fullWidth
+                                        onClick={() =>
+                                            console.log("Cancel tournament:", tournament.tournamentId)
+                                        }
+                                    >
+                                        Cancel Tournament
+                                    </Button>
+                                </Grid>
+                                <Grid item xs={12} sm={4}>
+                                    <Button
+                                        variant="contained"
+                                        color="error"
+                                        fullWidth
+                                        onClick={() =>
+                                            console.log("Delete tournament:", tournament.tournamentId)
+                                        }
+                                    >
+                                        Delete Tournament
+                                    </Button>
+                                </Grid>
+
+                                <Grid item xs={12} sm={6}>
+                                    <Select
+                                        fullWidth
+                                        displayEmpty
+                                        defaultValue=""
+                                        onChange={(e) =>
+                                            console.log(
+                                                `Team action "${e.target.value}" for tournament ${tournament.tournamentId}`
+                                            )
+                                        }
+                                    >
+                                        <MenuItem value="">Team Options</MenuItem>
+                                        <MenuItem value="addTeam">Add Team</MenuItem>
+                                        <MenuItem value="removeTeam">Remove Team</MenuItem>
+                                        <MenuItem value="disqualifyTeam">Disqualify Team</MenuItem>
+                                    </Select>
+                                </Grid>
+
+                                <Grid item xs={12} sm={6}>
+                                    <Select
+                                        fullWidth
+                                        displayEmpty
+                                        defaultValue=""
+                                        onChange={(e) =>
+                                            console.log(
+                                                `Facilitator action "${e.target.value}" for tournament ${tournament.tournamentId}`
+                                            )
+                                        }
+                                    >
+                                        <MenuItem value="">Facilitator Options</MenuItem>
+                                        <MenuItem value="listFacilitators">List Facilitators</MenuItem>
+                                        <MenuItem value="addFacilitator">Add Facilitator</MenuItem>
+                                        <MenuItem value="removeFacilitator">Remove Facilitator</MenuItem>
+                                    </Select>
+                                </Grid>
+                            </Grid>
                         </AccordionDetails>
                     </Accordion>
                 ))
             )}
+
+            {/* Tournament Edit Dialog */}
+            <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="sm">
+                <DialogTitle>Edit Tournament</DialogTitle>
+                <DialogContent dividers>
+                    {selectedTournament && (
+                        <Grid container spacing={2} mt={1}>
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    label="Tournament Name"
+                                    value={selectedTournament.tournamentName}
+                                    onChange={(e) =>
+                                        handleDialogChange("tournamentName", e.target.value)
+                                    }
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    label="Location"
+                                    value={selectedTournament.location}
+                                    onChange={(e) => handleDialogChange("location", e.target.value)}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                    <DatePicker
+                                        label="Start Date"
+                                        value={selectedTournament.startDate}
+                                        onChange={(newValue) => handleDialogChange("startDate", newValue)}
+                                        renderInput={(params) => <TextField {...params} fullWidth />}
+                                    />
+                                </LocalizationProvider>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                    <DatePicker
+                                        label="End Date"
+                                        value={selectedTournament.endDate}
+                                        onChange={(newValue) => handleDialogChange("endDate", newValue)}
+                                        renderInput={(params) => <TextField {...params} fullWidth />}
+                                    />
+                                </LocalizationProvider>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Select
+                                    fullWidth
+                                    value={selectedTournament.status}
+                                    onChange={(e) => handleDialogChange("status", e.target.value)}
+                                >
+                                    {tournamentStatuses.map((status) => (
+                                        <MenuItem key={status} value={status}>
+                                            {status}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </Grid>
+                        </Grid>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+                    <Button variant="contained" onClick={handleSaveChanges}>
+                        Save
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 };
