@@ -14,7 +14,7 @@ const users = require("./routes/users");
 const university = require("./routes/university");
 const teams = require("./routes/teams");
 const tournament = require("./routes/tournament");
-const payment = require("./routes/payment");
+const [payment, stripeWebhook] = require("./routes/payment");
 const createError = require("http-errors");
 
 const uploadService = require("./services/imageUploadService");
@@ -25,21 +25,20 @@ const app = express();
 
 // Middleware
 app.use(logger("dev"));
-app.use(cors()); // Enable CORS
-app.use(authenticationMiddleware);
-
-app.use("/api/stripe", payment); //SPECIAL CASE: Run stripe before express.json middleware so our webhook can use raw javascript instead.
+app.use("/api/stripe/webhook-process-events", stripeWebhook);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(cors()); // Enable CORS
+app.use(authenticationMiddleware);
 
 // Routes
 app.use("/api", index);
 app.use("/api/users", users);
 app.use("/api/university", university);
 app.use("/api/teams", teams);
-
+app.use("/api/stripe", payment);
 // app.use("/api", test);
 app.use("/api/user-images", express.static(__dirname + "/user-images"));
 app.use("/api/tournament", tournament);
