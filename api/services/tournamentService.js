@@ -1110,11 +1110,11 @@ const updateMatchResult = async (uid, matchID, score1, score2) => {
     }
     const user = await UserModel.getUserByFirebaseId(uid);
     if (
-        user.roleName !== "Super Admin" &&
-        user.roleName !== "Aardvark Games Employee" &&
-        (user.roleName !== "University Admin" ||
+        user.role !== UserModel.Roles.ADMIN &&
+        user.role !== UserModel.Roles.EMPLOYEE &&
+        (user.role !== UserModel.Roles.UNIVERSITY_ADMIN ||
             !checkFacilitatorTournament(tournamentID, user.userID)) &&
-        (user.roleName !== "Tournament Facilitator" ||
+        (user.role !== UserModel.Roles.FACILITATOR ||
             !checkFacilitatorTournament(tournamentID, user.userID))
     ) {
         throw createHttpError(403);
@@ -1134,7 +1134,7 @@ const updateMatchResult = async (uid, matchID, score1, score2) => {
     const [match] = await TournamentModel.searchMatches(matchID);
 
     // Ensure the match exists
-    if (!match) throw createHttpError(404)
+    if (!match) throw createHttpError(404);
 
     // Get participant information for Team1 to identify round and bracket side
     const [participants] = await TournamentModel.searchTournamentParticipants(
