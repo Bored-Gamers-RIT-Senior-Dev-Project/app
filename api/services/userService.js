@@ -186,9 +186,14 @@ const adminUpdateUser = async (uid, userId, body) => {
     const targetUser = await User.getFullUserByUserId(userId);
     if (body.password) {
         await Firebase.updatePassword(targetUser.firebaseUid, body.password);
+        delete body.password;
     }
     if (targetUser.username == body.username) {
         delete body.username;
+    }
+
+    if (Object.keys(body).length == 0) {
+        return targetUser;
     }
 
     const user = await User.updateUser(userId, body);

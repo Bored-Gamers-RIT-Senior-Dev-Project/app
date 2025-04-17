@@ -14,7 +14,7 @@ const users = require("./routes/users");
 const university = require("./routes/university");
 const teams = require("./routes/teams");
 const tournament = require("./routes/tournament");
-const payment = require("./routes/payment");
+const [payment, stripeWebhook] = require("./routes/payment");
 const createError = require("http-errors");
 
 const uploadService = require("./services/imageUploadService");
@@ -25,21 +25,20 @@ const app = express();
 
 // Middleware
 app.use(logger("dev"));
-app.use(cors()); // Enable CORS
-app.use(authenticationMiddleware);
-
-app.use("/api/stripe", payment); //SPECIAL CASE: Run stripe before express.json middleware so our webhook can use raw javascript instead.
+app.use("/api/stripe/webhook-process-events", stripeWebhook);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(cors()); // Enable CORS
+app.use(authenticationMiddleware);
 
 // Routes
 app.use("/api", index);
 app.use("/api/users", users);
 app.use("/api/university", university);
 app.use("/api/teams", teams);
-
+app.use("/api/stripe", payment);
 // app.use("/api", test);
 app.use("/api/user-images", express.static(__dirname + "/user-images"));
 app.use("/api/tournament", tournament);
@@ -50,20 +49,41 @@ app.use((_req, _res, next) => {
 });
 
 // Error Handler
-app.use((err, req, res, _next) => {
-    //Only provide error in development
-    const error = req.app.get("env") === "development" ? err : {};
+app.use(
+    /**
+     *
+     * @param {Error | import("http-errors").HttpError} err
+     * @param {import("express").Request} req
+     * @param {import("express").Response} res
+     * @param {import("express").NextFunction} _next
+     */
+    (err, req, res, _next) => {
+        //Only provide error in development
+        const error = req.app.get("env") === "development" ? err : {};
 
-    // set locals, only providing error in development
+        if (err.status == null || err.status >= 500) {
+            //If the error is null or a 500, log it so we can diagnose.
+            console.error("=====================");
+            console.error("An Unhandled Error Occurred.");
+            console.error(`Path: ${req.url}`);
+            console.error(`Body: ${JSON.stringify(req.body)}`);
+            console.error(`Error: ${err.message}`);
+            console.error("=====================");
 
-    res.locals.message = err.message;
-    res.locals.error = error;
+            err.status = 500;
+        }
 
-    // Send an error message
-    res.status(err.status || 500).json({
-        message: err.message, // https://stackoverflow.com/a/32836884
-        error,
-    });
-});
+        // set locals, only providing error in development
+
+        res.locals.message = err.message;
+        res.locals.error = error;
+
+        // Send an error message
+        res.status(err.status).json({
+            message: err.message, // https://stackoverflow.com/a/32836884
+            error,
+        });
+    }
+);
 
 module.exports = app;

@@ -53,6 +53,17 @@ const buildNavLinks = (user) => {
             });
             break;
         case 4: //"Marketing Staff" Role
+            links.push({
+                label: universityName ?? "University Representative",
+                links: [
+                    {
+                        key: "uniPage",
+                        text: "University Page",
+                        path: `/university/${universityId ?? 1}`,
+                    },
+                ],
+            });
+            break;
         case 8: //College Admin role
             links.push({
                 label: universityName ?? "University Representative",
