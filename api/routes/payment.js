@@ -45,7 +45,7 @@ const webhookRouter = express.Router();
 //Adapted from stripe webhooks guide
 //https://docs.stripe.com/webhooks
 webhookRouter.post(
-    "/webhook-process-events",
+    "/",
     cors(),
     express.raw({ type: "application/json" }),
     async (req, res) => {
