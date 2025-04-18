@@ -53,33 +53,38 @@ webhookRouter.post(
     cors(),
     express.raw({ type: "application/json" }),
     async (req, res) => {
-        //Lock-down webhook endpoint so only requests with a valid stripe-signature are allowed.
-        const sig = req.headers["stripe-signature"];
-        let event;
         try {
-            event = stripe.webhooks.constructEvent(
-                req.body,
-                sig,
-                process.env.STRIPE_ENDPOINT_SECRET
-            );
-        } catch (err) {
-            console.error("Webhook error: ", err.message);
-            return res.status(400).send(`Webhook Error: ${err.message}`);
-        }
+            //Lock-down webhook endpoint so only requests with a valid stripe-signature are allowed.
+            const sig = req.headers["stripe-signature"];
+            let event;
+            try {
+                event = stripe.webhooks.constructEvent(
+                    req.body,
+                    sig,
+                    process.env.STRIPE_ENDPOINT_SECRET
+                );
+            } catch (err) {
+                console.error("Webhook error: ", err.message);
+                return res.status(400).send(`Webhook Error: ${err.message}`);
+            }
 
-        // Handle the event
-        switch (event.type) {
-            case "checkout.session.completed":
-                const session = event.data.object;
-                if (session.status == "complete") {
-                    await userService.setUserPaid(session.metadata.user_id);
-                    break;
-                }
-            default:
-                console.warn(`Unhandled event type ${event.type}`);
+            // Handle the event
+            switch (event.type) {
+                case "checkout.session.completed":
+                    const session = event.data.object;
+                    if (session.status == "complete") {
+                        await userService.setUserPaid(session.metadata.user_id);
+                        break;
+                    }
+                default:
+                    console.warn(`Unhandled event type ${event.type}`);
+            }
+            // Return a response to acknowledge receipt of the event
+            res.json({ received: true });
+        } catch (error) {
+            console.error("Webhook error: ", error.message);
+            return res.status(400).send(`Webhook Error: ${error.message}`);
         }
-        // Return a response to acknowledge receipt of the event
-        res.json({ received: true });
     }
 );
 
