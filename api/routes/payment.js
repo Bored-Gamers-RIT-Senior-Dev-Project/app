@@ -9,36 +9,40 @@ const router = express.Router();
 
 //Adapted from Stripe Quickstart Documentation for Node.js/React Implementation:
 //https://docs.stripe.com/checkout/custom/quickstart?lang=node&client=react
-router.post("/create-session", async (req, res) => {
-    const uid = req.user?.uid;
-    if (!uid) return res.status(401).send();
+router.post("/create-session", async (req, res, next) => {
+    try {
+        const uid = req.user?.uid;
+        if (!uid) return res.status(401).send();
 
-    const user = await userService.getUserByFirebaseId(uid);
+        const user = await userService.getUserByFirebaseId(uid);
 
-    const session = await stripe.checkout.sessions.create({
-        ui_mode: "embedded",
-        line_items: [
-            {
-                price: process.env.STRIPE_PRICE_ID,
-                quantity: 1,
+        const session = await stripe.checkout.sessions.create({
+            ui_mode: "embedded",
+            line_items: [
+                {
+                    price: process.env.STRIPE_PRICE_ID,
+                    quantity: 1,
+                },
+            ],
+            mode: "payment",
+            metadata: {
+                user_id: user.userId,
             },
-        ],
-        mode: "payment",
-        metadata: {
-            user_id: user.userId,
-        },
-        customer_email: user.email,
-        return_url: `${
-            process.env.CLIENT_URL ??
-            process.env.API_URL ??
-            "http://localhost:5173"
-        }/settings`,
-    });
+            customer_email: user.email,
+            return_url: `${
+                process.env.CLIENT_URL ??
+                process.env.API_URL ??
+                "http://localhost:5173"
+            }/settings`,
+        });
 
-    return res.send({
-        clientSecret: session.client_secret,
-        sessionId: session.id,
-    });
+        return res.send({
+            clientSecret: session.client_secret,
+            sessionId: session.id,
+        });
+    } catch (error) {
+        next(error);
+    }
 });
 
 const webhookRouter = express.Router();
